@@ -12,6 +12,9 @@ type
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
   TAdminTools_DbSetupFunc = function(token: WideString; var reply: WideString): integer; stdcall;
+  TAdminTools_DbSetupCompletedFunc = function(var reply: WideString): integer; stdcall;
+  TAdminTools_DbSettingsReloadRemoteFunc = function(var reply: WideString): integer; stdcall;
+  TAdminTools_MigrateDbFunc = function(var reply: WideString): integer; stdcall;
 
   TLastErrorFunc = function: WideString; stdcall;
 
@@ -27,6 +30,9 @@ type
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
     AdminTools_DbSetupFunc: TAdminTools_DbSetupFunc;
+    AdminTools_DbSetupCompletedFunc: TAdminTools_DbSetupCompletedFunc;
+    AdminTools_DbSettingsReloadRemoteFunc: TAdminTools_DbSettingsReloadRemoteFunc;
+    AdminTools_MigrateDbFunc: TAdminTools_MigrateDbFunc;
     LastErrorFunc: TLastErrorFunc;
 
 
@@ -43,6 +49,9 @@ type
 
     procedure AdminTools_Create(serverConnectionString: string);
     function AdminTools_DbSetup(token: string): string;
+    function AdminTools_DbSetupCompleted: string;
+    function AdminTools_MigrateDb: string;
+    function AdminTools_DbSettingsReloadRemote: string;
 
   end;
 
@@ -106,6 +115,18 @@ begin
    @AdminTools_DbSetupFunc := GetProcAddress(handle, 'AdminTools_DbSetup') ;
    if not Assigned (AdminTools_DbSetupFunc) then
      raise Exception.Create('function AdminTools_DbSetup not found');
+
+   @AdminTools_DbSetupCompletedFunc := GetProcAddress(handle, 'AdminTools_DbSetupCompleted') ;
+   if not Assigned (AdminTools_DbSetupCompletedFunc) then
+     raise Exception.Create('function AdminTools_DbSetupCompleted not found');
+
+   @AdminTools_MigrateDbFunc := GetProcAddress(handle, 'AdminTools_MigrateDb') ;
+   if not Assigned (AdminTools_MigrateDbFunc) then
+     raise Exception.Create('function AdminTools_MigrateDb not found');
+
+   @AdminTools_DbSettingsReloadRemoteFunc := GetProcAddress(handle, 'AdminTools_DbSettingsReloadRemote') ;
+   if not Assigned (AdminTools_DbSettingsReloadRemoteFunc) then
+     raise Exception.Create('function AdminTools_DbSettingsReloadRemote not found');
 
    @LastErrorFunc := GetProcAddress(handle, 'GetLastError') ;
    if not Assigned (LastErrorFunc) then
@@ -179,6 +200,53 @@ begin
   end;
   Result := reply;
 end;
+
+
+function TDllHelper.AdminTools_DbSetupCompleted: string;
+var
+  res: integer;
+  reply: WideString;
+  err: WideString;
+begin
+  res := AdminTools_DbSetupCompletedFunc(reply);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  Result := reply;
+end;
+
+function TDllHelper.AdminTools_MigrateDb: string;
+var
+  res: integer;
+  reply: WideString;
+  err: WideString;
+begin
+  res := AdminTools_MigrateDbFunc(reply);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  Result := reply;
+end;
+
+function TDllHelper.AdminTools_DbSettingsReloadRemote: string;
+var
+  res: integer;
+  reply: WideString;
+  err: WideString;
+begin
+  res := AdminTools_DbSettingsReloadRemoteFunc(reply);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  Result := reply;
+end;
+
 
 
 end.

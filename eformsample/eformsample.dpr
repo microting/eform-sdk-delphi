@@ -9,7 +9,17 @@ uses
   AdminTools in 'AdminTools.pas',
   DllHelper in 'DllHelper.pas',
   Core in 'Core.pas',
-  Events in 'Events.pas';
+  Events in 'Events.pas',
+  Check in 'Model\Reply\Check.pas',
+  DataItemReply in 'Model\Reply\DataItemReply.pas',
+  ElementList in 'Model\Reply\ElementList.pas',
+  GeolocationData in 'Model\Reply\GeolocationData.pas',
+  Response in 'Model\Reply\Response.pas',
+  DataItem in 'Model\DataItem.pas',
+  DataItemGroup in 'Model\DataItemGroup.pas',
+  Element in 'Model\Element.pas',
+  Entities in 'Model\Entities.pas',
+  MainElement in 'Model\MainElement.pas';
 
 procedure OnCoreStartEvent;
 begin

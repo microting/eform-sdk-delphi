@@ -92,6 +92,16 @@
         <DCCReference Include="DllHelper.pas"/>
         <DCCReference Include="Core.pas"/>
         <DCCReference Include="Events.pas"/>
+        <DCCReference Include="Model\Reply\Check.pas"/>
+        <DCCReference Include="Model\Reply\DataItemReply.pas"/>
+        <DCCReference Include="Model\Reply\ElementList.pas"/>
+        <DCCReference Include="Model\Reply\GeolocationData.pas"/>
+        <DCCReference Include="Model\Reply\Response.pas"/>
+        <DCCReference Include="Model\DataItem.pas"/>
+        <DCCReference Include="Model\DataItemGroup.pas"/>
+        <DCCReference Include="Model\Element.pas"/>
+        <DCCReference Include="Model\Entities.pas"/>
+        <DCCReference Include="Model\MainElement.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
