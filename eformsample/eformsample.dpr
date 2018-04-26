@@ -19,7 +19,8 @@ uses
   DataItemGroup in 'Model\DataItemGroup.pas',
   Element in 'Model\Element.pas',
   Entities in 'Model\Entities.pas',
-  MainElement in 'Model\MainElement.pas';
+  MainElement in 'Model\MainElement.pas',
+  Classes in 'Dto\Classes.pas';
 
 procedure OnCoreStartEvent;
 begin
