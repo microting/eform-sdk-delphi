@@ -20,7 +20,8 @@ uses
   Element in 'Model\Element.pas',
   Entities in 'Model\Entities.pas',
   MainElement in 'Model\MainElement.pas',
-  Classes in 'Dto\Classes.pas';
+  Classes in 'Dto\Classes.pas',
+  FieldContainer in 'Model\FieldContainer.pas';
 
 procedure OnCoreStartEvent;
 begin
