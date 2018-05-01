@@ -184,6 +184,42 @@ type
     microtingUId: string; checkUId: string; custom: string; checkListId: integer; workflowState: string);overload;
       function ToString: string; override;
   end;
+  {$endregion}
+
+  {$region 'TFile_Dto declaration'}
+  TFile_Dto = class
+  public
+      SiteUId: integer;
+      CaseType: string;
+      CaseUId: string;
+      MicrotingUId: string;
+      CheckUId: string;
+      FileLocation: string;
+
+      constructor Create(siteUId: integer; caseType: string; caseUId: string; microtingUId: string;
+        checkUId: string; fileLocation: string);
+      function ToString: string; override;
+  end;
+  {$endregion}
+
+  {$region 'TSite_Dto declaration'}
+  TSite_Dto = class
+  public
+      SiteId: integer;
+      SiteName: string;
+      FirstName: string;
+      LastName: string;
+      CustomerNo: integer;
+      OtpCode: integer;
+      UnitId: integer;
+      WorkerUId: integer;
+
+      constructor Create; overload;
+      constructor Create(siteId: integer; siteName: string; firstName: string; lastName: string;
+          customerNo: integer; otpCode: integer; unitId: integer; workerUId: integer);overload;
+      function ToString: string; override;
+  end;
+  {$endregion}
 
   {$region 'TNote_Dto declaration'}
   TNote_Dto = class
@@ -211,6 +247,58 @@ type
       constructor Create; overload;
       constructor Create(workerUId: integer; firstName: string; lastName: string; email: string;
           createdAt: TDateTime; updatedAt: TDateTime);overload;
+      function ToString: string; override;
+  end;
+  {$endregion}
+
+  {$region 'TSite_Worker_Dto declaration'}
+  TSite_Worker_Dto = class
+  public
+    MicrotingUId: integer;
+    SiteUId: integer;
+    WorkerUId: integer;
+
+    constructor Create; overload;
+    constructor Create(microtingUId: integer; siteUId: integer; workerUId: integer); overload;
+    function ToString: string; override;
+  end;
+  {$endregion}
+
+  {$region 'TUnit_Dto declaration'}
+  TUnit_Dto = class
+  public
+      UnitUId: integer;
+      CustomerNo: integer;
+      OtpCode: integer;
+      SiteUId: integer;
+      CreatedAt: TDateTime;
+      UpdatedAt: TDateTime;
+
+      constructor Create; overload;
+      constructor Create(unitUId: integer; customerNo: integer; otpCode: integer; siteUId: integer;
+         createdAt: TDateTime; updatedAt: TDateTime); overload;
+      function ToString: string; override;
+  end;
+  {$endregion}
+
+  {$region 'TOrganization_Dto declaration'}
+  TOrganization_Dto = class
+  public
+      Id: integer;
+      Name: string;
+      CustomerNo: integer;
+      UnitLicenseNumber: integer;
+      AwsAccessKeyId: string;
+      AwsSecretAccessKey: string;
+      AwsEndPoint: string;
+      ComAddressApi: string;
+      ComAddressBasic: string;
+      ComAddressPdfUpload: string;
+
+      constructor Create;overload;
+      constructor Create(id: integer; name: string; customerNo: integer; unitLicenseNumber: integer;
+          awsAccessKeyId: string; awsSecretAccessKey: string; awsEndPoint: string; comAddressApi: string;
+          comAddressBasic: string; comAddressPdfUpload: string);overload;
       function ToString: string; override;
   end;
   {$endregion}
@@ -469,5 +557,127 @@ begin
 
 end;
 {$endregion}
+
+{$region 'TFile_Dto implementation'}
+constructor TFile_Dto.Create(siteUId: integer; caseType: string; caseUId: string; microtingUId: string;
+      checkUId: string; fileLocation: string);
+begin
+   self.SiteUId := siteUId;
+   self.CaseType := caseType;
+   self.CaseUId := caseUId;
+   self.MicrotingUId := microtingUId;
+   self.CheckUId := checkUId;
+   self.FileLocation := fileLocation;
+end;
+
+function TFile_Dto.ToString: string;
+begin
+  Result := 'SiteUId:' + IntToStr(SiteUId) + ' / CaseType:' + CaseType + ' / CaseUId:' + CaseUId +
+   ' / MicrotingUId:' + MicrotingUId + ' / CheckId:' + CheckUId + ' / FileLocation:' + FileLocation;
+end;
+{$endregion}
+
+{$region 'TSite_Dto implementation'}
+constructor TSite_Dto.Create;
+begin
+end;
+
+constructor TSite_Dto.Create(siteId: integer; siteName: string; firstName: string; lastName: string;
+      customerNo: integer; otpCode: integer; unitId: integer; workerUId: integer);
+begin
+    self.SiteId := siteId;
+    self.SiteName := siteName;
+    self.FirstName := firstName;
+    self.LastName := lastName;
+    self.CustomerNo := customerNo;
+    self.OtpCode := otpCode;
+    self.UnitId := unitId;
+    self.WorkerUId := workerUId;
+end;
+
+function  TSite_Dto.ToString: string;
+begin
+  Result := 'SiteId:' + IntToStr(SiteId) + ' / SiteName:' + SiteName + ' / FirstName:' + FirstName +
+   ' / LastName:' + LastName + ' / CustomerNo:' + IntToStr(CustomerNo) + ' / OtpCode:' + IntToStr(OtpCode) +
+   '/ UnitId:'+ IntToStr(UnitId) + '/ WorkerUid:' + IntToStr(WorkerUid) + '.';
+
+end;
+{$endregion}
+
+{$region 'TSite_Worker_Dto implementation'}
+constructor TSite_Worker_Dto.Create;
+begin
+end;
+
+constructor TSite_Worker_Dto.Create(microtingUId: integer; siteUId: integer; workerUId: integer);
+begin
+   self.MicrotingUId := microtingUId;
+   self.SiteUId := siteUId;
+   self.WorkerUId := workerUId;
+end;
+
+function TSite_Worker_Dto.ToString: string;
+begin
+  Result := 'MicrotingUId:' + IntToStr(MicrotingUId) + ' / SiteUId:' + IntToStr(SiteUId)
+   + ' / WorkerUId:' + IntToStr(WorkerUId) + '.';
+end;
+{$endregion}
+
+{$region 'TUnit_Dto implementation'}
+constructor TUnit_Dto.Create;
+begin
+end;
+
+constructor TUnit_Dto.Create(unitUId: integer; customerNo: integer; otpCode: integer; siteUId: integer;
+   createdAt: TDateTime; updatedAt: TDateTime);
+begin
+  self.UnitUId := unitUId;
+  self.CustomerNo := customerNo;
+  self.OtpCode := otpCode;
+  self.SiteUId := siteUId;
+  self.CreatedAt := createdAt;
+  self.UpdatedAt := updatedAt;
+end;
+
+function TUnit_Dto.ToString: string;
+begin
+  Result := 'UnitUId:' + IntToStr(UnitUId) + ' / CustomerNo:' + IntToStr(CustomerNo) +
+     ' / OtpCode:' + IntToStr(OtpCode) + ' / SiteUId:' + IntToStr(SiteUId) + ' / CreatedAt:' +
+     DateToStr(CreatedAt) + ' / UpdatedAt:' + DateToStr(UpdatedAt) + '.';
+
+end;
+{$endregion}
+
+{$region 'TOrganization_Dto implementation'}
+constructor TOrganization_Dto.Create;
+begin
+end;
+
+constructor TOrganization_Dto.Create(id: integer; name: string; customerNo: integer; unitLicenseNumber: integer;
+    awsAccessKeyId: string; awsSecretAccessKey: string; awsEndPoint: string; comAddressApi: string;
+    comAddressBasic: string; comAddressPdfUpload: string);
+begin
+    self.Id := id;
+    self.Name := name;
+    self.CustomerNo := customerNo;
+    self.UnitLicenseNumber := unitLicenseNumber;
+    self.AwsAccessKeyId := awsAccessKeyId;
+    self.AwsSecretAccessKey := awsSecretAccessKey;
+    self.AwsEndPoint := awsEndPoint;
+    self.ComAddressApi := comAddressApi;
+    self.ComAddressBasic := comAddressBasic;
+    self.ComAddressPdfUpload := comAddressPdfUpload;
+end;
+
+function TOrganization_Dto.ToString: string;
+begin
+  Result := 'OrganizationUid: '+ IntToStr(Id) + ' / Name:' + Name + '/ CustomerNo:' + IntToStr(CustomerNo) +
+       ' / UnitLicenseNumber:' + IntToStr(UnitLicenseNumber) + ' / AwsAccessKeyId:' + AwsAccessKeyId +
+       ' / AwsSecretAccessKey:' + AwsSecretAccessKey + ' / AwsEndPoint:' + AwsEndPoint +
+       ' / ComAddress:' + ComAddressApi + ' / ComAddressBasic:' + ComAddressBasic + ' / ComAddressPdfUpload:' +
+        ComAddressPdfUpload + '.';
+end;
+{$endregion}
+
 
 end.
