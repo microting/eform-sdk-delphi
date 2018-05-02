@@ -6,29 +6,31 @@ uses
   SysUtils, DllHelper;
 
 type
-
+  {$region 'TAdminTools declaration'}
   TAdminTools = class
   public
     constructor Create(serverConnectionString: String);
-    procedure RunConsole;
-end;
+    procedure Run;
+  end;
+  {$endregion}
 
 implementation
 
+{$region 'TAdminTools implementation'}
 constructor TAdminTools.Create(serverConnectionString: string);
 begin
   inherited Create;
   TDllHelper.GetInstance.AdminTools_Create(serverConnectionString);
 end;
 
-procedure TAdminTools.RunConsole;
+procedure TAdminTools.Run;
 var
   input, token, reply: String;
 begin
   while true do
   begin
 
-    {$region text}
+    {$region 'text'}
     WriteLn('');
     WriteLn('Press the following keys to run:');
     WriteLn('');
@@ -80,6 +82,7 @@ begin
        WriteLn(reply);
   end;
 end;
+{$endregion}
 
 end.
 

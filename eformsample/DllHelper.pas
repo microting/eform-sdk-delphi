@@ -9,7 +9,11 @@ type
   TCore_CreateFunc = function: integer; stdcall;
   TCore_StartFunc = function(serverConnectionString: WideString): integer; stdcall;
   TCore_SubscribeStartEvent = function(callback: LongInt): integer; stdcall;
-
+  TCore_TemplatFromXml = function(xml: WideString; var id: integer; var _label: WideString;
+      var displayOrder: integer; var checkListFolderName: WideString; var repeated: integer;
+      var startDate: WideString; var endDate: WideString; var language: WideString;
+      var multiApproval: boolean; var fastNavigation: boolean; var downloadEntities: boolean;
+      var manualSync: boolean; var caseType: WideString):   integer; stdcall;
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
   TAdminTools_DbSetupFunc = function(token: WideString; var reply: WideString): integer; stdcall;
   TAdminTools_DbSetupCompletedFunc = function(var reply: WideString): integer; stdcall;
@@ -18,6 +22,7 @@ type
 
   TLastErrorFunc = function: WideString; stdcall;
 
+  {$region 'TDllHelper declaration'}
   TDllHelper = class
   private
     class var instance: TDllHelper;
@@ -27,6 +32,7 @@ type
     Core_CreateFunc: TCore_CreateFunc;
     Core_StartFunc: TCore_StartFunc;
     Core_SubscribeStartEventFunc: TCore_SubscribeStartEvent;
+    Core_TemplatFromXmlFunc: TCore_TemplatFromXml;
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
     AdminTools_DbSetupFunc: TAdminTools_DbSetupFunc;
@@ -46,6 +52,11 @@ type
     procedure Core_Create;
     procedure Core_Start(serverConnectionString: string);
     procedure Core_SubscribeStartEvent(callback: LongInt);
+    procedure Core_TemplatFromXml(xml: WideString; var Id: integer; var _label: WideString;
+       var displayOrder: integer; var checkListFolderName: WideString; var repeated: integer;
+       var startDate: WideString; var endDate: WideString; var language: WideString;
+       var multiApproval: boolean; var fastNavigation: boolean; var downloadEntities: boolean;
+       var manualSync: boolean;  var caseType: WideString);
 
     procedure AdminTools_Create(serverConnectionString: string);
     function AdminTools_DbSetup(token: string): string;
@@ -54,11 +65,12 @@ type
     function AdminTools_DbSettingsReloadRemote: string;
 
   end;
+  {$endregion}
 
 
 implementation
 
-
+{$region 'TDllHelper implementation'}
 class function TDllHelper.GetInstance: TDllHelper;
 begin
   if (not Assigned(instance)) then
@@ -107,6 +119,9 @@ begin
    if not Assigned (Core_StartFunc) then
      raise Exception.Create('function Core_SubscribeStartEvent not found');
 
+   @Core_TemplatFromXmlFunc := GetProcAddress(handle, 'Core_TemplatFromXml') ;
+   if not Assigned (Core_TemplatFromXmlFunc) then
+     raise Exception.Create('function Core_TemplatFromXml not found');
 
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
@@ -120,13 +135,13 @@ begin
    if not Assigned (AdminTools_DbSetupCompletedFunc) then
      raise Exception.Create('function AdminTools_DbSetupCompleted not found');
 
-   @AdminTools_MigrateDbFunc := GetProcAddress(handle, 'AdminTools_MigrateDb') ;
-   if not Assigned (AdminTools_MigrateDbFunc) then
-     raise Exception.Create('function AdminTools_MigrateDb not found');
-
-   @AdminTools_DbSettingsReloadRemoteFunc := GetProcAddress(handle, 'AdminTools_DbSettingsReloadRemote') ;
-   if not Assigned (AdminTools_DbSettingsReloadRemoteFunc) then
-     raise Exception.Create('function AdminTools_DbSettingsReloadRemote not found');
+//   @AdminTools_MigrateDbFunc := GetProcAddress(handle, 'AdminTools_MigrateDb') ;
+//   if not Assigned (AdminTools_MigrateDbFunc) then
+//     raise Exception.Create('function AdminTools_MigrateDb not found');
+//
+//   @AdminTools_DbSettingsReloadRemoteFunc := GetProcAddress(handle, 'AdminTools_DbSettingsReloadRemote') ;
+//   if not Assigned (AdminTools_DbSettingsReloadRemoteFunc) then
+//     raise Exception.Create('function AdminTools_DbSettingsReloadRemote not found');
 
    @LastErrorFunc := GetProcAddress(handle, 'GetLastError') ;
    if not Assigned (LastErrorFunc) then
@@ -172,6 +187,25 @@ begin
      raise Exception.Create(err);
   end;
 end;
+
+procedure TDllHelper.Core_TemplatFromXml(xml: WideString; var Id: integer; var _label: WideString;
+   var displayOrder: integer; var checkListFolderName: WideString; var repeated: integer;
+   var startDate: WideString; var endDate: WideString; var language: WideString;
+   var multiApproval: boolean; var fastNavigation: boolean; var downloadEntities: boolean;
+   var manualSync: boolean;  var caseType: WideString);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXmlFunc(xml, id, _label, displayOrder, checkListFolderName,repeated, startDate,
+     endDate, language, multiApproval, fastNavigation, downloadEntities, manualSync, caseType);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
 
 procedure TDllHelper.AdminTools_Create(serverConnectionString: string);
 var
@@ -246,7 +280,7 @@ begin
   end;
   Result := reply;
 end;
-
+{$endregion}
 
 
 end.

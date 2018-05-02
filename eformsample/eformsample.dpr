@@ -21,7 +21,8 @@ uses
   Entities in 'Model\Entities.pas',
   MainElement in 'Model\MainElement.pas',
   Classes in 'Dto\Classes.pas',
-  FieldContainer in 'Model\FieldContainer.pas';
+  FieldContainer in 'Model\FieldContainer.pas',
+  Samples in 'Samples.pas';
 
 procedure OnCoreStartEvent;
 begin
@@ -33,12 +34,13 @@ var
   serverConnectionString: String;
   input: String;
   programm: TAdminTools;
+  samples: TSamples;
   core: TCore;
 begin
   try
-    {$region pick database}
+    {$region 'pick database'}
     WriteLn('Enter database to use:');
-    WriteLn('> If left blank, it will use ''MicrotingDelphi''');
+    WriteLn('> If left blank, it will use ''MicrotingDelphi_SDK''');
     WriteLn('  Enter name of database to be used');
     ReadLn(databaseName);
 
@@ -50,26 +52,32 @@ begin
     if  UpperCase(databaseName) = 'O' then
       serverConnectionString := 'Data Source=.\SQLEXPRESS;Initial Catalog=' + 'MicrotingOdense' + ';Integrated Security=True';
     if serverConnectionString = '' then
-      serverConnectionString := 'Data Source=.\SQLEXPRESS;Initial Catalog=' + 'MicrotingDelphi' + ';Integrated Security=True';
+      serverConnectionString := 'Data Source=.\SQLEXPRESS;Initial Catalog=' + 'MicrotingDelphi_SDK' + ';Integrated Security=True';
 
     WriteLn(serverConnectionString);
     {$endregion}
 
 
-    {$region WriteLn(...text...)}
+    {$region 'WriteLn(...text...)'}
     WriteLn('');
     WriteLn('Enter one of the following keys to start:');
     WriteLn('  ''A'', for Admin tools');
+    WriteLn('  ''S'', for sample programs');
     WriteLn('  ''I'', for pure run core');
     WriteLn('');
     WriteLn('Any other will close Console');
     ReadLn(input);
     {$endregion}
 
-   if (UpperCase(input) = 'A') then
+    if (UpperCase(input) = 'A') then
     begin
        programm := TAdminTools.Create(serverConnectionString);
-       programm.RunConsole();
+       programm.Run();
+    end
+    else if (UpperCase(input) = 'S') then
+    begin
+       samples := TSamples.Create(serverConnectionString);
+       samples.Run();
     end
     else if (UpperCase(input) = 'I') then
     begin
@@ -84,7 +92,7 @@ begin
     WriteLn('Console will close in 1s');
     Sleep(1000);
 
-  {$region ...catch all... }
+  {$region '...catch all... '}
   except
     on E: Exception do
     begin
