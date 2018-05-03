@@ -37,12 +37,11 @@ type
 
    {$region 'TDataElement declaration'}
    TDataElement = class(TElement)
-   private
-      constructor Create; overload;
    public
       DataItemList: TObjectList<TDataItem>;
       DataItemGroupList: TObjectList<TDataItemGroup>;
 
+      constructor Create; overload;
       constructor Create(id: integer; _label: string; displayOrder: integer; description: string;
           approvalEnabled: boolean; reviewEnabled: boolean; doneButtonEnabled: boolean;
           extraDataElementsEnabled: boolean; pinkBarText: string; dataItemGroupList: TObjectList<TDataItemGroup>;

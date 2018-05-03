@@ -3,7 +3,7 @@ unit Samples;
 interface
 
 uses
-  Core, SysUtils, MainElement, IOUtils;
+  Core, SysUtils, MainElement, IOUtils, Element, DataItem;
 
 type
   {$region 'TSamples declaration'}
@@ -80,6 +80,10 @@ begin
 end;
 
 procedure TSamples.Print(mainElement: TMainElement);
+var 
+  element: TElement;  
+  dataElement: TDataElement;
+  dataItem: TDataItem;
 begin
    WriteLn('');
    WriteLn('Main element:');
@@ -95,6 +99,32 @@ begin
    WriteLn('FastNavigation: ' + BoolToStr(mainElement.FastNavigation));
    WriteLn('ManualSync: ' + BoolToStr(mainElement.ManualSync));
    WriteLn('CaseType: ' + mainElement.CaseType);
+   WriteLn('ElementList:');
+   for element in mainElement.ElementList do
+   begin
+       WriteLn('  Element:');
+       if element is TDataElement then
+       begin
+         WriteLn('  Type: DataElement');
+         dataElement := element as TDataElement;
+         WriteLn('  Id: ' + IntToStr(dataElement.Id));
+         WriteLn('  Label: ' + dataElement._Label);
+         WriteLn('  Description: ' + dataElement.Description.InderValue);
+         WriteLn('  DisplayOrder: ' + IntToStr(dataElement.DisplayOrder));
+         WriteLn('  ReviewEnabled: ' + BoolToStr(dataElement.ReviewEnabled));
+        // WriteLn('  ManualSync: ' + BoolToStr(element.ManualSync));
+         WriteLn('  ExtraFieldsEnabled: ' + BoolToStr(dataElement.ExtraFieldsEnabled));
+        // WriteLn('  DoneButtonDisabled: ' + BoolToStr(element.DoneButtonDisabled));
+         WriteLn('  ApprovalEnabled: ' + BoolToStr(dataElement.ApprovalEnabled));
+         WriteLn('  DataItemList:');
+         for dataItem in dataElement.DataItemList do
+         begin 
+            WriteLn('   DataItem:');
+         end;
+       end;
+         
+   end;
+     
      
    WriteLn('');
 end;

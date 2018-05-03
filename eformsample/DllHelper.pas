@@ -9,11 +9,20 @@ type
   TCore_CreateFunc = function: integer; stdcall;
   TCore_StartFunc = function(serverConnectionString: WideString): integer; stdcall;
   TCore_SubscribeStartEvent = function(callback: LongInt): integer; stdcall;
+
+  {$region 'TemplatFromXml types'}
   TCore_TemplatFromXml = function(xml: WideString; var id: integer; var _label: WideString;
       var displayOrder: integer; var checkListFolderName: WideString; var repeated: integer;
       var startDate: WideString; var endDate: WideString; var language: WideString;
       var multiApproval: boolean; var fastNavigation: boolean; var downloadEntities: boolean;
       var manualSync: boolean; var caseType: WideString):   integer; stdcall;
+  TCore_TemplatFromXml_ElementListCount = function(var count: integer): integer; stdcall;
+  TCore_TemplatFromXml_GetElementType = function(n: integer; var elementType: WideString): integer; stdcall;
+  TCore_TemplatFromXml_GetDataElement = function(n: integer; var id: integer; var _label: WideString;
+        var description: WideString; var displayOrder: integer; var reviewEnabled: boolean;
+        var extraFieldsEnabled: boolean; var approvalEnabled: boolean): integer; stdcall;
+  {$endregion}
+
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
   TAdminTools_DbSetupFunc = function(token: WideString; var reply: WideString): integer; stdcall;
   TAdminTools_DbSetupCompletedFunc = function(var reply: WideString): integer; stdcall;
@@ -32,7 +41,13 @@ type
     Core_CreateFunc: TCore_CreateFunc;
     Core_StartFunc: TCore_StartFunc;
     Core_SubscribeStartEventFunc: TCore_SubscribeStartEvent;
+
+    {$region 'TemplatFromXml variables'}
     Core_TemplatFromXmlFunc: TCore_TemplatFromXml;
+    Core_TemplatFromXml_ElementListCountFunc: TCore_TemplatFromXml_ElementListCount;
+    Core_TemplatFromXml_GetElementTypeFunc: TCore_TemplatFromXml_GetElementType;
+    Core_TemplatFromXml_GetDataElementFunc: TCore_TemplatFromXml_GetDataElement;
+    {$endregion}
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
     AdminTools_DbSetupFunc: TAdminTools_DbSetupFunc;
@@ -52,11 +67,19 @@ type
     procedure Core_Create;
     procedure Core_Start(serverConnectionString: string);
     procedure Core_SubscribeStartEvent(callback: LongInt);
+
+    {$region 'TemplatFromXml functions'}
     procedure Core_TemplatFromXml(xml: WideString; var Id: integer; var _label: WideString;
        var displayOrder: integer; var checkListFolderName: WideString; var repeated: integer;
        var startDate: WideString; var endDate: WideString; var language: WideString;
        var multiApproval: boolean; var fastNavigation: boolean; var downloadEntities: boolean;
        var manualSync: boolean;  var caseType: WideString);
+    function Core_TemplatFromXml_ElementListCount: integer;
+    function Core_TemplatFromXml_GetElementType(n: integer): WideString;
+    procedure Core_TemplatFromXml_GetDataElement(n: integer; var id: integer; var _label: WideString;
+        var description: WideString; var displayOrder: integer; var reviewEnabled: boolean;
+        var extraFieldsEnabled: boolean; var approvalEnabled: boolean);
+    {$endregion}
 
     procedure AdminTools_Create(serverConnectionString: string);
     function AdminTools_DbSetup(token: string): string;
@@ -123,6 +146,18 @@ begin
    if not Assigned (Core_TemplatFromXmlFunc) then
      raise Exception.Create('function Core_TemplatFromXml not found');
 
+   @Core_TemplatFromXml_ElementListCountFunc := GetProcAddress(handle, 'Core_TemplatFromXml_ElementListCount') ;
+   if not Assigned (Core_TemplatFromXml_ElementListCountFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_ElementListCount not found');
+
+   @Core_TemplatFromXml_GetElementTypeFunc := GetProcAddress(handle, 'Core_TemplatFromXml_GetElementType') ;
+   if not Assigned (Core_TemplatFromXml_GetElementTypeFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_GetElementType not found');
+
+   @Core_TemplatFromXml_GetDataElementFunc := GetProcAddress(handle, 'Core_TemplatFromXml_GetDataElement') ;
+   if not Assigned (Core_TemplatFromXml_GetDataElementFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_GetDataElement not found');
+
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
      raise Exception.Create('function AdminTools_Create not found');
@@ -188,6 +223,7 @@ begin
   end;
 end;
 
+{$region 'TemplatFromXml implementation'}
 procedure TDllHelper.Core_TemplatFromXml(xml: WideString; var Id: integer; var _label: WideString;
    var displayOrder: integer; var checkListFolderName: WideString; var repeated: integer;
    var startDate: WideString; var endDate: WideString; var language: WideString;
@@ -206,6 +242,55 @@ begin
   end;
 end;
 
+function  TDllHelper.Core_TemplatFromXml_ElementListCount: integer;
+var
+  res: integer;
+  err: WideString;
+  count: integer;
+begin
+  Result := 0;
+  res := Core_TemplatFromXml_ElementListCountFunc(count);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  Result := count;
+end;
+
+function TDllHelper.Core_TemplatFromXml_GetElementType(n: integer): WideString;
+var
+  res: integer;
+  err: WideString;
+  elementType: WideString;
+begin
+  Result := '';
+  res := Core_TemplatFromXml_GetElementTypeFunc(n, elementType );
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  Result := elementType;
+end;
+
+procedure TDllHelper.Core_TemplatFromXml_GetDataElement(n: integer; var id: integer; var _label: WideString;
+        var description: WideString; var displayOrder: integer; var reviewEnabled: boolean;
+        var extraFieldsEnabled: boolean; var approvalEnabled: boolean);
+var
+  res: integer;
+  err: WideString;
+  count: integer;
+begin
+  res := Core_TemplatFromXml_GetDataElementFunc(n, id, _label, description, displayOrder, reviewEnabled,
+      extraFieldsEnabled, approvalEnabled);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+{$endregion}
 
 procedure TDllHelper.AdminTools_Create(serverConnectionString: string);
 var

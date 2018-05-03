@@ -3,7 +3,7 @@ unit Core;
 interface
 
 uses
-  DllHelper, Events, SysUtils, MainElement;
+  DllHelper, Events, SysUtils, MainElement, Element,  Generics.Collections, Classes;
 
 type
   {$region 'TCore declaration'}
@@ -50,13 +50,18 @@ end;
 function TCore.TemplatFromXml(xml: string): TMainElement;
 var
   mainElement: TMainElement;
+  element: TElement;
   _label: WideString;
+  description: WideString;
   checkListFolderName: WideString;
   startDate: WideString;
   endDate: WideString;
   language: WideString;
   caseType: WideString;
   fs: TFormatSettings;
+
+  i: integer;
+  elementType: WideString;
 begin
   mainElement:= TMainElement.Create;
   TDllHelper.GetInstance.Core_TemplatFromXml(xml, mainElement.Id, _label, mainElement.DisplayOrder,
@@ -73,6 +78,23 @@ begin
 
   mainElement.StartDate := StrToDate(startDate, fs);
   mainElement.EndDate := StrToDate(endDate, fs);
+
+  mainElement.ElementList := TObjectList<TElement>.Create;
+  for i := 0 to TDllHelper.GetInstance.Core_TemplatFromXml_ElementListCount - 1 do
+  begin
+      elementType := TDllHelper.GetInstance.Core_TemplatFromXml_GetElementType(i);
+      if elementType = 'DataElement' then
+      begin
+          element := TDataElement.Create;
+          TDllHelper.GetInstance.Core_TemplatFromXml_GetDataElement(i, element.Id, _label, description,
+           element.DisplayOrder, element.ReviewEnabled, element.ExtraFieldsEnabled, element.ApprovalEnabled);
+          element._Label := _label;
+          element.Description := TCDataValue.Create;
+          element.Description.InderValue := description;
+
+      end;
+      mainElement.ElementList.Add(element);
+  end;
 
   Result := mainElement;
 end;
