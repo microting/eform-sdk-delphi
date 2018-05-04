@@ -12,15 +12,21 @@ type
 
   {$region 'TemplatFromXml types'}
   TCore_TemplatFromXml = function(xml: WideString; var id: integer; var _label: WideString;
-      var displayOrder: integer; var checkListFolderName: WideString; var repeated: integer;
-      var startDate: WideString; var endDate: WideString; var language: WideString;
-      var multiApproval: boolean; var fastNavigation: boolean; var downloadEntities: boolean;
-      var manualSync: boolean; var caseType: WideString):   integer; stdcall;
+        var displayOrder: integer; var checkListFolderName: WideString; var repeated: integer;
+        var startDate: WideString; var endDate: WideString; var language: WideString;
+        var multiApproval: boolean; var fastNavigation: boolean; var downloadEntities: boolean;
+        var manualSync: boolean; var caseType: WideString):   integer; stdcall;
   TCore_TemplatFromXml_ElementListCount = function(var count: integer): integer; stdcall;
   TCore_TemplatFromXml_GetElementType = function(n: integer; var elementType: WideString): integer; stdcall;
   TCore_TemplatFromXml_GetDataElement = function(n: integer; var id: integer; var _label: WideString;
         var description: WideString; var displayOrder: integer; var reviewEnabled: boolean;
         var extraFieldsEnabled: boolean; var approvalEnabled: boolean): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_DataItemCount = function(n: integer; var count: integer): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetDataItemType = function(n: integer; m: integer;
+        var dataItemType: WideString): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetPicture = function(n: integer; m: integer; var id: integer;
+        var _label: WideString;  var description: WideString; var displayOrder: integer; var mandatory: boolean;
+        var color: WideString): integer; stdcall;
   {$endregion}
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
@@ -47,6 +53,9 @@ type
     Core_TemplatFromXml_ElementListCountFunc: TCore_TemplatFromXml_ElementListCount;
     Core_TemplatFromXml_GetElementTypeFunc: TCore_TemplatFromXml_GetElementType;
     Core_TemplatFromXml_GetDataElementFunc: TCore_TemplatFromXml_GetDataElement;
+    Core_TemplatFromXml_DataElement_DataItemCountFunc: TCore_TemplatFromXml_DataElement_DataItemCount;
+    Core_TemplatFromXml_DataElement_GetDataItemTypeFunc: TCore_TemplatFromXml_DataElement_GetDataItemType;
+    Core_TemplatFromXml_DataElement_GetPictureFunc: TCore_TemplatFromXml_DataElement_GetPicture;
     {$endregion}
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
@@ -79,6 +88,11 @@ type
     procedure Core_TemplatFromXml_GetDataElement(n: integer; var id: integer; var _label: WideString;
         var description: WideString; var displayOrder: integer; var reviewEnabled: boolean;
         var extraFieldsEnabled: boolean; var approvalEnabled: boolean);
+    function Core_TemplatFromXml_DataElement_DataItemCount(n: integer): integer;
+    function Core_TemplatFromXml_DataElement_GetDataItemType(n: integer; m: integer): WideString;
+    procedure Core_TemplatFromXml_DataElement_GetPicture(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer; var mandatory: boolean;
+        var color: WideString);
     {$endregion}
 
     procedure AdminTools_Create(serverConnectionString: string);
@@ -157,6 +171,19 @@ begin
    @Core_TemplatFromXml_GetDataElementFunc := GetProcAddress(handle, 'Core_TemplatFromXml_GetDataElement') ;
    if not Assigned (Core_TemplatFromXml_GetDataElementFunc) then
      raise Exception.Create('function Core_TemplatFromXml_GetDataElement not found');
+
+   @Core_TemplatFromXml_DataElement_DataItemCountFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_DataItemCount') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_DataItemCountFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_DataItemCount not found');
+
+   @Core_TemplatFromXml_DataElement_GetDataItemTypeFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetDataItemType') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetDataItemTypeFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetDataItemType not found');
+
+   @Core_TemplatFromXml_DataElement_GetPictureFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetPicture') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetPictureFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetPicture not found');
+
 
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
@@ -248,7 +275,7 @@ var
   err: WideString;
   count: integer;
 begin
-  Result := 0;
+  count := 0;
   res := Core_TemplatFromXml_ElementListCountFunc(count);
   if res <> 0 then
   begin
@@ -280,7 +307,6 @@ procedure TDllHelper.Core_TemplatFromXml_GetDataElement(n: integer; var id: inte
 var
   res: integer;
   err: WideString;
-  count: integer;
 begin
   res := Core_TemplatFromXml_GetDataElementFunc(n, id, _label, description, displayOrder, reviewEnabled,
       extraFieldsEnabled, approvalEnabled);
@@ -290,6 +316,56 @@ begin
      raise Exception.Create(err);
   end;
 end;
+
+function TDllHelper.Core_TemplatFromXml_DataElement_DataItemCount(n: integer): integer;
+var
+  res: integer;
+  err: WideString;
+  count: integer;
+begin
+  count := 0;
+  res := Core_TemplatFromXml_DataElement_DataItemCountFunc(n, count);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  Result := count;
+
+end;
+
+function TDllHelper.Core_TemplatFromXml_DataElement_GetDataItemType(n: integer; m: integer): WideString;
+var
+  res: integer;
+  err: WideString;
+  dataItemType: WideString;
+begin
+  Result := '';
+  res := Core_TemplatFromXml_DataElement_GetDataItemTypeFunc(n, m, dataItemType);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  Result := dataItemType;
+end;
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetPicture(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer; var mandatory: boolean;
+        var color: WideString);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetPictureFunc(n, m, id, _label, description, displayOrder,
+      mandatory, color);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
 {$endregion}
 
 procedure TDllHelper.AdminTools_Create(serverConnectionString: string);

@@ -3,7 +3,7 @@ unit Core;
 interface
 
 uses
-  DllHelper, Events, SysUtils, MainElement, Element,  Generics.Collections, Classes;
+  DllHelper, Events, SysUtils, MainElement, Element, Generics.Collections, Classes, DataItem;
 
 type
   {$region 'TCore declaration'}
@@ -51,6 +51,7 @@ function TCore.TemplatFromXml(xml: string): TMainElement;
 var
   mainElement: TMainElement;
   element: TElement;
+  dataItem: TDataItem;
   _label: WideString;
   description: WideString;
   checkListFolderName: WideString;
@@ -58,10 +59,12 @@ var
   endDate: WideString;
   language: WideString;
   caseType: WideString;
+  color: WideString;
   fs: TFormatSettings;
 
-  i: integer;
+  i, j: integer;
   elementType: WideString;
+  dataItemType: WideString;
 begin
   mainElement:= TMainElement.Create;
   TDllHelper.GetInstance.Core_TemplatFromXml(xml, mainElement.Id, _label, mainElement.DisplayOrder,
@@ -91,6 +94,22 @@ begin
           element._Label := _label;
           element.Description := TCDataValue.Create;
           element.Description.InderValue := description;
+          (element as TDataElement).DataItemList := TObjectList<TDataItem>.Create;
+          for j := 0 to TDllHelper.GetInstance.GetInstance.Core_TemplatFromXml_DataElement_DataItemCount(i) - 1 do
+          begin
+              dataItemType := TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetDataItemType(i, j);
+              if dataItemType = 'Picture' then
+              begin
+                  dataItem := TPicture.Create;
+                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetPicture(i, j, dataItem.Id, _label,
+                    description, dataItem.DisplayOrder, dataItem.Mandatory, color);
+                  dataItem._Label := _label;
+                  dataItem.Description := TCDataValue.Create;
+                  dataItem.Description.InderValue := description;
+                  dataItem.Color := color;
+                  (element as TDataElement).DataItemList.Add(dataItem);
+              end;
+          end;
 
       end;
       mainElement.ElementList.Add(element);

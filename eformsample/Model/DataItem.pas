@@ -125,12 +125,11 @@ type
 
  {$region 'TPicture declaration'}
  TPicture = class(TDataItem)
- private
-   constructor Create; overload;
  public
    Multi: integer;
    GeolocationEnabled: boolean;
 
+   constructor Create; overload;
    constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
     displayOrder: integer; dummy: boolean; multi: integer; geolocationEnabled: boolean); overload;
  end;

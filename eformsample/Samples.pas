@@ -83,7 +83,9 @@ procedure TSamples.Print(mainElement: TMainElement);
 var 
   element: TElement;  
   dataElement: TDataElement;
+
   dataItem: TDataItem;
+  picture: TPicture;
 begin
    WriteLn('');
    WriteLn('Main element:');
@@ -118,8 +120,20 @@ begin
          WriteLn('  ApprovalEnabled: ' + BoolToStr(dataElement.ApprovalEnabled));
          WriteLn('  DataItemList:');
          for dataItem in dataElement.DataItemList do
-         begin 
-            WriteLn('   DataItem:');
+         begin
+            WriteLn('    DataItem:');
+            picture := dataItem as TPicture;
+            if dataItem is TPicture then
+            begin
+                WriteLn('    Type: Picture');
+                WriteLn('    Id: ' + IntToStr(picture.Id));
+                WriteLn('    Label: ' + picture._Label);
+                WriteLn('    Description: ' + picture.Description.InderValue);
+                WriteLn('    DisplayOrder: ' + IntToStr(picture.DisplayOrder));
+                WriteLn('    Mandatory: ' + BoolToStr(picture.Mandatory));
+                WriteLn('    Color: ' + picture.Color);
+            end;
+
          end;
        end;
          
