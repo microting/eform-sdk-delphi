@@ -42,7 +42,7 @@ begin
     WriteLn('Select which MainController element to start. Type:');
     WriteLn('');
     WriteLn('  ''E'', for exiting program');
-    WriteLn('  ''1'', for sample 1');
+    WriteLn('  ''1'', for sample 1 (Create main element)');
     ReadLn(input);
     {$endregion}
 
@@ -57,6 +57,7 @@ end;
 procedure TSamples.Sample1;
 var
    input: string;
+   filename: string;
    mainElement: TMainElement;
    xml: WideString;
 begin
@@ -64,15 +65,26 @@ begin
 
    while true do
    begin
-       WriteLn('  Type ''S'' for setting up the eForm templat from the picture_test.xml, and define the siteId');
-       WriteLn('  Type ''C'' to create an eForm case based on the templat, and ''Q'' (to quit)');
+       WriteLn('');
+       WriteLn('  Type ''M'' Create main element from xml file and output it''s content to console');
+       WriteLn('  Type ''Q'' to quit');
        WriteLn('  As long as the Core left running, the system is able to process eForms');
        ReadLn(input);
        if UpperCase(input) = 'Q' then
           break
-       else if UpperCase(input) = 'S' then
+       else if UpperCase(input) = 'M' then
        begin
-          xml := TFile.ReadAllText('picture_test.xml');
+          WriteLn('');
+          WriteLn('    Type file name (picture_test.xml by default)');
+          ReadLn(input);
+          filename := input;
+          if filename = '' then
+            filename := 'picture_test.xml';
+            //filename := 'pdf_test.xml';
+           //  filename := 'date_example.xml';
+
+
+          xml := TFile.ReadAllText(filename);
           mainElement := Core.TemplatFromXml(xml);
           Print(mainElement);
        end;
@@ -86,6 +98,8 @@ var
 
   dataItem: TDataItem;
   picture: TPicture;
+  showPdf: TShowPdf;
+  date: TDate;
 begin
    WriteLn('');
    WriteLn('Main element:');
@@ -122,9 +136,9 @@ begin
          for dataItem in dataElement.DataItemList do
          begin
             WriteLn('    DataItem:');
-            picture := dataItem as TPicture;
             if dataItem is TPicture then
             begin
+                picture := dataItem as TPicture;
                 WriteLn('    Type: Picture');
                 WriteLn('    Id: ' + IntToStr(picture.Id));
                 WriteLn('    Label: ' + picture._Label);
@@ -132,7 +146,36 @@ begin
                 WriteLn('    DisplayOrder: ' + IntToStr(picture.DisplayOrder));
                 WriteLn('    Mandatory: ' + BoolToStr(picture.Mandatory));
                 WriteLn('    Color: ' + picture.Color);
+            end
+            else if dataItem is TShowPdf then
+            begin
+                showPdf := dataItem as TShowPdf;
+                WriteLn('    Type: ShowPdf');
+                WriteLn('    Id: ' + IntToStr(showPdf.Id));
+                WriteLn('    Label: ' + showPdf._Label);
+                WriteLn('    Description: ' + showPdf.Description.InderValue);
+                WriteLn('    DisplayOrder: ' + IntToStr(showPdf.DisplayOrder));
+                WriteLn('    Color: ' + showPdf.Color);
+                WriteLn('    Value: ' + showPdf.Value);
+            end
+            else if dataItem is TDate then
+            begin
+                date := dataItem as TDate;
+                WriteLn('    Type: Date');
+                WriteLn('    Id: ' + IntToStr(date.Id));
+                WriteLn('    Label: ' + date._Label);
+                WriteLn('    Description: ' + date.Description.InderValue);
+                WriteLn('    DisplayOrder: ' + IntToStr(date.DisplayOrder));
+                WriteLn('    MinValue: ' + DateToStr(date.MinValue));
+                WriteLn('    MaxValue: ' + DateToStr(date.MaxValue));
+                WriteLn('    Mandatory: ' + BoolToStr(date.Mandatory));
+                WriteLn('    ReadOnly: ' + BoolToStr(date.ReadOnly));
+                WriteLn('    Color: ' + date.Color);
+                WriteLn('    Value: ' + date.DefaultValue);
             end;
+
+
+
 
          end;
        end;

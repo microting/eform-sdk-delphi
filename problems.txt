@@ -1,3 +1,8 @@
-TCDataValue
-TMainElement
-TResponse
+MainElement
+Where are no such fields as Review, Summary among class members. But these fields exist in xml file 
+
+Element
+Where are no such fields as MultiSync, DoneButtonEnabled among class members. But these fields exist in xml file 
+
+Date
+Where are no such fields as Value. But these fields exist in xml file 

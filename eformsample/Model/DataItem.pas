@@ -65,8 +65,6 @@ type
  {$region 'TDate declaration'}
  TDate = class(TDataItem)
  private
-    constructor Create; overload;
-
     function GetMaxValueString: string;
     procedure SetMaxValueString(Value: string);
     function GetMinValueString: string;
@@ -76,6 +74,7 @@ type
     MaxValue: TDateTime;
     MinValue: TDateTime;
 
+    constructor Create; overload;
     constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
      displayOrder: integer; dummy: boolean; defaultValue: string; maxValue: TDateTime; minValue: TDateTime); overload;
 
@@ -137,11 +136,10 @@ type
 
  {$region 'TShowPdf declaration'}
  TShowPdf = class(TDataItem)
- private
-    constructor Create; overload;
  public
     Value: string;
 
+    constructor Create; overload;
     constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
      displayOrder: integer; dummy: boolean; value: string); overload;
  end;

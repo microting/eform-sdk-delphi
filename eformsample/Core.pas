@@ -52,19 +52,15 @@ var
   mainElement: TMainElement;
   element: TElement;
   dataItem: TDataItem;
-  _label: WideString;
-  description: WideString;
-  checkListFolderName: WideString;
-  startDate: WideString;
-  endDate: WideString;
-  language: WideString;
-  caseType: WideString;
-  color: WideString;
+
+  _label, description: WideString;
+  checkListFolderName, startDate, endDate: WideString;
+  language, caseType, color, value:  WideString;
+  minValue, maxValue: WideString;
   fs: TFormatSettings;
 
   i, j: integer;
-  elementType: WideString;
-  dataItemType: WideString;
+  elementType, dataItemType: WideString;
 begin
   mainElement:= TMainElement.Create;
   TDllHelper.GetInstance.Core_TemplatFromXml(xml, mainElement.Id, _label, mainElement.DisplayOrder,
@@ -107,10 +103,35 @@ begin
                   dataItem.Description := TCDataValue.Create;
                   dataItem.Description.InderValue := description;
                   dataItem.Color := color;
-                  (element as TDataElement).DataItemList.Add(dataItem);
+              end
+              else if dataItemType = 'ShowPdf' then
+              begin
+                  dataItem := TShowPdf.Create;
+                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetShowPdf(i, j, dataItem.Id, _label,
+                    description, dataItem.DisplayOrder, color, value);
+                  dataItem._Label := _label;
+                  dataItem.Description := TCDataValue.Create;
+                  dataItem.Description.InderValue := description;
+                  dataItem.Color := color;
+                  (dataItem as TShowPdf).Value := value;
+              end
+              else if dataItemType = 'Date' then
+              begin
+                  dataItem := TDate.Create;
+                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetDate(i, j, dataItem.Id, _label,
+                    description, dataItem.DisplayOrder, minValue, maxValue, dataItem.Mandatory, dataItem.ReadOnly,
+                    color, value);
+                  dataItem._Label := _label;
+                  dataItem.Description := TCDataValue.Create;
+                  dataItem.Description.InderValue := description;
+                  dataItem.Color := color;
+                  (dataItem as TDate).MinValue := StrToDate(minValue, fs);
+                  (dataItem as TDate).MaxValue := StrToDate(maxValue, fs);
+                  (dataItem as TDate).DefaultValue := value;
               end;
-          end;
+            end;
 
+            (element as TDataElement).DataItemList.Add(dataItem);
       end;
       mainElement.ElementList.Add(element);
   end;

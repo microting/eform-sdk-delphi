@@ -27,6 +27,14 @@ type
   TCore_TemplatFromXml_DataElement_GetPicture = function(n: integer; m: integer; var id: integer;
         var _label: WideString;  var description: WideString; var displayOrder: integer; var mandatory: boolean;
         var color: WideString): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetShowPdf = function(n: integer; m: integer; var id: integer;
+        var _label: WideString;  var description: WideString; var displayOrder: integer;
+        var color: WideString; var value: WideString): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetDate = function(n: integer; m: integer; var id: integer;
+        var _label: WideString;  var description: WideString; var displayOrder: integer;
+        var minValue: WideString; var maxValue: WideString; var mandatory: boolean;
+        var _readonly: boolean;  var color: WideString; var value: WideString): integer; stdcall;
+
   {$endregion}
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
@@ -56,6 +64,8 @@ type
     Core_TemplatFromXml_DataElement_DataItemCountFunc: TCore_TemplatFromXml_DataElement_DataItemCount;
     Core_TemplatFromXml_DataElement_GetDataItemTypeFunc: TCore_TemplatFromXml_DataElement_GetDataItemType;
     Core_TemplatFromXml_DataElement_GetPictureFunc: TCore_TemplatFromXml_DataElement_GetPicture;
+    Core_TemplatFromXml_DataElement_GetShowPdfFunc: TCore_TemplatFromXml_DataElement_GetShowPdf;
+    Core_TemplatFromXml_DataElement_GetDateFunc: TCore_TemplatFromXml_DataElement_GetDate;
     {$endregion}
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
@@ -93,6 +103,14 @@ type
     procedure Core_TemplatFromXml_DataElement_GetPicture(n: integer; m: integer; var id: integer;
         var _label: WideString; var description: WideString; var displayOrder: integer; var mandatory: boolean;
         var color: WideString);
+    procedure Core_TemplatFromXml_DataElement_GetShowPdf(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var color: WideString; var value: WideString);
+    procedure Core_TemplatFromXml_DataElement_GetDate(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var minValue: WideString; var maxValue: WideString; var mandatory: boolean;
+        var readonly: boolean; var color: WideString; var value: WideString);
+
     {$endregion}
 
     procedure AdminTools_Create(serverConnectionString: string);
@@ -184,6 +202,13 @@ begin
    if not Assigned (Core_TemplatFromXml_DataElement_GetPictureFunc) then
      raise Exception.Create('function Core_TemplatFromXml_DataElement_GetPicture not found');
 
+   @Core_TemplatFromXml_DataElement_GetShowPdfFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetShowPdf') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetShowPdfFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetShowPdf not found');
+
+   @Core_TemplatFromXml_DataElement_GetDateFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetDate') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetDateFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetDate not found');
 
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
@@ -365,6 +390,41 @@ begin
      raise Exception.Create(err);
   end;
 end;
+
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetShowPdf(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var color: WideString; var value: WideString);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetShowPdfFunc(n, m, id, _label, description, displayOrder,
+       color, value);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetDate(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var minValue: WideString; var maxValue: WideString; var mandatory: boolean;
+        var readonly: boolean; var color: WideString; var value: WideString);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetDateFunc(n, m, id, _label, description, displayOrder,
+       minValue, maxValue, mandatory, readonly, color, value);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
 
 {$endregion}
 
