@@ -34,7 +34,36 @@ type
         var _label: WideString;  var description: WideString; var displayOrder: integer;
         var minValue: WideString; var maxValue: WideString; var mandatory: boolean;
         var _readonly: boolean;  var color: WideString; var value: WideString): integer; stdcall;
-
+  TCore_TemplatFromXml_DataElement_GetSignature = function(n: integer; m: integer; var id: integer;
+        var _label: WideString;  var description: WideString; var displayOrder: integer; var mandatory: boolean;
+        var color: WideString): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetSaveButton = function(n: integer; m: integer; var id: integer;
+        var _label: WideString;  var description: WideString; var displayOrder: integer;
+        var value: WideString): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetTimer = function(n: integer; m: integer; var id: integer;
+        var _label: WideString;  var description: WideString; var displayOrder: integer;
+        var stopOnSave: Boolean; var mandatory: Boolean): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetNone = function(n: integer; m: integer; var id: integer;
+        var _label: WideString;  var description: WideString; var displayOrder: integer): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetCheckBox = function(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var mandatory: boolean; var selected: boolean): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetMultiSelect = function(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var mandatory: boolean): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetSingleSelect = function(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var mandatory: boolean): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetNumber = function(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var minValue: WideString; var maxValue: WideString; var mandatory:
+        boolean; var decimalCount: integer): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetText = function(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var geolocationEnabled: boolean;
+        var value: WideString; var readOnly: boolean; var mandatory: boolean): integer; stdcall;
+  TCore_TemplatFromXml_DataElement_GetComment = function(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var splitScreen: boolean;
+        var value: WideString; var readOnly: boolean; var mandatory: boolean): integer; stdcall;
   {$endregion}
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
@@ -66,6 +95,16 @@ type
     Core_TemplatFromXml_DataElement_GetPictureFunc: TCore_TemplatFromXml_DataElement_GetPicture;
     Core_TemplatFromXml_DataElement_GetShowPdfFunc: TCore_TemplatFromXml_DataElement_GetShowPdf;
     Core_TemplatFromXml_DataElement_GetDateFunc: TCore_TemplatFromXml_DataElement_GetDate;
+    Core_TemplatFromXml_DataElement_GetSignatureFunc: TCore_TemplatFromXml_DataElement_GetSignature;
+    Core_TemplatFromXml_DataElement_GetSaveButtonFunc: TCore_TemplatFromXml_DataElement_GetSaveButton;
+    Core_TemplatFromXml_DataElement_GetTimerFunc: TCore_TemplatFromXml_DataElement_GetTimer;
+    Core_TemplatFromXml_DataElement_GetNoneFunc: TCore_TemplatFromXml_DataElement_GetNone;
+    Core_TemplatFromXml_DataElement_GetCheckBoxFunc: TCore_TemplatFromXml_DataElement_GetCheckBox;
+    Core_TemplatFromXml_DataElement_GetMultiSelectFunc: TCore_TemplatFromXml_DataElement_GetMultiSelect;
+    Core_TemplatFromXml_DataElement_GetSingleSelectFunc: TCore_TemplatFromXml_DataElement_GetSingleSelect;
+    Core_TemplatFromXml_DataElement_GetNumberFunc: TCore_TemplatFromXml_DataElement_GetNumber;
+    Core_TemplatFromXml_DataElement_GetTextFunc: TCore_TemplatFromXml_DataElement_GetText;
+    Core_TemplatFromXml_DataElement_GetCommentFunc: TCore_TemplatFromXml_DataElement_GetComment;
     {$endregion}
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
@@ -110,7 +149,34 @@ type
         var _label: WideString; var description: WideString; var displayOrder: integer;
         var minValue: WideString; var maxValue: WideString; var mandatory: boolean;
         var readonly: boolean; var color: WideString; var value: WideString);
-
+    procedure Core_TemplatFromXml_DataElement_GetSignature(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer; var mandatory: boolean;
+        var color: WideString);
+    procedure Core_TemplatFromXml_DataElement_GetSaveButton(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer; var value: WideString);
+    procedure Core_TemplatFromXml_DataElement_GetTimer(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var stopOnSave: Boolean; var mandatory: Boolean);
+    procedure  Core_TemplatFromXml_DataElement_GetNone(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer);
+    procedure Core_TemplatFromXml_DataElement_GetCheckBox(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var mandatory: boolean; var selected: boolean);
+    procedure Core_TemplatFromXml_DataElement_GetMultiSelect(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var mandatory: boolean);
+    procedure Core_TemplatFromXml_DataElement_GetSingleSelect(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var mandatory: boolean);
+    procedure Core_TemplatFromXml_DataElement_GetNumber(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var minValue: WideString; var maxValue: WideString; var mandatory: boolean; var decimalCount: integer);
+    procedure Core_TemplatFromXml_DataElement_GetText(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var geolocationEnabled: boolean;
+        var value: WideString; var readOnly: boolean; var mandatory: boolean);
+    procedure Core_TemplatFromXml_DataElement_GetComment(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var splitScreen: boolean;
+        var value: WideString; var readOnly: boolean; var mandatory: boolean);
     {$endregion}
 
     procedure AdminTools_Create(serverConnectionString: string);
@@ -209,6 +275,46 @@ begin
    @Core_TemplatFromXml_DataElement_GetDateFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetDate') ;
    if not Assigned (Core_TemplatFromXml_DataElement_GetDateFunc) then
      raise Exception.Create('function Core_TemplatFromXml_DataElement_GetDate not found');
+
+   @Core_TemplatFromXml_DataElement_GetSignatureFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetSignature') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetSignatureFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetSignature not found');
+
+   @Core_TemplatFromXml_DataElement_GetSaveButtonFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetSaveButton') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetSaveButtonFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetSaveButton not found');
+
+   @Core_TemplatFromXml_DataElement_GetTimerFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetTimer') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetTimerFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetTimer not found');
+
+   @Core_TemplatFromXml_DataElement_GetNoneFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetNone') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetNoneFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetNone not found');
+
+   @Core_TemplatFromXml_DataElement_GetCheckBoxFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetCheckBox') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetCheckBoxFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetCheckBox not found');
+
+   @Core_TemplatFromXml_DataElement_GetMultiSelectFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetMultiSelect') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetMultiSelectFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetMultiSelect not found');
+
+   @Core_TemplatFromXml_DataElement_GetSingleSelectFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetSingleSelect') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetSingleSelectFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetSingleSelect not found');
+
+   @Core_TemplatFromXml_DataElement_GetNumberFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetNumber') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetNumberFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetNumber not found');
+
+   @Core_TemplatFromXml_DataElement_GetTextFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetText') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetTextFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetText not found');
+
+   @Core_TemplatFromXml_DataElement_GetCommentFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetComment') ;
+   if not Assigned (Core_TemplatFromXml_DataElement_GetCommentFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataElement_GetComment not found');
 
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
@@ -425,6 +531,162 @@ begin
   end;
 end;
 
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetSignature(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer; var mandatory: boolean;
+        var color: WideString);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetSignatureFunc(n, m, id, _label, description, displayOrder,
+      mandatory, color);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetSaveButton(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer; var value: WideString);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetSaveButtonFunc(n, m, id, _label, description, displayOrder, value);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetTimer(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var stopOnSave: Boolean; var mandatory: Boolean);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetTimerFunc(n, m, id, _label, description, displayOrder,
+    stopOnSave, mandatory);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetNone(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetNoneFunc(n, m, id, _label, description, displayOrder);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetCheckBox(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var mandatory: boolean; var selected: boolean);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetCheckBoxFunc(n, m, id, _label, description, displayOrder,
+      mandatory, selected);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetMultiSelect(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var mandatory: boolean);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetMultiSelectFunc(n, m, id, _label, description, displayOrder,
+      mandatory);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetSingleSelect(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var mandatory: boolean);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetSingleSelectFunc(n, m, id, _label, description, displayOrder,
+      mandatory);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetNumber(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var displayOrder: integer;
+        var minValue: WideString; var maxValue: WideString; var mandatory: boolean; var decimalCount: integer);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetNumberFunc(n, m, id, _label, description, displayOrder, minValue,
+      maxValue, mandatory, decimalCount);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetText(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var geolocationEnabled: boolean;
+        var value: WideString; var readOnly: boolean; var mandatory: boolean);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_DataElement_GetTextFunc(n, m, id, _label, description, geolocationEnabled,
+      value, readOnly, mandatory);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_TemplatFromXml_DataElement_GetComment(n: integer; m: integer; var id: integer;
+        var _label: WideString; var description: WideString; var splitScreen: boolean;
+        var value: WideString; var readOnly: boolean; var mandatory: boolean);
+var
+  res: integer;
+  err: WideString;
+begin
+   res := Core_TemplatFromXml_DataElement_GetCommentFunc(n, m, id, _label, description, splitScreen,
+      value, readOnly, mandatory);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
 
 {$endregion}
 

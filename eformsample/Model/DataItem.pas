@@ -25,11 +25,10 @@ type
  {$region 'children declaration'}
  {$region 'TAudio declaration'}
  TAudio = class(TDataItem)
- private
-    constructor Create; overload;
  public
    Multi: integer;
 
+   constructor Create; overload;
    constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
     displayOrder: integer; dummy: boolean; multi: integer); overload;
  end;
@@ -37,12 +36,11 @@ type
 
  {$region 'TCheckBox declaration'}
  TCheckBox = class(TDataItem)
- private
-    constructor Create; overload;
  public
    DefaultValue: boolean;
    Selected: boolean;
 
+   constructor Create; overload;
    constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
     displayOrder: integer; dummy: boolean; defaultValue: boolean; selected: boolean); overload;
  end;
@@ -50,13 +48,12 @@ type
 
  {$region 'TComment declaration'}
  TComment = class(TDataItem)
- private
-    constructor Create; overload;
  public
     Value: string;
     MaxLength: integer;
     SplitScreen: boolean;
 
+    constructor Create; overload;
     constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
      displayOrder: integer; dummy: boolean; value: string; maxLength: integer; splitScreen: boolean); overload;
  end;
@@ -85,9 +82,8 @@ type
 
  {$region 'TNone declaration'}
  TNone = class(TDataItem)
- private
-    constructor Create; overload;
  public
+   constructor Create; overload;
    constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
     displayOrder: integer; dummy: boolean); overload;
  end;
@@ -95,8 +91,6 @@ type
 
  {$region 'TNumber declaration'}
  TNumber = class(TDataItem)
- private
-    constructor Create; overload;
  public
     MinValue: string;
     MaxValue: string;
@@ -104,6 +98,7 @@ type
     DecimalCount: integer;
     UnitName: string;
 
+    constructor Create; overload;
     constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
       displayOrder: integer; dummy: boolean; minValue: string; maxValue: string; defaultValue:
       integer; decimalCount: integer; unitName: string); overload;
@@ -112,11 +107,10 @@ type
 
  {$region 'TMultiSelect declaration'}
  TMultiSelect = class(TDataItem)
- private
-    constructor Create; overload;
  public
     KeyValuePairList: TObjectList<TKeyValuePair>;
 
+    constructor Create; overload;
     constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
      displayOrder: integer; dummy: boolean; keyValuePairList: TObjectList<TKeyValuePair>); overload;
  end;
@@ -147,11 +141,10 @@ type
 
  {$region 'TSaveButton declaration'}
  TSaveButton = class(TDataItem)
- private
-    constructor Create; overload;
  public
     Value: string;
 
+    constructor Create; overload;
     constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
      displayOrder: integer; dummy: boolean; value: string); overload;
  end;
@@ -159,9 +152,8 @@ type
 
  {$region 'TSignature declaration'}
  TSignature = class(TDataItem)
- private
-    constructor Create; overload;
  public
+   constructor Create; overload;
    constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
     displayOrder: integer; dummy: boolean); overload;
  end;
@@ -181,8 +173,6 @@ type
 
  {$region 'TText declaration'}
  TText = class(TDataItem)
- private
-    constructor Create; overload;
  public
     Value: string;
     MaxLength: integer;
@@ -192,6 +182,7 @@ type
     BarcodeEnabled: boolean;
     BarcodeType: string;
 
+    constructor Create; overload;
     constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
       displayOrder: integer; dummy: boolean; value: string; maxLength: integer; geolocationEnabled:
       boolean; geolocationForced: boolean; geolocationHidden: boolean; barcodeEnabled: boolean; barcodeType: string); overload;
@@ -200,11 +191,10 @@ type
 
  {$region 'TTimer declaration'}
  TTimer = class(TDataItem)
- private
-    constructor Create; overload;
  public
     StopOnSave: boolean;
 
+    constructor Create; overload;
     constructor Create(id: integer; mandatory: boolean; readOnly: boolean; _label: string; description: string; color: string;
      displayOrder: integer; dummy: boolean; stopOnSave: boolean); overload;
  end;
