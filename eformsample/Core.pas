@@ -3,7 +3,7 @@ unit Core;
 interface
 
 uses
-  DllHelper, Events, SysUtils, MainElement, Element, Generics.Collections, Classes, DataItem;
+  DllHelper, Events, SysUtils, MainElement, Element, Generics.Collections, Classes, DataItem, DataItemGroup;
 
 type
   {$region 'TCore declaration'}
@@ -52,14 +52,15 @@ var
   mainElement: TMainElement;
   element: TElement;
   dataItem: TDataItem;
+  keyValuePair: TKeyValuePair;
 
   _label, description: WideString;
-  checkListFolderName, startDate, endDate: WideString;
+  key, checkListFolderName, startDate, endDate: WideString;
   language, caseType, color, value:  WideString;
-  minValue, maxValue, unitName: WideString;
+  minValue, maxValue, unitName, displayOrder: WideString;
   fs: TFormatSettings;
 
-  i, j, dataItemCount: integer;
+  i, j, k, dataItemCount, dataItemGroupCount, keyValueListCount: integer;
   elementType, dataItemType: WideString;
 begin
   mainElement:= TMainElement.Create;
@@ -90,8 +91,10 @@ begin
           element._Label := _label;
           element.Description := TCDataValue.Create;
           element.Description.InderValue := description;
-          (element as TDataElement).DataItemList := TObjectList<TDataItem>.Create;
+          {$region 'DataItemList'}
           dataItemCount := TDllHelper.GetInstance.GetInstance.Core_TemplatFromXml_DataElement_DataItemCount(i);
+          if dataItemCount > 0 then
+               (element as TDataElement).DataItemList := TObjectList<TDataItem>.Create;
           for j := 0 to dataItemCount - 1 do
           begin
               dataItemType := TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetDataItemType(i, j);
@@ -187,7 +190,19 @@ begin
                   dataItem._Label := _label;
                   dataItem.Description := TCDataValue.Create;
                   dataItem.Description.InderValue := description;
-                  // TODO KeyValuePairList
+
+                  keyValueListCount :=  TDllHelper.GetInstance.Core_TemplatFromXml_KeyValueListCount('DataElement_MultiSelect_' + IntToStr(i) + '_' + IntToStr(j));
+                  (dataItem as TMultiSelect).KeyValuePairList := TObjectList<TKeyValuePair>.Create();
+                  for k := 0 to keyValueListCount - 1 do
+                  begin
+                     keyValuePair := TKeyValuePair.Create();
+                     TDllHelper.GetInstance.Core_TemplatFromXml_GetKeyValuePair('DataElement_MultiSelect_' + IntToStr(i) + '_' + IntToStr(j) + '_' + IntToStr(k), key, value,
+                      keyValuePair.Selected, displayOrder);
+                     keyValuePair.Key := key;
+                     keyValuePair.Value := value;
+                     keyValuePair.DisplayOrder := displayOrder;
+                     (dataItem as TMultiSelect).KeyValuePairList.Add(keyValuePair);
+                  end;
               end
               else if dataItemType = 'SingleSelect' then
               begin
@@ -197,19 +212,32 @@ begin
                   dataItem._Label := _label;
                   dataItem.Description := TCDataValue.Create;
                   dataItem.Description.InderValue := description;
-                  // TODO KeyValuePairList
+
+                  keyValueListCount :=  TDllHelper.GetInstance.Core_TemplatFromXml_KeyValueListCount('DataElement_SingleSelect_' + IntToStr(i) + '_' + IntToStr(j));
+                  (dataItem as TMultiSelect).KeyValuePairList := TObjectList<TKeyValuePair>.Create();
+                  for k := 0 to keyValueListCount - 1 do
+                  begin
+                     keyValuePair := TKeyValuePair.Create();
+                     TDllHelper.GetInstance.Core_TemplatFromXml_GetKeyValuePair('DataElement_SingleSelect_' + IntToStr(i) + '_' + IntToStr(j) + '_' + IntToStr(k), key, value,
+                      keyValuePair.Selected, displayOrder);
+                     keyValuePair.Key := key;
+                     keyValuePair.Value := value;
+                     keyValuePair.DisplayOrder := displayOrder;
+                     (dataItem as TMultiSelect).KeyValuePairList.Add(keyValuePair);
+                  end;
               end
               else if dataItemType = 'Number' then
               begin
                   dataItem := TNumber.Create;
                   TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetNumber(i, j, dataItem.Id, _label,
                     description, dataItem.DisplayOrder, minValue, maxValue, dataItem.Mandatory,
-                    (dataItem as TNumber).DecimalCount);
+                    (dataItem as TNumber).DecimalCount, unitName);
                   dataItem._Label := _label;
                   dataItem.Description := TCDataValue.Create;
                   dataItem.Description.InderValue := description;
                   (dataItem as TNumber).MinValue := minValue;
                   (dataItem as TNumber).MaxValue := maxValue;
+                  (dataItem as TNumber).UnitName := unitName;
               end
               else if dataItemType = 'Text' then
               begin
@@ -235,6 +263,13 @@ begin
               end;
              (element as TDataElement).DataItemList.Add(dataItem);
             end;
+          {$endregion}
+          {$region 'DataItemGroupList'}
+          dataItemGroupCount := TDllHelper.GetInstance.GetInstance.Core_TemplatFromXml_DataItemGroupCount('DataElement' + '_' + IntToStr(i));
+          if dataItemGroupCount > 0 then
+               (element as TDataElement).DataItemGroupList := TObjectList<TDataItemGroup>.Create;
+
+          {$endregion}
       end;
       mainElement.ElementList.Add(element);
   end;

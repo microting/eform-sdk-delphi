@@ -51,14 +51,13 @@ type
 
   {$region 'TKeyValuePair declaration'}
   TKeyValuePair = class
-  private
-    constructor Create; overload;
   public
      Key: string;
      Value: string;
      Selected: boolean;
      DisplayOrder: string;
 
+     constructor Create; overload;
      constructor Create(key: string; value: string; selected: boolean; displayOrder: string); overload;
   end;
   {$endregion}

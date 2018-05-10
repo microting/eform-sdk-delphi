@@ -57,13 +57,17 @@ type
   TCore_TemplatFromXml_DataElement_GetNumber = function(n: integer; m: integer; var id: integer;
         var _label: WideString; var description: WideString; var displayOrder: integer;
         var minValue: WideString; var maxValue: WideString; var mandatory:
-        boolean; var decimalCount: integer): integer; stdcall;
+        boolean; var decimalCount: integer; var unitName: WideString): integer; stdcall;
   TCore_TemplatFromXml_DataElement_GetText = function(n: integer; m: integer; var id: integer;
         var _label: WideString; var description: WideString; var geolocationEnabled: boolean;
         var value: WideString; var readOnly: boolean; var mandatory: boolean): integer; stdcall;
   TCore_TemplatFromXml_DataElement_GetComment = function(n: integer; m: integer; var id: integer;
         var _label: WideString; var description: WideString; var splitScreen: boolean;
         var value: WideString; var readOnly: boolean; var mandatory: boolean): integer; stdcall;
+  TCore_TemplatFromXml_KeyValueListCount =  function(location: WideString; var count: integer): integer; stdcall;
+  TCore_TemplatFromXml_GetKeyValuePair = function(location: WideString; var key: WideString;
+        var value: WideString; var selected: Boolean; var displayOrder: WideString): integer; stdcall;
+  TCore_TemplatFromXml_DataItemGroupCount = function(location: WideString; var count: integer): integer;  stdcall;
   {$endregion}
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
@@ -105,6 +109,9 @@ type
     Core_TemplatFromXml_DataElement_GetNumberFunc: TCore_TemplatFromXml_DataElement_GetNumber;
     Core_TemplatFromXml_DataElement_GetTextFunc: TCore_TemplatFromXml_DataElement_GetText;
     Core_TemplatFromXml_DataElement_GetCommentFunc: TCore_TemplatFromXml_DataElement_GetComment;
+    Core_TemplatFromXml_KeyValueListCountFunc: TCore_TemplatFromXml_KeyValueListCount;
+    Core_TemplatFromXml_GetKeyValuePairFunc: TCore_TemplatFromXml_GetKeyValuePair;
+    Core_TemplatFromXml_DataItemGroupCountFunc: TCore_TemplatFromXml_DataItemGroupCount;
     {$endregion}
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
@@ -170,13 +177,18 @@ type
         var mandatory: boolean);
     procedure Core_TemplatFromXml_DataElement_GetNumber(n: integer; m: integer; var id: integer;
         var _label: WideString; var description: WideString; var displayOrder: integer;
-        var minValue: WideString; var maxValue: WideString; var mandatory: boolean; var decimalCount: integer);
+        var minValue: WideString; var maxValue: WideString; var mandatory: boolean; var decimalCount: integer;
+        var unitName: WideString);
     procedure Core_TemplatFromXml_DataElement_GetText(n: integer; m: integer; var id: integer;
         var _label: WideString; var description: WideString; var geolocationEnabled: boolean;
         var value: WideString; var readOnly: boolean; var mandatory: boolean);
     procedure Core_TemplatFromXml_DataElement_GetComment(n: integer; m: integer; var id: integer;
         var _label: WideString; var description: WideString; var splitScreen: boolean;
         var value: WideString; var readOnly: boolean; var mandatory: boolean);
+    function Core_TemplatFromXml_KeyValueListCount(location: WideString): integer;
+    procedure Core_TemplatFromXml_GetKeyValuePair(location: WideString; var key: WideString;
+        var value: WideString; var selected: Boolean; var displayOrder: WideString);
+    function Core_TemplatFromXml_DataItemGroupCount(location: WideString): integer;
     {$endregion}
 
     procedure AdminTools_Create(serverConnectionString: string);
@@ -315,6 +327,18 @@ begin
    @Core_TemplatFromXml_DataElement_GetCommentFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataElement_GetComment') ;
    if not Assigned (Core_TemplatFromXml_DataElement_GetCommentFunc) then
      raise Exception.Create('function Core_TemplatFromXml_DataElement_GetComment not found');
+
+   @Core_TemplatFromXml_KeyValueListCountFunc := GetProcAddress(handle, 'Core_TemplatFromXml_KeyValueListCount') ;
+   if not Assigned (Core_TemplatFromXml_KeyValueListCountFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_KeyValueListCount not found');
+
+   @Core_TemplatFromXml_GetKeyValuePairFunc := GetProcAddress(handle, 'Core_TemplatFromXml_GetKeyValuePair') ;
+   if not Assigned (Core_TemplatFromXml_GetKeyValuePairFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_GetKeyValuePair not found');
+
+   @Core_TemplatFromXml_DataItemGroupCountFunc := GetProcAddress(handle, 'Core_TemplatFromXml_DataItemGroupCount') ;
+   if not Assigned (Core_TemplatFromXml_DataItemGroupCountFunc) then
+     raise Exception.Create('function Core_TemplatFromXml_DataItemGroupCount not found');
 
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
@@ -462,8 +486,8 @@ begin
      raise Exception.Create(err);
   end;
   Result := count;
-
 end;
+
 
 function TDllHelper.Core_TemplatFromXml_DataElement_GetDataItemType(n: integer; m: integer): WideString;
 var
@@ -642,13 +666,14 @@ end;
 
 procedure TDllHelper.Core_TemplatFromXml_DataElement_GetNumber(n: integer; m: integer; var id: integer;
         var _label: WideString; var description: WideString; var displayOrder: integer;
-        var minValue: WideString; var maxValue: WideString; var mandatory: boolean; var decimalCount: integer);
+        var minValue: WideString; var maxValue: WideString; var mandatory: boolean; var decimalCount: integer;
+        var unitName: WideString);
 var
   res: integer;
   err: WideString;
 begin
   res := Core_TemplatFromXml_DataElement_GetNumberFunc(n, m, id, _label, description, displayOrder, minValue,
-      maxValue, mandatory, decimalCount);
+      maxValue, mandatory, decimalCount, unitName);
   if res <> 0 then
   begin
      err := LastErrorFunc;
@@ -686,6 +711,54 @@ begin
      err := LastErrorFunc;
      raise Exception.Create(err);
   end;
+end;
+
+function TDllHelper.Core_TemplatFromXml_KeyValueListCount(location: WideString): integer;
+var
+  res: integer;
+  err: WideString;
+  count: integer;
+begin
+  count := 0;
+  res := Core_TemplatFromXml_KeyValueListCountFunc(location, count);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  Result := count;
+end;
+
+
+procedure TDllHelper.Core_TemplatFromXml_GetKeyValuePair(location: WideString; var key: WideString;
+        var value: WideString; var selected: Boolean; var displayOrder: WideString);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplatFromXml_GetKeyValuePairFunc(location, key, value, selected, displayOrder);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+
+function TDllHelper.Core_TemplatFromXml_DataItemGroupCount(location: WideString): integer;
+var
+  res: integer;
+  err: WideString;
+  count: integer;
+begin
+  count := 0;
+  res := Core_TemplatFromXml_DataItemGroupCountFunc(location, count);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  Result := count;
 end;
 
 {$endregion}

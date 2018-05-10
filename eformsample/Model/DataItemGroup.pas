@@ -20,7 +20,7 @@ type
   end;
   {$endregion}
 
-  {$region 'TDateItemGroup declaration'}
+  {$region 'TFieldGroup declaration'}
   TFieldGroup = class(TDataItemGroup)
   private
      constructor Create; overload;
