@@ -7,13 +7,12 @@ uses  DataItemGroup, Generics.Collections, Classes, DataItem, SysUtils;
 type
  {$region 'TFieldContainer declaration'}
  TFieldContainer = class(TDataItem)
- private
-   constructor Create; overload;
  public
     Value: string;
     FieldType: string;
     DataItemList: TObjectList<TDataItem>;
 
+    constructor Create; overload;
     constructor Create(id: integer; _label: string; description: TCDataValue; color: string; displayOrder: integer;
       value: string; dataItemList: TObjectList<TDataItem>); overload;
 

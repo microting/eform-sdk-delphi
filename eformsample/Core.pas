@@ -3,7 +3,8 @@ unit Core;
 interface
 
 uses
-  DllHelper, Events, SysUtils, MainElement, Element, Generics.Collections, Classes, DataItem, DataItemGroup;
+  DllHelper, Events, SysUtils, MainElement, Element, Generics.Collections, Classes, DataItem, DataItemGroup,
+    FieldContainer;
 
 type
   {$region 'TCore declaration'}
@@ -13,6 +14,7 @@ type
 
     procedure SetCoreStartEvent(Value: TCoreStartEvent);
     //procedure OnCoreStartEvent;
+    function GetDataItemList(path: string): TObjectList<TDataItem>;
   public
     constructor Create;
     procedure Start(serverConnectionString: string);
@@ -47,21 +49,218 @@ begin
    TDllHelper.GetInstance.Core_SubscribeStartEvent(LongInt(@OnCoreStartEvent));
 end;
 
+
+function TCore.GetDataItemList(path: string): TObjectList<TDataItem>;
+var
+   dataItem: TDataItem;
+   keyValuePair: TKeyValuePair;
+
+   _label, description: WideString;
+   key:  WideString;
+   color, value, fieldType:  WideString;
+   minValue, maxValue, unitName, displayOrder: WideString;
+   fs: TFormatSettings;
+
+   dataItemList: TObjectList<TDataItem>;
+   i, j, k, dataItemCount, keyValueListCount: integer;
+   dataItemType: WideString;
+begin
+    fs := TFormatSettings.Create;
+    fs.DateSeparator := '-';
+    fs.ShortDateFormat := 'yyyy-MM-dd';
+
+
+    dataItemList := TObjectList<TDataItem>.Create;
+    dataItemCount := TDllHelper.GetInstance.GetInstance.Core_TemplatFromXml_DataItemCount(path);
+    for j := 0 to dataItemCount - 1 do
+    begin
+        dataItemType := TDllHelper.GetInstance.Core_TemplatFromXml_GetDataItemType(path + '_' + IntToStr(j));
+        if dataItemType = 'Picture' then
+        begin
+            dataItem := TPicture.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetPicture(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, dataItem.DisplayOrder, dataItem.Mandatory, color);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+            dataItem.Color := color;
+        end
+        else if dataItemType = 'ShowPdf' then
+        begin
+            dataItem := TShowPdf.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetShowPdf(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, dataItem.DisplayOrder, color, value);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+            dataItem.Color := color;
+            (dataItem as TShowPdf).Value := value;
+        end
+        else if dataItemType = 'Date' then
+        begin
+            dataItem := TDate.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetDate(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, dataItem.DisplayOrder, minValue, maxValue, dataItem.Mandatory, dataItem.ReadOnly,
+              color, value);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+            dataItem.Color := color;
+            (dataItem as TDate).MinValue := StrToDate(minValue, fs);
+            (dataItem as TDate).MaxValue := StrToDate(maxValue, fs);
+            (dataItem as TDate).DefaultValue := value;
+        end
+        else if dataItemType = 'Signature' then
+        begin
+            dataItem := TSignature.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetSignature(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, dataItem.DisplayOrder, dataItem.Mandatory, color);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+            dataItem.Color := color;
+        end
+        else if dataItemType = 'SaveButton' then
+        begin
+            dataItem := TSaveButton.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetSaveButton(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, dataItem.DisplayOrder, value);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+            dataItem.Color := color;
+            (dataItem as TSaveButton).Value := value;
+        end
+        else if dataItemType = 'Timer' then
+        begin
+            dataItem := TTimer.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetTimer(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, dataItem.DisplayOrder, (dataItem as TTimer).StopOnSave, dataItem.Mandatory);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+            dataItem.Color := color;
+        end
+        else if dataItemType = 'None' then
+        begin
+            dataItem := TNone.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetNone(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, dataItem.DisplayOrder);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+        end
+        else if dataItemType = 'CheckBox' then
+        begin
+            dataItem := TCheckBox.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetCheckBox(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, dataItem.DisplayOrder, dataItem.Mandatory, (dataItem as TCheckBox).Selected);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+        end
+        else if dataItemType = 'MultiSelect' then
+        begin
+            dataItem := TMultiSelect.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetMultiSelect(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, dataItem.DisplayOrder, dataItem.Mandatory);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+
+            keyValueListCount :=  TDllHelper.GetInstance.Core_TemplatFromXml_KeyValueListCount(path + '_' + IntToStr(j) + '_MultiSelect');
+            (dataItem as TMultiSelect).KeyValuePairList := TObjectList<TKeyValuePair>.Create();
+            for k := 0 to keyValueListCount - 1 do
+            begin
+               keyValuePair := TKeyValuePair.Create();
+               TDllHelper.GetInstance.Core_TemplatFromXml_GetKeyValuePair(path + '_' + IntToStr(j) + '_MultiSelect_' + IntToStr(k), key, value,
+                keyValuePair.Selected, displayOrder);
+               keyValuePair.Key := key;
+               keyValuePair.Value := value;
+               keyValuePair.DisplayOrder := displayOrder;
+               (dataItem as TMultiSelect).KeyValuePairList.Add(keyValuePair);
+            end;
+        end
+        else if dataItemType = 'SingleSelect' then
+        begin
+            dataItem := TMultiSelect.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetSingleSelect(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, dataItem.DisplayOrder, dataItem.Mandatory);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+
+            keyValueListCount :=  TDllHelper.GetInstance.Core_TemplatFromXml_KeyValueListCount(path +'_' + IntToStr(j) + '_SingleSelect');
+            (dataItem as TMultiSelect).KeyValuePairList := TObjectList<TKeyValuePair>.Create();
+            for k := 0 to keyValueListCount - 1 do
+            begin
+               keyValuePair := TKeyValuePair.Create();
+               TDllHelper.GetInstance.Core_TemplatFromXml_GetKeyValuePair(path + '_' + IntToStr(j) + '_SingleSelect_' + IntToStr(k), key, value,
+                keyValuePair.Selected, displayOrder);
+               keyValuePair.Key := key;
+               keyValuePair.Value := value;
+               keyValuePair.DisplayOrder := displayOrder;
+               (dataItem as TMultiSelect).KeyValuePairList.Add(keyValuePair);
+            end;
+        end
+        else if dataItemType = 'Number' then
+        begin
+            dataItem := TNumber.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetNumber(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, dataItem.DisplayOrder, minValue, maxValue, dataItem.Mandatory,
+              (dataItem as TNumber).DecimalCount, unitName);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+            (dataItem as TNumber).MinValue := minValue;
+            (dataItem as TNumber).MaxValue := maxValue;
+            (dataItem as TNumber).UnitName := unitName;
+        end
+        else if dataItemType = 'Text' then
+        begin
+            dataItem := TText.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetText(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, (dataItem as TText).GeolocationEnabled, value, dataItem.Mandatory
+              , dataItem.ReadOnly);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+            (dataItem as TText).Value := value;
+        end
+        else if dataItemType = 'Comment' then
+        begin
+            dataItem := TComment.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetComment(path + '_' + IntToStr(j), dataItem.Id, _label,
+              description, (dataItem as TComment).SplitScreen, value, dataItem.Mandatory
+              , dataItem.ReadOnly);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
+            (dataItem as TComment).Value := value;
+        end
+        else if dataItemType = 'FieldContainer' then
+        begin
+            dataItem := TFieldContainer.Create;
+            TDllHelper.GetInstance.Core_TemplatFromXml_GetFieldContainer(path + '_' + IntToStr(j),
+              value, fieldType);
+            (dataItem as TFieldContainer).Value := value;
+            (dataItem as TFieldContainer).FieldType := fieldType;
+            (dataItem as TFieldContainer).DataItemList := GetDataItemList(path + '_' + IntToStr(j));
+        end;
+        dataItemList.Add(dataItem);
+      end;
+   result := dataItemList;
+end;
+
 function TCore.TemplatFromXml(xml: string): TMainElement;
 var
   mainElement: TMainElement;
   element: TElement;
-  dataItem: TDataItem;
-  keyValuePair: TKeyValuePair;
-
-  _label, description: WideString;
-  key, checkListFolderName, startDate, endDate: WideString;
-  language, caseType, color, value:  WideString;
-  minValue, maxValue, unitName, displayOrder: WideString;
+  _label, elementType, checkListFolderName: WideString;
+  startDate, endDate, language, caseType: WideString;
+  description: WideString;
   fs: TFormatSettings;
-
-  i, j, k, dataItemCount, dataItemGroupCount, keyValueListCount: integer;
-  elementType, dataItemType: WideString;
+  i, dataItemGroupCount: integer;
 begin
   mainElement:= TMainElement.Create;
   TDllHelper.GetInstance.Core_TemplatFromXml(xml, mainElement.Id, _label, mainElement.DisplayOrder,
@@ -92,177 +291,8 @@ begin
           element.Description := TCDataValue.Create;
           element.Description.InderValue := description;
           {$region 'DataItemList'}
-          dataItemCount := TDllHelper.GetInstance.GetInstance.Core_TemplatFromXml_DataElement_DataItemCount(i);
-          if dataItemCount > 0 then
-               (element as TDataElement).DataItemList := TObjectList<TDataItem>.Create;
-          for j := 0 to dataItemCount - 1 do
-          begin
-              dataItemType := TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetDataItemType(i, j);
-              if dataItemType = 'Picture' then
-              begin
-                  dataItem := TPicture.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetPicture(i, j, dataItem.Id, _label,
-                    description, dataItem.DisplayOrder, dataItem.Mandatory, color);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-                  dataItem.Color := color;
-              end
-              else if dataItemType = 'ShowPdf' then
-              begin
-                  dataItem := TShowPdf.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetShowPdf(i, j, dataItem.Id, _label,
-                    description, dataItem.DisplayOrder, color, value);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-                  dataItem.Color := color;
-                  (dataItem as TShowPdf).Value := value;
-              end
-              else if dataItemType = 'Date' then
-              begin
-                  dataItem := TDate.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetDate(i, j, dataItem.Id, _label,
-                    description, dataItem.DisplayOrder, minValue, maxValue, dataItem.Mandatory, dataItem.ReadOnly,
-                    color, value);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-                  dataItem.Color := color;
-                  (dataItem as TDate).MinValue := StrToDate(minValue, fs);
-                  (dataItem as TDate).MaxValue := StrToDate(maxValue, fs);
-                  (dataItem as TDate).DefaultValue := value;
-              end
-              else if dataItemType = 'Signature' then
-              begin
-                  dataItem := TSignature.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetSignature(i, j, dataItem.Id, _label,
-                    description, dataItem.DisplayOrder, dataItem.Mandatory, color);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-                  dataItem.Color := color;
-              end
-              else if dataItemType = 'SaveButton' then
-              begin
-                  dataItem := TSaveButton.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetSaveButton(i, j, dataItem.Id, _label,
-                    description, dataItem.DisplayOrder, value);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-                  dataItem.Color := color;
-                  (dataItem as TSaveButton).Value := value;
-              end
-              else if dataItemType = 'Timer' then
-              begin
-                  dataItem := TTimer.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetTimer(i, j, dataItem.Id, _label,
-                    description, dataItem.DisplayOrder, (dataItem as TTimer).StopOnSave, dataItem.Mandatory);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-                  dataItem.Color := color;
-              end
-              else if dataItemType = 'None' then
-              begin
-                  dataItem := TNone.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetNone(i, j, dataItem.Id, _label,
-                    description, dataItem.DisplayOrder);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-              end
-              else if dataItemType = 'CheckBox' then
-              begin
-                  dataItem := TCheckBox.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetCheckBox(i, j, dataItem.Id, _label,
-                    description, dataItem.DisplayOrder, dataItem.Mandatory, (dataItem as TCheckBox).Selected);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-              end
-              else if dataItemType = 'MultiSelect' then
-              begin
-                  dataItem := TMultiSelect.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetMultiSelect(i, j, dataItem.Id, _label,
-                    description, dataItem.DisplayOrder, dataItem.Mandatory);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
+          (element as TDataElement).DataItemList := GetDataItemList('DataElement_' + IntToStr(i));
 
-                  keyValueListCount :=  TDllHelper.GetInstance.Core_TemplatFromXml_KeyValueListCount('DataElement_MultiSelect_' + IntToStr(i) + '_' + IntToStr(j));
-                  (dataItem as TMultiSelect).KeyValuePairList := TObjectList<TKeyValuePair>.Create();
-                  for k := 0 to keyValueListCount - 1 do
-                  begin
-                     keyValuePair := TKeyValuePair.Create();
-                     TDllHelper.GetInstance.Core_TemplatFromXml_GetKeyValuePair('DataElement_MultiSelect_' + IntToStr(i) + '_' + IntToStr(j) + '_' + IntToStr(k), key, value,
-                      keyValuePair.Selected, displayOrder);
-                     keyValuePair.Key := key;
-                     keyValuePair.Value := value;
-                     keyValuePair.DisplayOrder := displayOrder;
-                     (dataItem as TMultiSelect).KeyValuePairList.Add(keyValuePair);
-                  end;
-              end
-              else if dataItemType = 'SingleSelect' then
-              begin
-                  dataItem := TMultiSelect.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetSingleSelect(i, j, dataItem.Id, _label,
-                    description, dataItem.DisplayOrder, dataItem.Mandatory);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-
-                  keyValueListCount :=  TDllHelper.GetInstance.Core_TemplatFromXml_KeyValueListCount('DataElement_SingleSelect_' + IntToStr(i) + '_' + IntToStr(j));
-                  (dataItem as TMultiSelect).KeyValuePairList := TObjectList<TKeyValuePair>.Create();
-                  for k := 0 to keyValueListCount - 1 do
-                  begin
-                     keyValuePair := TKeyValuePair.Create();
-                     TDllHelper.GetInstance.Core_TemplatFromXml_GetKeyValuePair('DataElement_SingleSelect_' + IntToStr(i) + '_' + IntToStr(j) + '_' + IntToStr(k), key, value,
-                      keyValuePair.Selected, displayOrder);
-                     keyValuePair.Key := key;
-                     keyValuePair.Value := value;
-                     keyValuePair.DisplayOrder := displayOrder;
-                     (dataItem as TMultiSelect).KeyValuePairList.Add(keyValuePair);
-                  end;
-              end
-              else if dataItemType = 'Number' then
-              begin
-                  dataItem := TNumber.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetNumber(i, j, dataItem.Id, _label,
-                    description, dataItem.DisplayOrder, minValue, maxValue, dataItem.Mandatory,
-                    (dataItem as TNumber).DecimalCount, unitName);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-                  (dataItem as TNumber).MinValue := minValue;
-                  (dataItem as TNumber).MaxValue := maxValue;
-                  (dataItem as TNumber).UnitName := unitName;
-              end
-              else if dataItemType = 'Text' then
-              begin
-                  dataItem := TText.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetText(i, j, dataItem.Id, _label,
-                    description, (dataItem as TText).GeolocationEnabled, value, dataItem.Mandatory
-                    , dataItem.ReadOnly);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-                  (dataItem as TText).Value := value;
-              end
-              else if dataItemType = 'Comment' then
-              begin
-                  dataItem := TComment.Create;
-                  TDllHelper.GetInstance.Core_TemplatFromXml_DataElement_GetComment(i, j, dataItem.Id, _label,
-                    description, (dataItem as TComment).SplitScreen, value, dataItem.Mandatory
-                    , dataItem.ReadOnly);
-                  dataItem._Label := _label;
-                  dataItem.Description := TCDataValue.Create;
-                  dataItem.Description.InderValue := description;
-                  (dataItem as TComment).Value := value;
-              end;
-             (element as TDataElement).DataItemList.Add(dataItem);
-            end;
           {$endregion}
           {$region 'DataItemGroupList'}
           dataItemGroupCount := TDllHelper.GetInstance.GetInstance.Core_TemplatFromXml_DataItemGroupCount('DataElement' + '_' + IntToStr(i));

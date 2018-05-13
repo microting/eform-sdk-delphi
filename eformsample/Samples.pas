@@ -3,7 +3,7 @@ unit Samples;
 interface
 
 uses
-  Core, SysUtils, MainElement, IOUtils, Element, DataItem,  Generics.Collections, Classes;
+  Core, SysUtils, MainElement, IOUtils, Element, DataItem,  Generics.Collections, Classes, FieldContainer;
 
 type
   {$region 'TSamples declaration'}
@@ -13,6 +13,7 @@ type
       Core: TCore;
 
       procedure Print(mainElement: TMainElement);
+      procedure PrintDataItemList(dataItemList: TObjectList<TDataItem>; offset: string);
       procedure PrintKeyValuePairList(list:  TObjectList<TKeyValuePair>; offset: string);
       procedure Sample1;
   public
@@ -81,8 +82,8 @@ begin
           filename := input;
           if filename = '' then
             //filename := 'field_groups_example.xml';
-           // filename := 'options_with_microting_example.xml';
-           filename := 'picture_test.xml';
+            filename := 'options_with_microting_example.xml';
+           // filename := 'picture_test.xml';
            //  filename := 'picture_signature_example.xml';
             //filename := 'pdf_test.xml';
            //  filename := 'date_example.xml';
@@ -99,21 +100,6 @@ procedure TSamples.Print(mainElement: TMainElement);
 var 
   element: TElement;  
   dataElement: TDataElement;
-
-  dataItem: TDataItem;
-  picture: TPicture;
-  showPdf: TShowPdf;
-  signature: TSignature;
-  date: TDate;
-  checkBox: TCheckBox;
-  saveButton: TSaveButton;
-  timer: TTimer;
-  none: TNone;
-  multiSelect: TMultiSelect;
-  singleSelect: TSingleSelect;
-  number: TNumber;
-  text: TText;
-  comment: TComment;
 begin
    WriteLn('');
    WriteLn('Main element:');
@@ -148,164 +134,7 @@ begin
          WriteLn('  ApprovalEnabled: ' + BoolToStr(dataElement.ApprovalEnabled));
          {$region 'DataItemList'}
          if dataElement.DataItemList.Count > 0 then
-         begin
-             WriteLn('  DataItemList:');
-             for dataItem in dataElement.DataItemList do
-             begin
-                WriteLn('    DataItem:');
-                if dataItem is TPicture then
-                begin
-                    picture := dataItem as TPicture;
-                    WriteLn('    Type: Picture');
-                    WriteLn('    Id: ' + IntToStr(picture.Id));
-                    WriteLn('    Label: ' + picture._Label);
-                    WriteLn('    Description: ' + picture.Description.InderValue);
-                    WriteLn('    DisplayOrder: ' + IntToStr(picture.DisplayOrder));
-                    WriteLn('    Mandatory: ' + BoolToStr(picture.Mandatory));
-                    WriteLn('    Color: ' + picture.Color);
-                end
-                else if dataItem is TShowPdf then
-                begin
-                    showPdf := dataItem as TShowPdf;
-                    WriteLn('    Type: ShowPdf');
-                    WriteLn('    Id: ' + IntToStr(showPdf.Id));
-                    WriteLn('    Label: ' + showPdf._Label);
-                    WriteLn('    Description: ' + showPdf.Description.InderValue);
-                    WriteLn('    DisplayOrder: ' + IntToStr(showPdf.DisplayOrder));
-                    WriteLn('    Color: ' + showPdf.Color);
-                    WriteLn('    Value: ' + showPdf.Value);
-                end
-                else if dataItem is TDate then
-                begin
-                    date := dataItem as TDate;
-                    WriteLn('    Type: Date');
-                    WriteLn('    Id: ' + IntToStr(date.Id));
-                    WriteLn('    Label: ' + date._Label);
-                    WriteLn('    Description: ' + date.Description.InderValue);
-                    WriteLn('    DisplayOrder: ' + IntToStr(date.DisplayOrder));
-                    WriteLn('    MinValue: ' + DateToStr(date.MinValue));
-                    WriteLn('    MaxValue: ' + DateToStr(date.MaxValue));
-                    WriteLn('    Mandatory: ' + BoolToStr(date.Mandatory));
-                    WriteLn('    ReadOnly: ' + BoolToStr(date.ReadOnly));
-                    WriteLn('    Color: ' + date.Color);
-                    WriteLn('    Value: ' + date.DefaultValue);
-                end
-                else if dataItem is TSignature then
-                begin
-                    signature := dataItem as TSignature;
-                    WriteLn('    Type: Signature');
-                    WriteLn('    Id: ' + IntToStr(signature.Id));
-                    WriteLn('    Label: ' + signature._Label);
-                    WriteLn('    Description: ' + signature.Description.InderValue);
-                    WriteLn('    DisplayOrder: ' + IntToStr(signature.DisplayOrder));
-                    WriteLn('    Mandatory: ' + BoolToStr(signature.Mandatory));
-                    WriteLn('    Color: ' + signature.Color);
-                end
-                else if dataItem is TCheckBox then
-                begin
-                    checkBox := dataItem as TCheckBox;
-                    WriteLn('    Type: CheckBox');
-                    WriteLn('    Id: ' + IntToStr(checkBox.Id));
-                    WriteLn('    Label: ' + checkBox._Label);
-                    WriteLn('    Description: ' + checkBox.Description.InderValue);
-                    WriteLn('    DisplayOrder: ' + IntToStr(checkBox.DisplayOrder));
-                    WriteLn('    Mandatory: ' + BoolToStr(checkBox.Mandatory));
-                    WriteLn('    Selected: ' + BoolToStr(checkBox.Selected));
-                end
-                else if dataItem is TSaveButton then
-                begin
-                    saveButton := dataItem as TSaveButton;
-                    WriteLn('    Type: SaveButton');
-                    WriteLn('    Id: ' + IntToStr(saveButton.Id));
-                    WriteLn('    Label: ' + saveButton._Label);
-                    WriteLn('    Description: ' + saveButton.Description.InderValue);
-                    WriteLn('    DisplayOrder: ' + IntToStr(saveButton.DisplayOrder));
-                    WriteLn('    Value: ' + saveButton.Value);
-                end
-                else if dataItem is TTimer then
-                begin
-                    timer := dataItem as TTimer;
-                    WriteLn('    Type: Timer');
-                    WriteLn('    Id: ' + IntToStr(timer.Id));
-                    WriteLn('    Label: ' + timer._Label);
-                    WriteLn('    Description: ' + timer.Description.InderValue);
-                    WriteLn('    DisplayOrder: ' + IntToStr(timer.DisplayOrder));
-                    WriteLn('    StopOnSave: ' + BoolToStr(timer.StopOnSave));
-                    WriteLn('    Mandatory: ' + BoolToStr(timer.Mandatory));
-                end
-                else if dataItem is TNone then
-                begin
-                    none := dataItem as TNone;
-                    WriteLn('    Type: None');
-                    WriteLn('    Id: ' + IntToStr(none.Id));
-                    WriteLn('    Label: ' + none._Label);
-                    WriteLn('    Description: ' + none.Description.InderValue);
-                    WriteLn('    DisplayOrder: ' + IntToStr(none.DisplayOrder));
-                end
-                else if dataItem is TMultiSelect then
-                begin
-                    multiSelect := dataItem as TMultiSelect;
-                    WriteLn('    Type: MultiSelect');
-                    WriteLn('    Id: ' + IntToStr(multiSelect.Id));
-                    WriteLn('    Label: ' + multiSelect._Label);
-                    WriteLn('    Description: ' + multiSelect.Description.InderValue);
-                    WriteLn('    DisplayOrder: ' + IntToStr(multiSelect.DisplayOrder));
-                    WriteLn('    Mandatory: ' + BoolToStr(multiSelect.Mandatory));
-                    WriteLn('    KeyValuePairList:');
-                    PrintKeyValuePairList(multiSelect.KeyValuePairList, '      ');
-                end
-                else if dataItem is TSingleSelect then
-                begin
-                    singleSelect := dataItem as TSingleSelect;
-                    WriteLn('    Type: SingleSelect');
-                    WriteLn('    Id: ' + IntToStr(singleSelect.Id));
-                    WriteLn('    Label: ' + singleSelect._Label);
-                    WriteLn('    Description: ' + singleSelect.Description.InderValue);
-                    WriteLn('    DisplayOrder: ' + IntToStr(singleSelect.DisplayOrder));
-                    WriteLn('    Mandatory: ' + BoolToStr(singleSelect.Mandatory));
-                    WriteLn('    KeyValuePairList:');
-                    PrintKeyValuePairList(singleSelect.KeyValuePairList, '      ');
-                end
-                else if dataItem is TNumber then
-                begin
-                    number := dataItem as TNumber;
-                    WriteLn('    Type: Number');
-                    WriteLn('    Id: ' + IntToStr(number.Id));
-                    WriteLn('    Label: ' + number._Label);
-                    WriteLn('    Description: ' + number.Description.InderValue);
-                    WriteLn('    DisplayOrder: ' + IntToStr(number.DisplayOrder));
-                    WriteLn('    MinValue: ' + number.MinValue);
-                    WriteLn('    MaxValue: ' + number.MaxValue);
-                    WriteLn('    Mandatory: ' + BoolToStr(number.Mandatory));
-                    WriteLn('    DecimalCount: ' + IntToStr(number.DecimalCount));
-                    WriteLn('    UnitName: ' + number.UnitName);
-                end
-                else if dataItem is TText then
-                begin
-                    text := dataItem as TText;
-                    WriteLn('    Type: Text');
-                    WriteLn('    Id: ' + IntToStr(text.Id));
-                    WriteLn('    Label: ' + text._Label);
-                    WriteLn('    Description: ' + text.Description.InderValue);
-                    WriteLn('    GeolocationEnabled: ' + BoolToStr(text.GeolocationEnabled));
-                    WriteLn('    Value: ' + text.Value);
-                    WriteLn('    ReadOnly: ' + BoolToStr(text.ReadOnly));
-                    WriteLn('    Mandatory: ' + BoolToStr(text.Mandatory));
-                 end
-                else if dataItem is TComment then
-                begin
-                    comment := dataItem as TComment;
-                    WriteLn('    Type: Comment');
-                    WriteLn('    Id: ' + IntToStr(comment.Id));
-                    WriteLn('    Label: ' + comment._Label);
-                    WriteLn('    Description: ' + comment.Description.InderValue);
-                    WriteLn('    SplitScreen: ' + BoolToStr(comment.SplitScreen));
-                    WriteLn('    Value: ' + comment.Value);
-                    WriteLn('    ReadOnly: ' + BoolToStr(comment.ReadOnly));
-                    WriteLn('    Mandatory: ' + BoolToStr(comment.Mandatory));
-                 end
-             end;
-         end;
+            PrintDataItemList(dataElement.DataItemList,'  ');
          {$endregion}
          {$region 'DataItemGroupList'}
          if dataElement.DataItemGroupList.Count > 0 then
@@ -317,6 +146,191 @@ begin
 
    end;
    WriteLn('');
+end;
+
+procedure TSamples.PrintDataItemList(dataItemList: TObjectList<TDataItem>; offset: string);
+var
+  dataItem: TDataItem;
+  picture: TPicture;
+  showPdf: TShowPdf;
+  signature: TSignature;
+  date: TDate;
+  checkBox: TCheckBox;
+  saveButton: TSaveButton;
+  timer: TTimer;
+  none: TNone;
+  multiSelect: TMultiSelect;
+  singleSelect: TSingleSelect;
+  number: TNumber;
+  text: TText;
+  comment: TComment;
+  fieldContainer: TFieldContainer;
+begin
+   WriteLn(offset + 'DataItemList:');
+   for dataItem in dataItemList do
+   begin
+      WriteLn(offset + 'DataItem:');
+      if dataItem is TPicture then
+      begin
+          picture := dataItem as TPicture;
+          WriteLn(offset + 'Type: Picture');
+          WriteLn(offset + 'Id: ' + IntToStr(picture.Id));
+          WriteLn(offset + 'Label: ' + picture._Label);
+          WriteLn(offset + 'Description: ' + picture.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(picture.DisplayOrder));
+          WriteLn(offset + 'Mandatory: ' + BoolToStr(picture.Mandatory));
+          WriteLn(offset + 'Color: ' + picture.Color);
+      end
+      else if dataItem is TShowPdf then
+      begin
+          showPdf := dataItem as TShowPdf;
+          WriteLn(offset + 'Type: ShowPdf');
+          WriteLn(offset + 'Id: ' + IntToStr(showPdf.Id));
+          WriteLn(offset + 'Label: ' + showPdf._Label);
+          WriteLn(offset + 'Description: ' + showPdf.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(showPdf.DisplayOrder));
+          WriteLn(offset + 'Color: ' + showPdf.Color);
+          WriteLn(offset + 'Value: ' + showPdf.Value);
+      end
+      else if dataItem is TDate then
+      begin
+          date := dataItem as TDate;
+          WriteLn(offset + 'Type: Date');
+          WriteLn(offset + 'Id: ' + IntToStr(date.Id));
+          WriteLn(offset + 'Label: ' + date._Label);
+          WriteLn(offset + 'Description: ' + date.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(date.DisplayOrder));
+          WriteLn(offset + 'MinValue: ' + DateToStr(date.MinValue));
+          WriteLn(offset + 'MaxValue: ' + DateToStr(date.MaxValue));
+          WriteLn(offset + 'Mandatory: ' + BoolToStr(date.Mandatory));
+          WriteLn(offset + 'ReadOnly: ' + BoolToStr(date.ReadOnly));
+          WriteLn(offset + 'Color: ' + date.Color);
+          WriteLn(offset + 'Value: ' + date.DefaultValue);
+      end
+      else if dataItem is TSignature then
+      begin
+          signature := dataItem as TSignature;
+          WriteLn(offset + 'Type: Signature');
+          WriteLn(offset + 'Id: ' + IntToStr(signature.Id));
+          WriteLn(offset + 'Label: ' + signature._Label);
+          WriteLn(offset + 'Description: ' + signature.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(signature.DisplayOrder));
+          WriteLn(offset + 'Mandatory: ' + BoolToStr(signature.Mandatory));
+          WriteLn(offset + 'Color: ' + signature.Color);
+      end
+      else if dataItem is TCheckBox then
+      begin
+          checkBox := dataItem as TCheckBox;
+          WriteLn(offset + 'Type: CheckBox');
+          WriteLn(offset + 'Id: ' + IntToStr(checkBox.Id));
+          WriteLn(offset + 'Label: ' + checkBox._Label);
+          WriteLn(offset + 'Description: ' + checkBox.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(checkBox.DisplayOrder));
+          WriteLn(offset + 'Mandatory: ' + BoolToStr(checkBox.Mandatory));
+          WriteLn(offset + 'Selected: ' + BoolToStr(checkBox.Selected));
+      end
+      else if dataItem is TSaveButton then
+      begin
+          saveButton := dataItem as TSaveButton;
+          WriteLn(offset + 'Type: SaveButton');
+          WriteLn(offset + 'Id: ' + IntToStr(saveButton.Id));
+          WriteLn(offset + 'Label: ' + saveButton._Label);
+          WriteLn(offset + 'Description: ' + saveButton.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(saveButton.DisplayOrder));
+          WriteLn(offset + 'Value: ' + saveButton.Value);
+      end
+      else if dataItem is TTimer then
+      begin
+          timer := dataItem as TTimer;
+          WriteLn(offset + 'Type: Timer');
+          WriteLn(offset + 'Id: ' + IntToStr(timer.Id));
+          WriteLn(offset + 'Label: ' + timer._Label);
+          WriteLn(offset + 'Description: ' + timer.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(timer.DisplayOrder));
+          WriteLn(offset + 'StopOnSave: ' + BoolToStr(timer.StopOnSave));
+          WriteLn(offset + 'Mandatory: ' + BoolToStr(timer.Mandatory));
+      end
+      else if dataItem is TNone then
+      begin
+          none := dataItem as TNone;
+          WriteLn(offset + 'Type: None');
+          WriteLn(offset + 'Id: ' + IntToStr(none.Id));
+          WriteLn(offset + 'Label: ' + none._Label);
+          WriteLn(offset + 'Description: ' + none.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(none.DisplayOrder));
+      end
+      else if dataItem is TMultiSelect then
+      begin
+          multiSelect := dataItem as TMultiSelect;
+          WriteLn(offset + 'Type: MultiSelect');
+          WriteLn(offset + 'Id: ' + IntToStr(multiSelect.Id));
+          WriteLn(offset + 'Label: ' + multiSelect._Label);
+          WriteLn(offset + 'Description: ' + multiSelect.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(multiSelect.DisplayOrder));
+          WriteLn(offset + 'Mandatory: ' + BoolToStr(multiSelect.Mandatory));
+          WriteLn(offset + 'KeyValuePairList:');
+          PrintKeyValuePairList(multiSelect.KeyValuePairList, '      ');
+      end
+      else if dataItem is TSingleSelect then
+      begin
+          singleSelect := dataItem as TSingleSelect;
+          WriteLn(offset + 'Type: SingleSelect');
+          WriteLn(offset + 'Id: ' + IntToStr(singleSelect.Id));
+          WriteLn(offset + 'Label: ' + singleSelect._Label);
+          WriteLn(offset + 'Description: ' + singleSelect.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(singleSelect.DisplayOrder));
+          WriteLn(offset + 'Mandatory: ' + BoolToStr(singleSelect.Mandatory));
+          WriteLn(offset + 'KeyValuePairList:');
+          PrintKeyValuePairList(singleSelect.KeyValuePairList, '      ');
+      end
+      else if dataItem is TNumber then
+      begin
+          number := dataItem as TNumber;
+          WriteLn(offset + 'Type: Number');
+          WriteLn(offset + 'Id: ' + IntToStr(number.Id));
+          WriteLn(offset + 'Label: ' + number._Label);
+          WriteLn(offset + 'Description: ' + number.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(number.DisplayOrder));
+          WriteLn(offset + 'MinValue: ' + number.MinValue);
+          WriteLn(offset + 'MaxValue: ' + number.MaxValue);
+          WriteLn(offset + 'Mandatory: ' + BoolToStr(number.Mandatory));
+          WriteLn(offset + 'DecimalCount: ' + IntToStr(number.DecimalCount));
+          WriteLn(offset + 'UnitName: ' + number.UnitName);
+      end
+      else if dataItem is TText then
+      begin
+          text := dataItem as TText;
+          WriteLn(offset + 'Type: Text');
+          WriteLn(offset + 'Id: ' + IntToStr(text.Id));
+          WriteLn(offset + 'Label: ' + text._Label);
+          WriteLn(offset + 'Description: ' + text.Description.InderValue);
+          WriteLn(offset + 'GeolocationEnabled: ' + BoolToStr(text.GeolocationEnabled));
+          WriteLn(offset + 'Value: ' + text.Value);
+          WriteLn(offset + 'ReadOnly: ' + BoolToStr(text.ReadOnly));
+          WriteLn(offset + 'Mandatory: ' + BoolToStr(text.Mandatory));
+       end
+      else if dataItem is TComment then
+      begin
+          comment := dataItem as TComment;
+          WriteLn(offset + 'Type: Comment');
+          WriteLn(offset + 'Id: ' + IntToStr(comment.Id));
+          WriteLn(offset + 'Label: ' + comment._Label);
+          WriteLn(offset + 'Description: ' + comment.Description.InderValue);
+          WriteLn(offset + 'SplitScreen: ' + BoolToStr(comment.SplitScreen));
+          WriteLn(offset + 'Value: ' + comment.Value);
+          WriteLn(offset + 'ReadOnly: ' + BoolToStr(comment.ReadOnly));
+          WriteLn(offset + 'Mandatory: ' + BoolToStr(comment.Mandatory));
+       end
+       else if dataItem is TFieldContainer then
+       begin
+          fieldContainer := dataItem as TFieldContainer;
+          WriteLn(offset + 'Type: Comment');
+          WriteLn(offset + 'Value: ' + fieldContainer.Value);
+          WriteLn(offset + 'FieldType: ' + fieldContainer.FieldType);
+          PrintDataItemList(fieldContainer.DataItemList, offset + '  ');
+       end;
+
+   end;
 end;
 
 procedure TSamples.PrintKeyValuePairList(list:  TObjectList<TKeyValuePair>; offset: string);
