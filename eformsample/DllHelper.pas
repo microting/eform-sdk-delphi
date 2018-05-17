@@ -79,8 +79,8 @@ type
         var _label: WideString; var description: WideString; var splitScreen: boolean;
         var value: WideString; var readOnly: boolean; var mandatory: boolean): integer; stdcall;
 
-  TCore_TemplatFromXml_GetFieldContainer = function(path: WideString; var value: WideString;
-        var fieldType: WideString): integer; stdcall;
+  TCore_TemplatFromXml_GetFieldContainer = function(path: WideString; var id: Integer;
+        var _label: WideString; var description: WideString; var value: WideString; var fieldType: WideString): integer; stdcall;
 
   TCore_TemplatFromXml_KeyValueListCount =  function(path: WideString; var count: integer): integer; stdcall;
   TCore_TemplatFromXml_GetKeyValuePair = function(location: WideString; var key: WideString;
@@ -211,7 +211,8 @@ type
     procedure Core_TemplatFromXml_GetComment(path: WideString; var id: integer;
         var _label: WideString; var description: WideString; var splitScreen: boolean;
         var value: WideString; var readOnly: boolean; var mandatory: boolean);
-    procedure Core_TemplatFromXml_GetFieldContainer(location: WideString; var value: WideString;
+    procedure Core_TemplatFromXml_GetFieldContainer(path: WideString;  var id: Integer;
+       var _label: WideString; var description: WideString; var value: WideString;
       var fieldType: WideString);
     function Core_TemplatFromXml_KeyValueListCount(location: WideString): integer;
     procedure Core_TemplatFromXml_GetKeyValuePair(location: WideString; var key: WideString;
@@ -752,13 +753,13 @@ begin
   end;
 end;
 
-procedure TDllHelper.Core_TemplatFromXml_GetFieldContainer(location: WideString; var value: WideString;
-  var fieldType: WideString);
+procedure TDllHelper.Core_TemplatFromXml_GetFieldContainer(path: WideString; var id: Integer;
+  var _label: WideString; var description: WideString; var value: WideString; var fieldType: WideString);
 var
   res: integer;
   err: WideString;
 begin
-  res := Core_TemplatFromXml_GetFieldContainerFunc(location, value, fieldType);
+  res := Core_TemplatFromXml_GetFieldContainerFunc(path, Id, _label, description, value, fieldType);
   if res <> 0 then
   begin
      err := LastErrorFunc;

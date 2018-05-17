@@ -244,7 +244,10 @@ begin
         begin
             dataItem := TFieldContainer.Create;
             TDllHelper.GetInstance.Core_TemplatFromXml_GetFieldContainer(path + '_' + IntToStr(j),
-              value, fieldType);
+              dataItem.Id, _label, description, value, fieldType);
+            dataItem._Label := _label;
+            dataItem.Description := TCDataValue.Create;
+            dataItem.Description.InderValue := description;
             (dataItem as TFieldContainer).Value := value;
             (dataItem as TFieldContainer).FieldType := fieldType;
             (dataItem as TFieldContainer).DataItemList := GetDataItemList(path + '_' + IntToStr(j));
