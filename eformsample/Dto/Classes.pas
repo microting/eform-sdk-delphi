@@ -2,7 +2,7 @@ unit Classes;
 
 interface
 
-uses Xml.XMLDoc, Generics.Collections, SysUtils;
+uses Xml.XMLDoc, Generics.Collections, SysUtils, System.Classes;
 
 type
 
@@ -305,13 +305,13 @@ type
   {$region 'TCDataValue declaration'}
   TCDataValue = class
   private
-     function GetDataWrapper: TXMLNodeCollection;
-     procedure SetDataWrapper(Value: TXMLNodeCollection);
+     //function GetDataWrapper: TXMLNodeCollection;
+     //procedure SetDataWrapper(Value: TXMLNodeCollection);
 
   public
       InderValue: string;
-
-      property DataWrapper: TXMLNodeCollection read GetDataWrapper write SetDataWrapper;
+      DataWrapper: TStringList;
+     // property DataWrapper: TXMLNodeCollection read GetDataWrapper write SetDataWrapper;
   end;
   {$endregion}
 
@@ -412,20 +412,20 @@ end;
 {$endregion}
 
 {$region 'TCDataValue implementation'}
-function TCDataValue.GetDataWrapper: TXMLNodeCollection;
-begin
-    Result := nil;
-end;
-
-procedure TCDataValue.SetDataWrapper(Value: TXMLNodeCollection);
-begin
-    if Value = nil then
-    begin
-      InderValue := '';
-      exit;
-    end;
-
-end;
+//function TCDataValue.GetDataWrapper: TXMLNodeCollection;
+//begin
+//    Result := nil;
+//end;
+//
+//procedure TCDataValue.SetDataWrapper(Value: TXMLNodeCollection);
+//begin
+//    if Value = nil then
+//    begin
+//      InderValue := '';
+//      exit;
+//    end;
+//
+//end;
 {$endregion}
 
 {$region 'TKeyValuePair implementaton'}

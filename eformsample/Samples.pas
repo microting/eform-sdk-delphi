@@ -44,7 +44,7 @@ begin
     WriteLn('Select which MainController element to start. Type:');
     WriteLn('');
     WriteLn('  ''E'', for exiting program');
-    WriteLn('  ''1'', for sample 1 (Create main element)');
+    WriteLn('  ''1'', for sample 1 (Working with templates)');
     ReadLn(input);
     {$endregion}
 
@@ -62,36 +62,58 @@ var
    filename: string;
    mainElement: TMainElement;
    xml: WideString;
+   templateId: integer;
 begin
    Core.Start(ServerConnectionString);
 
    while true do
    begin
        WriteLn('');
-       WriteLn('  Type ''M'' Create main element from xml file and output it''s content to console');
+       WriteLn('  Type ''R'' Read main element from xml file and output it''s content to console (TemplatFromXml test)');
+       WriteLn('  Type ''C'' Read main element from xml file and create it in database (TemplateCreate test)');
        WriteLn('  Type ''Q'' to quit');
        WriteLn('  As long as the Core left running, the system is able to process eForms');
        ReadLn(input);
        if UpperCase(input) = 'Q' then
           break
-       else if UpperCase(input) = 'M' then
+       else if UpperCase(input) = 'R' then
        begin
           WriteLn('');
-          WriteLn('    Type file name (picture_test.xml by default)');
+          WriteLn('  Type file name (picture_test.xml by default)');
           ReadLn(input);
           filename := input;
           if filename = '' then
             //filename := 'field_groups_example.xml';
-            filename := 'options_with_microting_example.xml';
-           // filename := 'picture_test.xml';
+            //filename := 'options_with_microting_example.xml';
+            filename := 'picture_test.xml';
            //  filename := 'picture_signature_example.xml';
-            //filename := 'pdf_test.xml';
-           //  filename := 'date_example.xml';
+           // filename := 'pdf_test.xml';
+            // filename := 'date_example.xml';
 
 
           xml := TFile.ReadAllText(filename);
           mainElement := Core.TemplatFromXml(xml);
           Print(mainElement);
+       end
+       else if UpperCase(input) = 'C' then
+       begin
+          WriteLn('');
+          WriteLn('  Type file name (picture_test.xml by default)');
+          ReadLn(input);
+          filename := input;
+          if filename = '' then
+           //filename := 'picture_test.xml';
+            //filename := 'pdf_test.xml';
+            //filename := 'date_example.xml';
+           // filename := 'picture_signature_example.xml';
+          // filename := 'options_with_microting_example.xml';
+            filename := 'field_groups_example.xml';
+
+
+          xml := TFile.ReadAllText(filename);
+          mainElement := Core.TemplatFromXml(xml);
+          templateId := Core.TemplateCreate(mainElement);
+          WriteLn('  MainElement was successfully created in database, templateId: ' + IntToStr(templateId));
        end;
    end;
 end;

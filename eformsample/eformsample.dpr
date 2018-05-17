@@ -22,7 +22,8 @@ uses
   MainElement in 'Model\MainElement.pas',
   Classes in 'Dto\Classes.pas',
   FieldContainer in 'Model\FieldContainer.pas',
-  Samples in 'Samples.pas';
+  Samples in 'Samples.pas',
+  Packer in 'Packer.pas';
 
 procedure OnCoreStartEvent;
 begin

@@ -4,7 +4,7 @@ interface
 
 uses
   DllHelper, Events, SysUtils, MainElement, Element, Generics.Collections, Classes, DataItem, DataItemGroup,
-    FieldContainer;
+    FieldContainer,  Packer;
 
 type
   {$region 'TCore declaration'}
@@ -12,13 +12,15 @@ type
   private
     FCoreStartEvent: TCoreStartEvent;
 
+    function GetDataItemList(path: string): TObjectList<TDataItem>;
     procedure SetCoreStartEvent(Value: TCoreStartEvent);
     //procedure OnCoreStartEvent;
-    function GetDataItemList(path: string): TObjectList<TDataItem>;
+
   public
     constructor Create;
     procedure Start(serverConnectionString: string);
     function TemplatFromXml(xml: string): TMainElement;
+    function TemplateCreate(mainElement: TMainElement): integer;
 
     property CoreEvent: TCoreStartEvent read FCoreStartEvent write SetCoreStartEvent;
   end;
@@ -305,6 +307,17 @@ begin
   end;
 
   Result := mainElement;
+end;
+
+
+function TCore.TemplateCreate(mainElement: TMainElement): integer;
+var
+  jsonString: string;
+  packer: TPacker;
+begin
+  packer := TPacker.Create;
+  jsonString := packer.Pack(mainElement);
+  result := TDllHelper.GetInstance.Core_TemplateCreate(jsonString);
 end;
 
 {$endregion}
