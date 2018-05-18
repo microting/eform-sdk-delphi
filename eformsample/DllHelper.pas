@@ -87,9 +87,10 @@ type
         var value: WideString; var selected: Boolean; var displayOrder: WideString): integer; stdcall;
   TCore_TemplatFromXml_DataItemGroupCount = function(location: WideString; var count: integer): integer;  stdcall;
   {$endregion}
-  {$region 'TemplateCreate types'}
+
   TCore_TemplateCreate = function(json: WideString; var templateId: integer): integer; stdcall;
-  {$endregion}
+  TCore_TemplateRead = function(templateId: integer; var json: WideString): integer; stdcall;
+
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
   TAdminTools_DbSetupFunc = function(token: WideString; var reply: WideString): integer; stdcall;
@@ -136,9 +137,10 @@ type
     Core_TemplatFromXml_DataItemGroupCountFunc: TCore_TemplatFromXml_DataItemGroupCount;
     {$endregion}
 
-    {$region 'TemplateCreate variables'}
+
     Core_TemplateCreateFunc: TCore_TemplateCreate;
-    {$endregion}
+    Core_TemplateReadFunc: TCore_TemplateRead;
+
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
     AdminTools_DbSetupFunc: TAdminTools_DbSetupFunc;
@@ -219,9 +221,10 @@ type
         var value: WideString; var selected: Boolean; var displayOrder: WideString);
     function Core_TemplatFromXml_DataItemGroupCount(location: WideString): integer;
     {$endregion}
-    {$region 'TemplateCreate functions'}
+
     function Core_TemplateCreate(json: WideString) : integer;
-    {$endregion}
+    function Core_TemplateRead(templateId: Integer; var json: WideString) : integer;
+
     procedure AdminTools_Create(serverConnectionString: string);
     function AdminTools_DbSetup(token: string): string;
     function AdminTools_DbSetupCompleted: string;
@@ -375,10 +378,14 @@ begin
    if not Assigned (Core_TemplatFromXml_DataItemGroupCountFunc) then
      raise Exception.Create('function Core_TemplatFromXml_DataItemGroupCount not found');
 
-
    @Core_TemplateCreateFunc := GetProcAddress(handle, 'Core_TemplateCreate') ;
    if not Assigned (Core_TemplateCreateFunc) then
      raise Exception.Create('function Core_TemplateCreate not found');
+
+   @Core_TemplateReadFunc := GetProcAddress(handle, 'Core_TemplateRead') ;
+   if not Assigned (Core_TemplateReadFunc) then
+     raise Exception.Create('function Core_TemplateRead not found');
+
 
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
@@ -818,7 +825,7 @@ end;
 
 {$endregion}
 
-{$region 'TemplateCreate implementation'}
+
 function TDllHelper.Core_TemplateCreate(json: WideString) : integer;
 var
   res: integer;
@@ -834,7 +841,22 @@ begin
   result := templateId;
 end;
 
-{$endregion}
+
+
+function TDllHelper.Core_TemplateRead(templateId: Integer; var json: WideString) : integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplateReadFunc(templateId, json);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := templateId;
+end;
+
 
 
 procedure TDllHelper.AdminTools_Create(serverConnectionString: string);

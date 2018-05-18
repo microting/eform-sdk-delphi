@@ -21,6 +21,7 @@ type
     procedure Start(serverConnectionString: string);
     function TemplatFromXml(xml: string): TMainElement;
     function TemplateCreate(mainElement: TMainElement): integer;
+    function TemplateRead(templateId: integer): TMainElement;
 
     property CoreEvent: TCoreStartEvent read FCoreStartEvent write SetCoreStartEvent;
   end;
@@ -321,6 +322,16 @@ begin
   packer := TPacker.Create;
   jsonString := packer.Pack(mainElement);
   result := TDllHelper.GetInstance.Core_TemplateCreate(jsonString);
+end;
+
+function  TCore.TemplateRead(templateId: integer): TMainElement;
+var
+  jsonString: WideString;
+  packer: TPacker;
+begin
+  packer := TPacker.Create;
+  TDllHelper.GetInstance.Core_TemplateRead(templateId, jsonString);
+  result :=  packer.UnpackMainElement(jsonString);
 end;
 
 {$endregion}

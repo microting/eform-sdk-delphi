@@ -16,6 +16,7 @@ type
       procedure PrintDataItemList(dataItemList: TObjectList<TDataItem>; offset: string);
       procedure PrintKeyValuePairList(list:  TObjectList<TKeyValuePair>; offset: string);
       procedure Sample1;
+      function GetDefaultFileName: string;
   public
       constructor Create(serverConnectionString: string);
       procedure Run;
@@ -56,6 +57,16 @@ begin
   end;
 end;
 
+function TSamples.GetDefaultFileName: string;
+begin
+    result := 'field_groups_example.xml';
+  //  result := 'options_with_microting_example.xml';
+  //  result := 'picture_test.xml';
+   // result := 'picture_signature_example.xml';
+   // result := 'pdf_test.xml';
+  //  result := 'date_example.xml';
+end;
+
 procedure TSamples.Sample1;
 var
    input: string;
@@ -69,26 +80,22 @@ begin
    while true do
    begin
        WriteLn('');
-       WriteLn('  Type ''R'' Read main element from xml file and output it''s content to console (TemplatFromXml test)');
+       WriteLn('  Type ''X'' Read main element from xml file and output it''s content to console (TemplatFromXml test)');
        WriteLn('  Type ''C'' Read main element from xml file and create it in database (TemplateCreate test)');
+       WriteLn('  Type ''R'' Read main element from database by templateId and output it''s content to console (TemplateRead test)');
        WriteLn('  Type ''Q'' to quit');
        WriteLn('  As long as the Core left running, the system is able to process eForms');
        ReadLn(input);
        if UpperCase(input) = 'Q' then
           break
-       else if UpperCase(input) = 'R' then
+       else if UpperCase(input) = 'X' then
        begin
           WriteLn('');
-          WriteLn('  Type file name (picture_test.xml by default)');
+          WriteLn('  Type file name ('+ GetDefaultFileName +' by default):');
           ReadLn(input);
           filename := input;
           if filename = '' then
-            //filename := 'field_groups_example.xml';
-            //filename := 'options_with_microting_example.xml';
-            filename := 'picture_test.xml';
-           //  filename := 'picture_signature_example.xml';
-           // filename := 'pdf_test.xml';
-            // filename := 'date_example.xml';
+            filename := GetDefaultFileName;
 
 
           xml := TFile.ReadAllText(filename);
@@ -98,22 +105,26 @@ begin
        else if UpperCase(input) = 'C' then
        begin
           WriteLn('');
-          WriteLn('  Type file name (picture_test.xml by default)');
+          WriteLn('  Type file name ('+ GetDefaultFileName +' by default):');
           ReadLn(input);
           filename := input;
           if filename = '' then
-           //filename := 'picture_test.xml';
-            //filename := 'pdf_test.xml';
-            //filename := 'date_example.xml';
-           // filename := 'picture_signature_example.xml';
-          // filename := 'options_with_microting_example.xml';
-            filename := 'field_groups_example.xml';
+              filename := GetDefaultFileName();
 
 
           xml := TFile.ReadAllText(filename);
           mainElement := Core.TemplatFromXml(xml);
           templateId := Core.TemplateCreate(mainElement);
           WriteLn('  MainElement was successfully created in database, templateId: ' + IntToStr(templateId));
+       end
+       else if UpperCase(input) = 'R' then
+       begin
+          WriteLn('');
+          WriteLn('  Type templateId: ');
+          ReadLn(input);
+          mainElement.Free;
+          mainElement := Core.TemplateRead(StrToInt(input));
+          Print(mainElement);
        end;
    end;
 end;
@@ -156,7 +167,10 @@ begin
          WriteLn('  ApprovalEnabled: ' + BoolToStr(dataElement.ApprovalEnabled));
          {$region 'DataItemList'}
          if dataElement.DataItemList.Count > 0 then
-            PrintDataItemList(dataElement.DataItemList,'  ');
+         begin
+            WriteLn('   DataItemList:');
+            PrintDataItemList(dataElement.DataItemList,'    ');
+         end;
          {$endregion}
          {$region 'DataItemGroupList'}
          if dataElement.DataItemGroupList.Count > 0 then
@@ -188,7 +202,6 @@ var
   comment: TComment;
   fieldContainer: TFieldContainer;
 begin
-   WriteLn(offset + 'DataItemList:');
    for dataItem in dataItemList do
    begin
       WriteLn(offset + 'DataItem:');
@@ -349,7 +362,7 @@ begin
           WriteLn(offset + 'Type: Comment');
           WriteLn(offset + 'Value: ' + fieldContainer.Value);
           WriteLn(offset + 'FieldType: ' + fieldContainer.FieldType);
-          PrintDataItemList(fieldContainer.DataItemList, offset + '  ');
+          PrintDataItemList(fieldContainer.DataItemList, offset + '    ');
        end;
 
    end;

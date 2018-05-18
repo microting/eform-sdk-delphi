@@ -31,7 +31,7 @@ type
 
       constructor Create(id: integer; _label: string; displayOrder: integer; description: string;
           approvedEnabled: boolean; reviewEnabled: boolean; doneButtonEnabled: boolean;
-          extraDataElementsEnabled: boolean; pinkBarText: string; elementList: TObjectList<TElement>); overload;
+          extraFieldsEnabled: boolean; pinkBarText: string; elementList: TObjectList<TElement>); overload;
    end;
    {$endregion}
 
@@ -44,7 +44,7 @@ type
       constructor Create; overload;
       constructor Create(id: integer; _label: string; displayOrder: integer; description: string;
           approvalEnabled: boolean; reviewEnabled: boolean; doneButtonEnabled: boolean;
-          extraDataElementsEnabled: boolean; pinkBarText: string; dataItemGroupList: TObjectList<TDataItemGroup>;
+          extraFieldsEnabled: boolean; pinkBarText: string; dataItemGroupList: TObjectList<TDataItemGroup>;
           dataItemList: TObjectList<TDataItem>); overload;
 
    end;
@@ -79,7 +79,7 @@ end;
 
 constructor TGroupElement.Create(id: integer; _label: string; displayOrder: integer; description: string;
           approvedEnabled: boolean; reviewEnabled: boolean; doneButtonEnabled: boolean;
-          extraDataElementsEnabled: boolean; pinkBarText: string; elementList: TObjectList<TElement>);
+          extraFieldsEnabled: boolean; pinkBarText: string; elementList: TObjectList<TElement>);
 begin
   inherited Create;
 
@@ -91,7 +91,7 @@ begin
   self.ApprovalEnabled := approvedEnabled;
   self.ReviewEnabled := reviewEnabled;
   self.DoneButtonEnabled := self.doneButtonEnabled;
-  self.ExtraFieldsEnabled := extraDataElementsEnabled;
+  self.ExtraFieldsEnabled := extraFieldsEnabled;
   self.PinkBarText := pinkBarText;
 
   self.ElementList := elementList;
@@ -107,7 +107,7 @@ end;
 
 constructor TDataElement.Create(id: integer; _label: string; displayOrder: integer; description: string;
         approvalEnabled: boolean; reviewEnabled: boolean; doneButtonEnabled: boolean;
-        extraDataElementsEnabled: boolean; pinkBarText: string; dataItemGroupList: TObjectList<TDataItemGroup>;
+        extraFieldsEnabled: boolean; pinkBarText: string; dataItemGroupList: TObjectList<TDataItemGroup>;
         dataItemList: TObjectList<TDataItem>);
 begin
   inherited Create;
@@ -120,7 +120,7 @@ begin
   self.ApprovalEnabled := approvalEnabled;
   self.ReviewEnabled := reviewEnabled;
   self.DoneButtonEnabled := self.doneButtonEnabled;
-  self.ExtraFieldsEnabled := extraDataElementsEnabled;
+  self.ExtraFieldsEnabled := extraFieldsEnabled;
   self.PinkBarText := pinkBarText;
 
   self.DataItemGroupList := dataItemGroupList;

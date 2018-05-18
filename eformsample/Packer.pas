@@ -3,7 +3,8 @@ unit Packer;
 interface
 
 uses
-  System.JSON, REST.JSON, DataItem, Element, MainElement, Generics.Collections, Classes, SysUtils, FieldContainer;
+  System.JSON, REST.JSON, DataItem, Element, MainElement, Generics.Collections, Classes, SysUtils,
+  FieldContainer, DataItemGroup;
 
 type
   TPacker = class
@@ -26,12 +27,36 @@ type
       function Pack(comment: TComment): TJSONObject; overload;
       function Pack(keyValuePairList: TObjectList<TKeyValuePair>): TJSONArray; overload;
       function Pack(fieldContainer: TFieldContainer): TJSONObject; overload;
+
+      function UnpackPicture(obj: TJSONObject): TPicture;
+      function UnpackSaveButton(obj: TJSONObject): TSaveButton;
+      function UnpackSignature(obj: TJSONObject): TSignature;
+      function UnpackDate(obj: TJSONObject): TDate;
+      function UnpackShowPdf(obj: TJSONObject): TShowPdf;
+      function UnpackTimer(obj: TJSONObject): TTimer;
+      function UnpackNone(obj: TJSONObject): TNone;
+      function UnpackCheckBox(obj: TJSONObject): TCheckBox;
+      function UnpackMultiSelect(obj: TJSONObject): TMultiSelect;
+      function UnpackSingleSelect(obj: TJSONObject): TSingleSelect;
+      function UnpackNumber(obj: TJSONObject): TNumber;
+      function UnpackText(obj: TJSONObject): TText;
+      function UnpackComment(obj: TJSONObject): TComment;
+      function UnpackKeyValuePairList(arr: TJSONArray): TObjectList<TKeyValuePair>;
+      function UnpackKeyValuePair(obj: TJSONObject): TKeyValuePair;
+      function UnpackFieldContainer(obj: TJSONObject): TFieldContainer;
+      function UnpackDataItemGroupList(arr: TJSONArray): TObjectList<TDataItemGroup>;
+      function UnpackDataItemList(arr: TJSONArray): TObjectList<TDataItem>;
+      function UnpackElementList(arr: TJSONArray): TObjectList<TElement>;
+      function UnpackDataElement(obj: TJSONObject): TDataElement;
+
   public
       function Pack(mainElement: TMainElement): string; overload;
+      function UnpackMainElement(json: string): TMainElement;
   end;
 
 implementation
 
+{$region 'Packers'}
 function TPacker.Pack(signature: TSignature): TJSONObject;
 var
   obj: TJSONObject;
@@ -424,6 +449,422 @@ begin
 
    result := obj.ToString();
 end;
+{$endregion}
 
+{$region 'Unpackers'}
+function TPacker.UnpackSignature(obj: TJSONObject): TSignature;
+var
+  signature: TSignature;
+begin
+  signature := TSignature.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy')
+  );
+  result := signature;
+end;
+
+function TPacker.UnpackDate(obj: TJSONObject): TDate;
+var
+  date: TDate;
+begin
+   date := TDate.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy'),
+       obj.GetValue<string>('DefaultValue'),
+       obj.GetValue<TDateTime>('MaxValue'),
+       obj.GetValue<TDateTime>('MinValue')
+  );
+  result := date;
+end;
+
+function TPacker.UnpackShowPdf(obj: TJSONObject): TShowPdf;
+var
+   showPdf: TShowPdf;
+begin
+   showPdf := TShowPdf.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy'),
+       obj.GetValue<string>('Value')
+  );
+  result := showPdf;
+end;
+
+function TPacker.UnpackTimer(obj: TJSONObject): TTimer;
+var
+   timer: TTimer;
+begin
+   timer := TTimer.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy'),
+       obj.GetValue<boolean>('StopOnSave')
+  );
+  result := timer;
+end;
+
+function TPacker.UnpackNone(obj: TJSONObject): TNone;
+var
+   none: TNone;
+begin
+   none := TNone.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy')
+  );
+  result := none;
+end;
+
+function TPacker.UnpackCheckBox(obj: TJSONObject): TCheckBox;
+var
+   checkBox: TCheckBox;
+begin
+   checkBox := TCheckBox.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy'),
+       obj.GetValue<boolean>('DefaultValue'),
+       obj.GetValue<boolean>('Selected')
+   );
+   result := checkBox;
+end;
+
+function TPacker.UnpackMultiSelect(obj: TJSONObject): TMultiSelect;
+var
+   multiSelect: TMultiSelect;
+begin
+   multiSelect := TMultiSelect.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy'),
+       UnpackKeyValuePairList(obj.GetValue<TJSONArray>('KeyValuePairList'))
+   );
+   result := multiSelect;
+end;
+
+function TPacker.UnpackSingleSelect(obj: TJSONObject): TSingleSelect;
+var
+   singleSelect: TSingleSelect;
+begin
+   singleSelect := TSingleSelect.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy'),
+       UnpackKeyValuePairList(obj.GetValue<TJSONArray>('KeyValuePairList'))
+   );
+   result := singleSelect;
+end;
+
+function TPacker.UnpackNumber(obj: TJSONObject): TNumber;
+var
+   number: TNumber;
+begin
+   number := TNumber.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy'),
+       obj.GetValue<string>('MinValue'),
+       obj.GetValue<string>('MaxValue'),
+       obj.GetValue<integer>('DefaultValue'),
+       obj.GetValue<integer>('DecimalCount'),
+       obj.GetValue<string>('UnitName')
+   );
+   result := number;
+end;
+
+function TPacker.UnpackText(obj: TJSONObject): TText;
+var
+   text: TText;
+begin
+   text := TText.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy'),
+       obj.GetValue<string>('Value'),
+       obj.GetValue<integer>('MaxLength'),
+       obj.GetValue<boolean>('GeolocationEnabled'),
+       obj.GetValue<boolean>('GeolocationForced'),
+       obj.GetValue<boolean>('GeolocationHidden'),
+       obj.GetValue<boolean>('BarcodeEnabled'),
+       obj.GetValue<string>('BarcodeType')
+   );
+   result := text;
+end;
+
+function TPacker.UnpackComment(obj: TJSONObject): TComment;
+var
+   comment: TComment;
+begin
+  comment := TComment.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy'),
+       obj.GetValue<string>('Value'),
+       obj.GetValue<integer>('Maxlength'),
+       obj.GetValue<boolean>('SplitScreen')
+   );
+   result := comment;
+end;
+
+function TPacker.UnpackKeyValuePairList(arr: TJSONArray): TObjectList<TKeyValuePair>;
+var
+   keyValuePairList: TObjectList<TKeyValuePair>;
+   i: integer;
+begin
+   keyValuePairList := TObjectList<TKeyValuePair>.Create;
+   for i := 0 to arr.Count - 1 do
+       keyValuePairList.Add(UnpackKeyValuePair(arr.Items[i] as TJSONObject));
+   result := keyValuePairList;
+end;
+
+function TPacker.UnpackKeyValuePair(obj: TJSONObject): TKeyValuePair;
+var
+   keyValuePair: TKeyValuePair;
+begin
+   keyValuePair := TKeyValuePair.Create(
+       obj.GetValue<string>('Key'),
+       obj.GetValue<string>('Value'),
+       obj.GetValue<boolean>('Selected'),
+       obj.GetValue<string>('DisplayOrder')
+   );
+   result := keyValuePair;
+end;
+
+function TPacker.UnpackFieldContainer(obj: TJSONObject): TFieldContainer;
+var
+   fieldContainer: TFieldContainer;
+begin
+   fieldContainer := TFieldContainer.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TCDataValue>('Description'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<string>('Value'),
+       UnpackDataItemList(obj.GetValue<TJSONArray>('DataItemList'))
+   );
+   result := fieldContainer;
+end;
+
+
+function TPacker.UnpackPicture(obj: TJSONObject): TPicture;
+var
+  picture: TPicture;
+begin
+  picture := TPicture.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy'),
+       obj.GetValue<integer>('Multi'),
+       obj.GetValue<boolean>('GeolocationEnabled')
+  );
+  result := picture;
+end;
+
+function TPacker.UnpackSaveButton(obj: TJSONObject): TSaveButton;
+var
+  saveButton: TSaveButton;
+begin
+  saveButton := TSaveButton.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<boolean>('Mandatory'),
+       obj.GetValue<boolean>('ReadOnly'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<string>('Color'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<boolean>('Dummy'),
+       obj.GetValue<string>('Value')
+  );
+  result := saveButton;
+end;
+
+function TPacker.UnpackDataItemGroupList(arr: TJSONArray): TObjectList<TDataItemGroup>;
+var
+   dataItemGroupList: TObjectList<TDataItemGroup>;
+begin
+   dataItemGroupList := TObjectList<TDataItemGroup>.Create;
+   result := dataItemGroupList;
+end;
+
+function TPacker.UnpackDataItemList(arr: TJSONArray): TObjectList<TDataItem>;
+var
+   obj: TJSONObject;
+   dataItemList: TObjectList<TDataItem>;
+   i: integer;
+    _type: string;
+begin
+   dataItemList := TObjectList<TDataItem>.Create;
+   for i := 0 to arr.Count - 1 do
+   begin
+     obj := arr.Items[i] as TJSONObject;
+     _type := obj.GetValue<string>('Type');
+     if _type = 'Picture' then
+        dataItemList.Add(UnpackPicture(obj))
+     else if _type = 'SaveButton' then
+       dataItemList.Add(UnpackSaveButton(obj))
+     else if _type = 'None' then
+       dataItemList.Add(UnpackNone(obj))
+     else if _type = 'CheckBox' then
+       dataItemList.Add(UnpackCheckBox(obj))
+     else if _type = 'Timer' then
+       dataItemList.Add(UnpackTimer(obj))
+     else if _type = 'ShowPdf' then
+       dataItemList.Add(UnpackShowPdf(obj))
+     else if _type = 'Date' then
+       dataItemList.Add(UnpackDate(obj))
+     else if _type = 'Number' then
+       dataItemList.Add(UnpackNumber(obj))
+     else if _type = 'MultiSelect' then
+       dataItemList.Add(UnpackMultiSelect(obj))
+     else if _type = 'SingleSelect' then
+       dataItemList.Add(UnpackSingleSelect(obj))
+     else if _type = 'Text' then
+       dataItemList.Add(UnpackText(obj))
+     else if _type = 'Comment' then
+       dataItemList.Add(UnpackComment(obj))
+     else if _type = 'FieldContainer' then
+       dataItemList.Add(UnpackFieldContainer(obj))
+     else if _type = 'Signature' then
+       dataItemList.Add(UnpackSignature(obj));
+
+   end;
+   result := dataItemList;
+end;
+
+function TPacker.UnpackDataElement(obj: TJSONObject): TDataElement;
+var
+   dataElement: TDataElement;
+begin
+   dataElement := TDataElement.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<boolean>('ApprovalEnabled'),
+       obj.GetValue<boolean>('ReviewEnabled'),
+       obj.GetValue<boolean>('DoneButtonEnabled'),
+       obj.GetValue<boolean>('ExtraFieldsEnabled'),
+       obj.GetValue<string>('PinkBarText'),
+       UnpackDataItemGroupList(obj.GetValue<TJSONArray>('DataItemGroupList')),
+       UnpackDataItemList(obj.GetValue<TJSONArray>('DataItemList'))
+   );
+   result := dataElement;
+end;
+
+function TPacker.UnpackElementList(arr: TJSONArray): TObjectList<TElement>;
+var
+  obj: TJSONObject;
+  elementList: TObjectList<TElement>;
+  dataElement: TDataElement;
+  i: integer;
+  _type: string;
+begin
+  elementList := TObjectList<TElement>.Create;
+  for i := 0 to arr.Count - 1 do
+  begin
+    obj := arr.Items[i] as TJSONObject;
+    _type := obj.GetValue<string>('Type');
+    if _type = 'DataElement' then
+    begin
+       dataElement := UnpackDataElement(obj);
+       elementList.Add(dataElement);
+    end;
+  end;
+  result := elementList;
+end;
+
+function TPacker.UnpackMainElement(json: string): TMainElement;
+var
+  mainElement: TMainElement;
+  obj: TJSONValue;
+  id: integer;
+  elementList: TObjectList<TElement>;
+begin
+  obj := TJSONObject.ParseJSONValue(json);
+  elementList := TObjectList<TElement>.Create;
+  mainElement := TMainElement.Create(
+     obj.GetValue<integer>('Id'),
+     obj.GetValue<string>('Label'),
+     obj.GetValue<integer>('DisplayOrder'),
+     obj.GetValue<string>('CheckListFolderName'),
+     obj.GetValue<integer>('Repeated'),
+     obj.GetValue<TDateTime>('StartDate'),
+     obj.GetValue<TDateTime>('EndDate'),
+     obj.GetValue<string>('Language'),
+     obj.GetValue<boolean>('MultiApproval'),
+     obj.GetValue<boolean>('FastNavigation'),
+     obj.GetValue<boolean>('DownloadEntities'),
+     obj.GetValue<boolean>('ManualSync'),
+     obj.GetValue<string>('CaseType'),
+     obj.GetValue<string>('PushMessageTitle'),
+     obj.GetValue<string>('PushMessageBody'),
+     UnpackElementList( obj.GetValue<TJSONArray>('ElementList'))
+     );
+  result := mainElement;
+end;
+{$endregion}
 
 end.
