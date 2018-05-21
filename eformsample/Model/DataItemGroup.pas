@@ -6,8 +6,6 @@ uses  Generics.Collections, DataItem;
 type
   {$region 'TDataItemGroup declaration'}
   TDataItemGroup = class
-  private
-     constructor Create; overload;
   public
     Id: string;
     _Label: string;
@@ -17,6 +15,7 @@ type
     Value: string;
 
     DataItemList: TObjectList<TDataItem>;
+    constructor Create;
   end;
   {$endregion}
 

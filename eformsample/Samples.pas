@@ -3,7 +3,8 @@ unit Samples;
 interface
 
 uses
-  Core, SysUtils, MainElement, IOUtils, Element, DataItem,  Generics.Collections, Classes, FieldContainer;
+  Core, SysUtils, MainElement, IOUtils, Element, DataItem,  Generics.Collections, Classes,
+  FieldContainer, DataItemGroup;
 
 type
   {$region 'TSamples declaration'}
@@ -14,6 +15,7 @@ type
 
       procedure Print(mainElement: TMainElement);
       procedure PrintDataItemList(dataItemList: TObjectList<TDataItem>; offset: string);
+      procedure PrintDataItemGroupList(dataItemGroupList: TObjectList<TDataItemGroup>; offset: string);
       procedure PrintKeyValuePairList(list:  TObjectList<TKeyValuePair>; offset: string);
       procedure Sample1;
       function GetDefaultFileName: string;
@@ -168,14 +170,15 @@ begin
          {$region 'DataItemList'}
          if dataElement.DataItemList.Count > 0 then
          begin
-            WriteLn('   DataItemList:');
+            WriteLn('  DataItemList:');
             PrintDataItemList(dataElement.DataItemList,'    ');
          end;
          {$endregion}
          {$region 'DataItemGroupList'}
          if dataElement.DataItemGroupList.Count > 0 then
          begin
-
+            WriteLn('  DataItemGroupList:');
+            PrintDataItemGroupList(dataElement.DataItemGroupList,'    ');
          end;
          {$endregion}
        end;
@@ -383,6 +386,24 @@ begin
     end;
 end;
 
+
+procedure TSamples.PrintDataItemGroupList(dataItemGroupList: TObjectList<TDataItemGroup>; offset: string);
+var
+  dataItemGroup: TDataItemGroup;
+begin
+   for dataItemGroup in dataItemGroupList do
+   begin
+     WriteLn(offset + 'DataItemGroup:');
+     WriteLn(offset + 'Id: ' + dataItemGroup.Id);
+     WriteLn(offset + 'Label: ' + dataItemGroup._Label);
+     WriteLn(offset + 'Description: ' + dataItemGroup.Description);
+     WriteLn(offset + 'DisplayOrder: ' + IntToStr(dataItemGroup.DisplayOrder));
+     WriteLn(offset + 'Color: ' + dataItemGroup.Color);
+     WriteLn(offset + 'Value: ' + dataItemGroup.Value);
+     WriteLn(offset + 'DataItemList:');
+     PrintDataItemList(dataItemGroup.DataItemList, offset + '  ');
+   end;
+end;
 
 {$endregion}
 

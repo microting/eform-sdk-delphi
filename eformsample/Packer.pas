@@ -45,9 +45,11 @@ type
       function UnpackKeyValuePair(obj: TJSONObject): TKeyValuePair;
       function UnpackFieldContainer(obj: TJSONObject): TFieldContainer;
       function UnpackDataItemGroupList(arr: TJSONArray): TObjectList<TDataItemGroup>;
+      function UnpackDataItemGroup(obj: TJSONObject): TDataItemGroup;
       function UnpackDataItemList(arr: TJSONArray): TObjectList<TDataItem>;
       function UnpackElementList(arr: TJSONArray): TObjectList<TElement>;
       function UnpackDataElement(obj: TJSONObject): TDataElement;
+
 
   public
       function Pack(mainElement: TMainElement): string; overload;
@@ -741,11 +743,34 @@ begin
   result := saveButton;
 end;
 
+function  TPacker.UnpackDataItemGroup(obj: TJSONObject): TDataItemGroup;
+var
+  dataItemGroup: TDataItemGroup;
+begin
+  dataItemGroup := TDataItemGroup.Create;
+  dataItemGroup.Id :=  obj.GetValue<string>('Id');
+  dataItemGroup._Label :=  obj.GetValue<string>('Label');
+  if  (obj.GetValue('Description').Value <> '') then
+    dataItemGroup.Description :=   obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue');
+  dataItemGroup.Color := obj.GetValue<string>('Color');
+  dataItemGroup.DisplayOrder := obj.GetValue<integer>('DisplayOrder');
+  dataItemGroup.Value := obj.GetValue<string>('Value');
+  dataItemGroup.DataItemList := UnpackDataItemList(obj.GetValue<TJSONArray>('DataItemList'));
+  result := dataItemGroup;
+end;
+
 function TPacker.UnpackDataItemGroupList(arr: TJSONArray): TObjectList<TDataItemGroup>;
 var
    dataItemGroupList: TObjectList<TDataItemGroup>;
+   i: integer;
+   obj: TJSONObject;
 begin
    dataItemGroupList := TObjectList<TDataItemGroup>.Create;
+   for i := 0 to arr.Count - 1 do
+   begin
+     obj := arr.Items[i] as TJSONObject;
+     dataItemGroupList.Add(UnpackDataItemGroup(obj));
+   end;
    result := dataItemGroupList;
 end;
 
