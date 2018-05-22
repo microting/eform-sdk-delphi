@@ -4,7 +4,7 @@ interface
 
 uses
   DllHelper, Events, SysUtils, MainElement, Element, Generics.Collections, Classes, DataItem, DataItemGroup,
-    FieldContainer,  Packer;
+    FieldContainer, Packer, System.Classes;
 
 type
   {$region 'TCore declaration'}
@@ -20,8 +20,10 @@ type
     constructor Create;
     procedure Start(serverConnectionString: string);
     function TemplatFromXml(xml: string): TMainElement;
+    function TemplatFromXml2(xml: string): TMainElement;
     function TemplateCreate(mainElement: TMainElement): integer;
     function TemplateRead(templateId: integer): TMainElement;
+    function TemplateValidation(mainElement: TMainElement): TStringList;
 
     property CoreEvent: TCoreStartEvent read FCoreStartEvent write SetCoreStartEvent;
   end;
@@ -313,6 +315,15 @@ begin
   Result := mainElement;
 end;
 
+function TCore.TemplatFromXml2(xml: string): TMainElement;
+var
+  jsonString: WideString;
+  packer: TPacker;
+begin
+  packer := TPacker.Create;
+  TDllHelper.GetInstance.Core_TemplateFromXml2(xml, jsonString);
+  result :=  packer.UnpackMainElement(jsonString);
+end;
 
 function TCore.TemplateCreate(mainElement: TMainElement): integer;
 var
@@ -333,6 +344,19 @@ begin
   TDllHelper.GetInstance.Core_TemplateRead(templateId, jsonString);
   result :=  packer.UnpackMainElement(jsonString);
 end;
+
+function TCore.TemplateValidation(mainElement: TMainElement): TStringList;
+var
+  jsonMainElement: string;
+  jsonValidation: WideString;
+  packer: TPacker;
+begin
+  packer := TPacker.Create;
+  jsonMainElement := packer.Pack(mainElement);
+  TDllHelper.GetInstance.Core_TemplateValidation(jsonMainElement, jsonValidation);
+  result := packer.UnpackValidationErrors(jsonValidation);
+end;
+
 
 {$endregion}
 

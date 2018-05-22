@@ -4,7 +4,7 @@ interface
 
 uses
   System.JSON, REST.JSON, DataItem, Element, MainElement, Generics.Collections, Classes, SysUtils,
-  FieldContainer, DataItemGroup;
+  FieldContainer, DataItemGroup, System.Classes;
 
 type
   TPacker = class
@@ -50,10 +50,10 @@ type
       function UnpackElementList(arr: TJSONArray): TObjectList<TElement>;
       function UnpackDataElement(obj: TJSONObject): TDataElement;
 
-
   public
       function Pack(mainElement: TMainElement): string; overload;
       function UnpackMainElement(json: string): TMainElement;
+      function UnpackValidationErrors(jsonValidation: string): TStringList;
   end;
 
 implementation
@@ -890,6 +890,18 @@ begin
      );
   result := mainElement;
 end;
+
+function TPacker.UnpackValidationErrors(jsonValidation: string): TStringList;
+var
+  arr: TJSONArray;
+  i: integer;
+begin
+  result := TStringList.Create;
+  arr := TJSONObject.ParseJSONValue(jsonValidation) as TJSONArray;
+  for i := 0 to arr.Count-1 do
+    result.Add(arr.Items[i].Value);
+end;
+
 {$endregion}
 
 end.

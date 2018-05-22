@@ -4,7 +4,7 @@ interface
 
 uses
   Core, SysUtils, MainElement, IOUtils, Element, DataItem,  Generics.Collections, Classes,
-  FieldContainer, DataItemGroup;
+  FieldContainer, DataItemGroup, System.Classes;
 
 type
   {$region 'TSamples declaration'}
@@ -17,6 +17,7 @@ type
       procedure PrintDataItemList(dataItemList: TObjectList<TDataItem>; offset: string);
       procedure PrintDataItemGroupList(dataItemGroupList: TObjectList<TDataItemGroup>; offset: string);
       procedure PrintKeyValuePairList(list:  TObjectList<TKeyValuePair>; offset: string);
+      procedure PrintValidationErrors(validationErrors: TStringList; offset: string);
       procedure Sample1;
       function GetDefaultFileName: string;
   public
@@ -61,11 +62,11 @@ end;
 
 function TSamples.GetDefaultFileName: string;
 begin
-    result := 'field_groups_example.xml';
+  //  result := 'field_groups_example.xml';
   //  result := 'options_with_microting_example.xml';
   //  result := 'picture_test.xml';
-   // result := 'picture_signature_example.xml';
-   // result := 'pdf_test.xml';
+  //  result := 'picture_signature_example.xml';
+    result := 'pdf_test.xml';
   //  result := 'date_example.xml';
 end;
 
@@ -76,6 +77,7 @@ var
    mainElement: TMainElement;
    xml: WideString;
    templateId: integer;
+   validationErrors: TStringList;
 begin
    Core.Start(ServerConnectionString);
 
@@ -85,6 +87,7 @@ begin
        WriteLn('  Type ''X'' Read main element from xml file and output it''s content to console (TemplatFromXml test)');
        WriteLn('  Type ''C'' Read main element from xml file and create it in database (TemplateCreate test)');
        WriteLn('  Type ''R'' Read main element from database by templateId and output it''s content to console (TemplateRead test)');
+       WriteLn('  Type ''V'' Read main element from xml file and validate it (TemplateValidation test)');
        WriteLn('  Type ''Q'' to quit');
        WriteLn('  As long as the Core left running, the system is able to process eForms');
        ReadLn(input);
@@ -127,6 +130,21 @@ begin
           mainElement.Free;
           mainElement := Core.TemplateRead(StrToInt(input));
           Print(mainElement);
+       end
+       else if UpperCase(input) = 'V' then
+       begin
+          WriteLn('');
+          WriteLn('  Type file name ('+ GetDefaultFileName +' by default):');
+          ReadLn(input);
+          filename := input;
+          if filename = '' then
+            filename := GetDefaultFileName;
+
+
+          xml := TFile.ReadAllText(filename);
+          mainElement := Core.TemplatFromXml2(xml);
+          validationErrors := Core.TemplateValidation(mainElement);
+          PrintValidationErrors(validationErrors, '  ');
        end;
    end;
 end;
@@ -386,7 +404,6 @@ begin
     end;
 end;
 
-
 procedure TSamples.PrintDataItemGroupList(dataItemGroupList: TObjectList<TDataItemGroup>; offset: string);
 var
   dataItemGroup: TDataItemGroup;
@@ -403,6 +420,20 @@ begin
      WriteLn(offset + 'DataItemList:');
      PrintDataItemList(dataItemGroup.DataItemList, offset + '  ');
    end;
+end;
+
+procedure TSamples.PrintValidationErrors(validationErrors: TStringList; offset: string);
+var
+  error: String;
+begin
+  WriteLn(offset + 'Validation errors:');
+  if (validationErrors.Count = 0) then
+    WriteLn(offset + 'None')
+  else
+  begin
+    for error in validationErrors do
+      WriteLn(offset + error);
+  end;
 end;
 
 {$endregion}

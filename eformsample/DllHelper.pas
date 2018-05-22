@@ -88,9 +88,11 @@ type
   TCore_TemplatFromXml_DataItemGroupCount = function(location: WideString; var count: integer): integer;  stdcall;
   {$endregion}
 
+  TCore_TemplateFromXml2 = function(xml: WideString; var json: WideString): integer; stdcall;
   TCore_TemplateCreate = function(json: WideString; var templateId: integer): integer; stdcall;
   TCore_TemplateRead = function(templateId: integer; var json: WideString): integer; stdcall;
-
+  TCore_TemplateValidation = function (jsonMainElement: WideString;
+         var jsonValidationErrors: WideString) : integer; stdcall;
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
   TAdminTools_DbSetupFunc = function(token: WideString; var reply: WideString): integer; stdcall;
@@ -138,8 +140,10 @@ type
     {$endregion}
 
 
+    Core_TemplateFromXml2Func: TCore_TemplateFromXml2;
     Core_TemplateCreateFunc: TCore_TemplateCreate;
     Core_TemplateReadFunc: TCore_TemplateRead;
+    Core_TemplateValidationFunc: TCore_TemplateValidation;
 
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
@@ -222,8 +226,11 @@ type
     function Core_TemplatFromXml_DataItemGroupCount(location: WideString): integer;
     {$endregion}
 
+    function Core_TemplateFromXml2(xml: WideString; var json: WideString) : integer;
     function Core_TemplateCreate(json: WideString) : integer;
     function Core_TemplateRead(templateId: Integer; var json: WideString) : integer;
+    function Core_TemplateValidation(jsonMainElement: WideString;
+         var jsonValidationErrors: WideString) : integer;
 
     procedure AdminTools_Create(serverConnectionString: string);
     function AdminTools_DbSetup(token: string): string;
@@ -378,6 +385,10 @@ begin
    if not Assigned (Core_TemplatFromXml_DataItemGroupCountFunc) then
      raise Exception.Create('function Core_TemplatFromXml_DataItemGroupCount not found');
 
+   @Core_TemplateFromXml2Func := GetProcAddress(handle, 'Core_TemplateFromXml2') ;
+   if not Assigned (Core_TemplateFromXml2Func) then
+     raise Exception.Create('function Core_TemplateFromXml2 not found');
+
    @Core_TemplateCreateFunc := GetProcAddress(handle, 'Core_TemplateCreate') ;
    if not Assigned (Core_TemplateCreateFunc) then
      raise Exception.Create('function Core_TemplateCreate not found');
@@ -386,6 +397,9 @@ begin
    if not Assigned (Core_TemplateReadFunc) then
      raise Exception.Create('function Core_TemplateRead not found');
 
+   @Core_TemplateValidationFunc := GetProcAddress(handle, 'Core_TemplateValidation') ;
+   if not Assigned (Core_TemplateValidationFunc) then
+     raise Exception.Create('function Core_TemplateValidation not found');
 
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
@@ -826,6 +840,21 @@ end;
 {$endregion}
 
 
+
+function TDllHelper.Core_TemplateFromXml2(xml: WideString; var json: WideString) : integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplateFromXml2Func(xml, json);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
+end;
+
 function TDllHelper.Core_TemplateCreate(json: WideString) : integer;
 var
   res: integer;
@@ -856,6 +885,24 @@ begin
   end;
   result := templateId;
 end;
+
+
+function TDllHelper.Core_TemplateValidation(jsonMainElement: WideString;
+  var jsonValidationErrors: WideString) : integer;
+var
+  res: integer;
+  err: WideString;
+  templateId: integer;
+begin
+  res := Core_TemplateValidationFunc(jsonMainElement, jsonValidationErrors);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := templateId;
+end;
+
 
 
 
