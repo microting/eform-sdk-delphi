@@ -49,11 +49,12 @@ type
       function UnpackDataItemList(arr: TJSONArray): TObjectList<TDataItem>;
       function UnpackElementList(arr: TJSONArray): TObjectList<TElement>;
       function UnpackDataElement(obj: TJSONObject): TDataElement;
-
+      function UnpackSiteNameDto(obj: TJSONValue): TSiteName_Dto;
   public
       function Pack(mainElement: TMainElement): string; overload;
       function UnpackMainElement(json: string): TMainElement;
       function UnpackValidationErrors(jsonValidation: string): TStringList;
+      function UnpackSiteNameDtoList(json: string): TObjectList<TSiteName_Dto>;
   end;
 
 implementation
@@ -901,6 +902,35 @@ begin
   for i := 0 to arr.Count-1 do
     result.Add(arr.Items[i].Value);
 end;
+
+function TPacker.UnpackSiteNameDtoList(json: string): TObjectList<TSiteName_Dto>;
+var
+  arr: TJSONArray;
+  i: integer;
+  siteNameDto: TSiteName_Dto;
+begin
+  result := TObjectList<TSiteName_Dto>.Create;
+  arr := TJSONObject.ParseJSONValue(json) as TJSONArray;
+  for i := 0 to arr.Count-1 do
+  begin
+    siteNameDto := UnpackSiteNameDto(arr.Items[i]);
+    result.Add(siteNameDto);
+  end;
+end;
+
+function TPacker.UnpackSiteNameDto(obj: TJSONValue): TSiteName_Dto;
+var
+  siteNameDto: TSiteName_Dto;
+begin
+  siteNameDto := TSiteName_Dto.Create(
+     obj.GetValue<integer>('SiteUId'),
+     obj.GetValue<string>('SiteName'),
+     obj.GetValue<TDateTime>('CreatedAt'),
+     obj.GetValue<TDateTime>('UpdatedAt')
+     );
+  result := siteNameDto;
+end;
+
 
 {$endregion}
 

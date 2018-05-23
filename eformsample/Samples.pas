@@ -13,13 +13,16 @@ type
       ServerConnectionString: string;
       Core: TCore;
 
-      procedure Print(mainElement: TMainElement);
+      procedure Sample1;
+      procedure PrintMainElement(mainElement: TMainElement);
       procedure PrintDataItemList(dataItemList: TObjectList<TDataItem>; offset: string);
       procedure PrintDataItemGroupList(dataItemGroupList: TObjectList<TDataItemGroup>; offset: string);
       procedure PrintKeyValuePairList(list:  TObjectList<TKeyValuePair>; offset: string);
       procedure PrintValidationErrors(validationErrors: TStringList; offset: string);
-      procedure Sample1;
       function GetDefaultFileName: string;
+
+      procedure Sample2;
+      procedure PrintSiteNameDto(siteNameDro: TSiteName_Dto);
   public
       constructor Create(serverConnectionString: string);
       procedure Run;
@@ -49,6 +52,7 @@ begin
     WriteLn('');
     WriteLn('  ''E'', for exiting program');
     WriteLn('  ''1'', for sample 1 (Working with templates)');
+    WriteLn('  ''2'', for sample 2 (Working with items)');
     ReadLn(input);
     {$endregion}
 
@@ -56,7 +60,9 @@ begin
     if UpperCase(input) = 'E' then
       break
     else if input = '1' then
-      Sample1();
+      Sample1()
+    else if input = '2' then
+      Sample2();
   end;
 end;
 
@@ -105,7 +111,7 @@ begin
 
           xml := TFile.ReadAllText(filename);
           mainElement := Core.TemplatFromXml(xml);
-          Print(mainElement);
+          PrintMainElement(mainElement);
        end
        else if UpperCase(input) = 'C' then
        begin
@@ -129,7 +135,7 @@ begin
           ReadLn(input);
           mainElement.Free;
           mainElement := Core.TemplateRead(StrToInt(input));
-          Print(mainElement);
+          PrintMainElement(mainElement);
        end
        else if UpperCase(input) = 'V' then
        begin
@@ -142,14 +148,14 @@ begin
 
 
           xml := TFile.ReadAllText(filename);
-          mainElement := Core.TemplatFromXml2(xml);
+          mainElement := Core.TemplatFromXml(xml);
           validationErrors := Core.TemplateValidation(mainElement);
           PrintValidationErrors(validationErrors, '  ');
        end;
    end;
 end;
 
-procedure TSamples.Print(mainElement: TMainElement);
+procedure TSamples.PrintMainElement(mainElement: TMainElement);
 var 
   element: TElement;  
   dataElement: TDataElement;
@@ -436,6 +442,41 @@ begin
   end;
 end;
 
+procedure TSamples.Sample2;
+var
+  input: string;
+  siteNameDtoList: TObjectList<TSiteName_Dto>;
+  siteNameDto: TSiteName_Dto;
+
+begin
+   Core.Start(ServerConnectionString);
+
+     while true do
+   begin
+       WriteLn('');
+       WriteLn('  Type ''A'' Read all site items (Advanced_SiteItemReadAll test)');
+       WriteLn('  Type ''Q'' to quit');
+       WriteLn('  As long as the Core left running, the system is able to process eForms');
+       ReadLn(input);
+       if UpperCase(input) = 'Q' then
+          break
+       else if UpperCase(input) = 'A' then
+       begin
+          WriteLn('');
+          siteNameDtoList := Core.Advanced_SiteItemReadAll();
+          for siteNameDto in siteNameDtoList do
+          begin
+            WriteLn('SiteName_Dto:');
+            WriteLn(siteNameDto.ToString);
+          end;
+       end;
+    end;
+end;
+
+procedure TSamples.PrintSiteNameDto(siteNameDro: TSiteName_Dto);
+begin
+
+end;
 {$endregion}
 
 end.
