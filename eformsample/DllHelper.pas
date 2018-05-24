@@ -16,6 +16,7 @@ type
   TCore_TemplateValidation = function (jsonMainElement: WideString;
          var jsonValidationErrors: WideString) : integer; stdcall;
   TCore_Advanced_SiteItemReadAll = function (var json: WideString): integer; stdcall;
+  TCore_TemplateItemRead = function(templateId: Integer; var json: WideString) : integer; stdcall;
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
   TAdminTools_DbSetupFunc = function(token: WideString; var reply: WideString): integer; stdcall;
@@ -41,6 +42,7 @@ type
     Core_TemplateReadFunc: TCore_TemplateRead;
     Core_TemplateValidationFunc: TCore_TemplateValidation;
     Core_Advanced_SiteItemReadAllFunc: TCore_Advanced_SiteItemReadAll;
+    Core_TemplateItemReadFunc: TCore_TemplateItemRead;
 
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
@@ -68,6 +70,7 @@ type
     function Core_TemplateValidation(jsonMainElement: WideString;
          var jsonValidationErrors: WideString) : integer;
     function Core_Advanced_SiteItemReadAll(var json: WideString): integer;
+    function Core_TemplateItemRead(templateId: Integer; var json: WideString) : integer;
 
     procedure AdminTools_Create(serverConnectionString: string);
     function AdminTools_DbSetup(token: string): string;
@@ -149,6 +152,11 @@ begin
    @Core_Advanced_SiteItemReadAllFunc := GetProcAddress(handle, 'Core_Advanced_SiteItemReadAll') ;
    if not Assigned (Core_Advanced_SiteItemReadAllFunc) then
      raise Exception.Create('function Core_Advanced_SiteItemReadAll not found');
+
+   @Core_TemplateItemReadFunc := GetProcAddress(handle, 'Core_TemplateItemRead') ;
+   if not Assigned (Core_TemplateItemReadFunc) then
+     raise Exception.Create('function Core_TemplateItemRead not found');
+
 
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
@@ -293,8 +301,19 @@ begin
   result := res;
 end;
 
-
-
+function TDllHelper.Core_TemplateItemRead(templateId: Integer; var json: WideString) : integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplateItemReadFunc(templateId, json);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
+end;
 
 
 procedure TDllHelper.AdminTools_Create(serverConnectionString: string);

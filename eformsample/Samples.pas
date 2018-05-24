@@ -19,10 +19,11 @@ type
       procedure PrintDataItemGroupList(dataItemGroupList: TObjectList<TDataItemGroup>; offset: string);
       procedure PrintKeyValuePairList(list:  TObjectList<TKeyValuePair>; offset: string);
       procedure PrintValidationErrors(validationErrors: TStringList; offset: string);
+      procedure PrintTemplateDto(templateDto: TTemplate_Dto);
+      procedure PrintFieldDto(fieldDto: TField_Dto);
       function GetDefaultFileName: string;
 
       procedure Sample2;
-      procedure PrintSiteNameDto(siteNameDro: TSiteName_Dto);
   public
       constructor Create(serverConnectionString: string);
       procedure Run;
@@ -447,7 +448,7 @@ var
   input: string;
   siteNameDtoList: TObjectList<TSiteName_Dto>;
   siteNameDto: TSiteName_Dto;
-
+  templateDto: TTemplate_Dto;
 begin
    Core.Start(ServerConnectionString);
 
@@ -455,6 +456,7 @@ begin
    begin
        WriteLn('');
        WriteLn('  Type ''A'' Read all site items (Advanced_SiteItemReadAll test)');
+       WriteLn('  Type ''R'' Get Template_Dto object using templateId (TemplateItemRead test)');
        WriteLn('  Type ''Q'' to quit');
        WriteLn('  As long as the Core left running, the system is able to process eForms');
        ReadLn(input);
@@ -469,14 +471,62 @@ begin
             WriteLn('SiteName_Dto:');
             WriteLn(siteNameDto.ToString);
           end;
-       end;
+       end
+       else if UpperCase(input) = 'R' then
+       begin
+          WriteLn('');
+          WriteLn('  Type templateId: ');
+          ReadLn(input);
+          templateDto := Core.TemplateItemRead(StrToInt(input));
+          PrintTemplateDto(templateDto);
+       end
     end;
 end;
 
-procedure TSamples.PrintSiteNameDto(siteNameDro: TSiteName_Dto);
+procedure TSamples.PrintFieldDto(fieldDto: TField_Dto);
 begin
-
+  WriteLn('FieldDto:');
+  if fieldDto = nil then
+    exit;
+  WriteLn('Id: ' + IntToStr(fieldDto.Id));
+  WriteLn('Label: ' + fieldDto._Label);
+  WriteLn('Description: ' + fieldDto.Description);
+  WriteLn('FieldTypeId: ' + IntToStr(fieldDto.FieldTypeId));
+  WriteLn('FieldType: ' + fieldDto.FieldType);
+  WriteLn('CheckListId: ' + IntToStr(fieldDto.CheckListId));
 end;
+
+procedure TSamples.PrintTemplateDto(templateDto: TTemplate_Dto);
+var
+  i: integer;
+begin
+   WriteLn('TemplateDto:');
+   WriteLn('Id: ' + IntToStr(templateDto.Id));
+   WriteLn('Label: ' + templateDto._Label);
+   WriteLn('Description: ' + templateDto.Descripition);
+   WriteLn('CreatedAt: ' + DateToStr(templateDto.CreatedAt));
+   WriteLn('UpdatedAt: ' + DateToStr(templateDto.UpdatedAt));
+   WriteLn('Repeated: ' + IntToStr(templateDto.Repeated));
+   WriteLn('FolderName: ' + templateDto.FolderName);
+   WriteLn('WorkflowState: ' + templateDto.WorkflowState);
+   for i := 0 to templateDto.DeployedSites.Count-1 do
+      WriteLn('SiteName_Dto: ' + templateDto.DeployedSites[i].ToString);
+   WriteLn('HasCases: ' + BoolToStr(templateDto.HasCases));
+   WriteLn('DisplayIndex: ' + IntToStr(templateDto.DisplayIndex));
+   PrintFieldDto(templateDto.Field1);
+   PrintFieldDto(templateDto.Field2);
+   PrintFieldDto(templateDto.Field3);
+   PrintFieldDto(templateDto.Field4);
+   PrintFieldDto(templateDto.Field5);
+   PrintFieldDto(templateDto.Field6);
+   PrintFieldDto(templateDto.Field7);
+   PrintFieldDto(templateDto.Field8);
+   PrintFieldDto(templateDto.Field9);
+   PrintFieldDto(templateDto.Field10);
+   WriteLn('Tags:');
+   PrintKeyValuePairList(templateDto.Tags,'  ');
+end;
+
 {$endregion}
 
 end.

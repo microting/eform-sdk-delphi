@@ -50,11 +50,14 @@ type
       function UnpackElementList(arr: TJSONArray): TObjectList<TElement>;
       function UnpackDataElement(obj: TJSONObject): TDataElement;
       function UnpackSiteNameDto(obj: TJSONValue): TSiteName_Dto;
+      function UnpackFieldDto(obj: TJSONValue): TField_Dto;
+      function UnpackSiteNameDtoList(arr: TJSONArray): TObjectList<TSiteName_Dto>; overload;
   public
       function Pack(mainElement: TMainElement): string; overload;
       function UnpackMainElement(json: string): TMainElement;
       function UnpackValidationErrors(jsonValidation: string): TStringList;
-      function UnpackSiteNameDtoList(json: string): TObjectList<TSiteName_Dto>;
+      function UnpackSiteNameDtoList(json: string): TObjectList<TSiteName_Dto>; overload;
+      function UnpackTemplateDto(json: string): TTemplate_Dto;
   end;
 
 implementation
@@ -906,11 +909,18 @@ end;
 function TPacker.UnpackSiteNameDtoList(json: string): TObjectList<TSiteName_Dto>;
 var
   arr: TJSONArray;
+begin
+  result := TObjectList<TSiteName_Dto>.Create;
+  arr := TJSONObject.ParseJSONValue(json) as TJSONArray;
+  result := UnpackSiteNameDtoList(arr)
+end;
+
+function TPacker.UnpackSiteNameDtoList(arr: TJSONArray): TObjectList<TSiteName_Dto>;
+var
   i: integer;
   siteNameDto: TSiteName_Dto;
 begin
   result := TObjectList<TSiteName_Dto>.Create;
-  arr := TJSONObject.ParseJSONValue(json) as TJSONArray;
   for i := 0 to arr.Count-1 do
   begin
     siteNameDto := UnpackSiteNameDto(arr.Items[i]);
@@ -932,6 +942,62 @@ begin
 end;
 
 
+function TPacker.UnpackFieldDto(obj: TJSONValue): TField_Dto;
+var
+  fieldDto: TField_Dto;
+begin
+  if (obj.Value = '') or (obj.Value = 'null') then
+  begin
+    Result := nil;
+    exit;
+  end;
+  WriteLn(obj.Value);
+  fieldDto := TField_Dto.Create(
+    obj.GetValue<integer>('Id'),
+    obj.GetValue<string>('Label'),
+    obj.GetValue<string>('Description'),
+    obj.GetValue<integer>('FieldTypeId'),
+    obj.GetValue<string>('FieldType'),
+    obj.GetValue<integer>('CheckListId')
+  );
+  Result := fieldDto;
+end;
+
+
+function TPacker.UnpackTemplateDto(json: string): TTemplate_Dto;
+var
+  templateDto: TTemplate_Dto;
+  obj: TJSONValue;
+begin
+  templateDto := TTemplate_Dto.Create;
+  obj := TJSONObject.ParseJSONValue(json);
+
+  templateDto := TTemplate_Dto.Create(
+     obj.GetValue<integer>('Id'),
+     obj.GetValue<TDateTime>('CreatedAt'),
+     obj.GetValue<TDateTime>('UpdatedAt'),
+     obj.GetValue<string>('Label'),
+     obj.GetValue<string>('Description'),
+     obj.GetValue<integer>('Repeated'),
+     obj.GetValue<string>('FolderName'),
+     obj.GetValue<string>('WorkflowState'),
+     UnpackSiteNameDtoList(obj.GetValue<TJSONArray>('DeployedSites')),
+     obj.GetValue<boolean>('HasCases'),
+     obj.GetValue<integer>('DisplayIndex'),
+     UnpackFieldDto(obj.GetValue<TJSONValue>('Field1')),
+     UnpackFieldDto(obj.GetValue<TJSONValue>('Field2')),
+     UnpackFieldDto(obj.GetValue<TJSONValue>('Field3')),
+     UnpackFieldDto(obj.GetValue<TJSONValue>('Field4')),
+     UnpackFieldDto(obj.GetValue<TJSONValue>('Field5')),
+     UnpackFieldDto(obj.GetValue<TJSONValue>('Field6')),
+     UnpackFieldDto(obj.GetValue<TJSONValue>('Field7')),
+     UnpackFieldDto(obj.GetValue<TJSONValue>('Field8')),
+     UnpackFieldDto(obj.GetValue<TJSONValue>('Field9')),
+     UnpackFieldDto(obj.GetValue<TJSONValue>('Field10')),
+     UnpackKeyValuePairList(obj.GetValue<TJSONArray>('Tags'))
+  );
+  result := templateDto;
+end;
 {$endregion}
 
 end.

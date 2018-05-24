@@ -11,20 +11,18 @@ type
   TCore = class
   private
     FCoreStartEvent: TCoreStartEvent;
-
-    //function GetDataItemList(path: string): TObjectList<TDataItem>;
     procedure SetCoreStartEvent(Value: TCoreStartEvent);
     //procedure OnCoreStartEvent;
 
   public
     constructor Create;
     procedure Start(serverConnectionString: string);
-    //function TemplatFromXml(xml: string): TMainElement;
     function TemplatFromXml(xml: string): TMainElement;
     function TemplateCreate(mainElement: TMainElement): integer;
     function TemplateRead(templateId: integer): TMainElement;
     function TemplateValidation(mainElement: TMainElement): TStringList;
     function Advanced_SiteItemReadAll: TObjectList<TSiteName_Dto>;
+    function TemplateItemRead(templateId: integer): TTemplate_Dto;
 
     property CoreEvent: TCoreStartEvent read FCoreStartEvent write SetCoreStartEvent;
   end;
@@ -336,7 +334,7 @@ begin
   result := TDllHelper.GetInstance.Core_TemplateCreate(jsonString);
 end;
 
-function  TCore.TemplateRead(templateId: integer): TMainElement;
+function TCore.TemplateRead(templateId: integer): TMainElement;
 var
   jsonString: WideString;
   packer: TPacker;
@@ -368,6 +366,17 @@ begin
   TDllHelper.GetInstance.Core_Advanced_SiteItemReadAll(json);
   result := packer.UnpackSiteNameDtoList(json);
 end;
+
+function TCore.TemplateItemRead(templateId: integer): TTemplate_Dto;
+var
+  json: WideString;
+  packer: TPacker;
+begin
+  packer := TPacker.Create;
+  TDllHelper.GetInstance.Core_TemplateItemRead(templateId, json);
+  result :=  packer.UnpackTemplateDto(json);
+end;
+
 
 {$endregion}
 
