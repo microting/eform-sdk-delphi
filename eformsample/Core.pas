@@ -23,6 +23,7 @@ type
     function TemplateValidation(mainElement: TMainElement): TStringList;
     function Advanced_SiteItemReadAll: TObjectList<TSiteName_Dto>;
     function TemplateItemRead(templateId: integer): TTemplate_Dto;
+    function CaseCreate(mainElement: TMainElement; caseUId: string; siteUId: integer): string;
 
     property CoreEvent: TCoreStartEvent read FCoreStartEvent write SetCoreStartEvent;
   end;
@@ -377,6 +378,18 @@ begin
   result :=  packer.UnpackTemplateDto(json);
 end;
 
+
+function TCore.CaseCreate(mainElement: TMainElement; caseUId: string; siteUId: integer): string;
+var
+  jsonMainElement: WideString;
+  resultCase: WideString;
+  packer: TPacker;
+begin
+  packer := TPacker.Create;
+  jsonMainElement := packer.Pack(mainElement);
+  TDllHelper.GetInstance.Core_CaseCreate(jsonMainElement, caseUId, siteUId, resultCase);
+  result := resultCase;
+end;
 
 {$endregion}
 

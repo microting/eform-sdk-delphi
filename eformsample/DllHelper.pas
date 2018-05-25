@@ -17,6 +17,8 @@ type
          var jsonValidationErrors: WideString) : integer; stdcall;
   TCore_Advanced_SiteItemReadAll = function (var json: WideString): integer; stdcall;
   TCore_TemplateItemRead = function(templateId: Integer; var json: WideString) : integer; stdcall;
+  TCore_CaseCreate = function (jsonMainElement: WideString; caseUId: WideString; siteUId: integer;
+       var resultCase: WideString): integer; stdcall;
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
   TAdminTools_DbSetupFunc = function(token: WideString; var reply: WideString): integer; stdcall;
@@ -43,6 +45,7 @@ type
     Core_TemplateValidationFunc: TCore_TemplateValidation;
     Core_Advanced_SiteItemReadAllFunc: TCore_Advanced_SiteItemReadAll;
     Core_TemplateItemReadFunc: TCore_TemplateItemRead;
+    Core_CaseCreateFunc: TCore_CaseCreate;
 
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
@@ -71,6 +74,8 @@ type
          var jsonValidationErrors: WideString) : integer;
     function Core_Advanced_SiteItemReadAll(var json: WideString): integer;
     function Core_TemplateItemRead(templateId: Integer; var json: WideString) : integer;
+    function Core_CaseCreate(jsonMainElement: WideString; caseUId: WideString; siteUId: integer;
+       var resultCase: WideString): integer;
 
     procedure AdminTools_Create(serverConnectionString: string);
     function AdminTools_DbSetup(token: string): string;
@@ -157,6 +162,9 @@ begin
    if not Assigned (Core_TemplateItemReadFunc) then
      raise Exception.Create('function Core_TemplateItemRead not found');
 
+   @Core_CaseCreateFunc := GetProcAddress(handle, 'Core_CaseCreate') ;
+   if not Assigned (Core_CaseCreateFunc) then
+     raise Exception.Create('function Core_CaseCreate not found');
 
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
@@ -307,6 +315,22 @@ var
   err: WideString;
 begin
   res := Core_TemplateItemReadFunc(templateId, json);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
+end;
+
+
+function TDllHelper.Core_CaseCreate(jsonMainElement: WideString; caseUId: WideString;
+     siteUId: integer; var resultCase: WideString) : integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_CaseCreateFunc(jsonMainElement, caseUId, siteUId, resultCase);
   if res <> 0 then
   begin
      err := LastErrorFunc;

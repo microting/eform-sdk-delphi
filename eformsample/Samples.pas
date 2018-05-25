@@ -13,7 +13,7 @@ type
       ServerConnectionString: string;
       Core: TCore;
 
-      procedure Sample1;
+
       procedure PrintMainElement(mainElement: TMainElement);
       procedure PrintDataItemList(dataItemList: TObjectList<TDataItem>; offset: string);
       procedure PrintDataItemGroupList(dataItemGroupList: TObjectList<TDataItemGroup>; offset: string);
@@ -23,7 +23,9 @@ type
       procedure PrintFieldDto(fieldDto: TField_Dto);
       function GetDefaultFileName: string;
 
+      procedure Sample1;
       procedure Sample2;
+      procedure Sample3;
   public
       constructor Create(serverConnectionString: string);
       procedure Run;
@@ -54,6 +56,7 @@ begin
     WriteLn('  ''E'', for exiting program');
     WriteLn('  ''1'', for sample 1 (Working with templates)');
     WriteLn('  ''2'', for sample 2 (Working with items)');
+    WriteLn('  ''3'', for sample 3 (Working with cases)');
     ReadLn(input);
     {$endregion}
 
@@ -63,7 +66,9 @@ begin
     else if input = '1' then
       Sample1()
     else if input = '2' then
-      Sample2();
+      Sample2()
+    else if input = '3' then
+      Sample3();
   end;
 end;
 
@@ -452,7 +457,7 @@ var
 begin
    Core.Start(ServerConnectionString);
 
-     while true do
+   while true do
    begin
        WriteLn('');
        WriteLn('  Type ''A'' Read all site items (Advanced_SiteItemReadAll test)');
@@ -527,6 +532,44 @@ begin
    PrintKeyValuePairList(templateDto.Tags,'  ');
 end;
 
+procedure TSamples.Sample3;
+var
+  mainElement: TMainElement;
+  resultCase: string;
+  input: string;
+  templateId: integer;
+  siteId: integer;
+begin
+   Core.Start(ServerConnectionString);
+
+   while true do
+   begin
+       WriteLn('');
+       WriteLn('  Type ''C'' Read main element from database by templateId and create eForm case  (CaseCreate test)');
+       WriteLn('  Type ''Q'' to quit');
+       WriteLn('  As long as the Core left running, the system is able to process eForms');
+       ReadLn(input);
+       if UpperCase(input) = 'Q' then
+          break
+       else if UpperCase(input) = 'C' then
+       begin
+          WriteLn('');
+          WriteLn('');
+          WriteLn('  Type templateId: ');
+          ReadLn(input);
+          templateId := StrToInt(input);
+
+          WriteLn('  Type siteId:');
+          ReadLn(input);
+          siteId := StrToInt(input);
+
+          mainElement := Core.TemplateRead(templateId);
+          resultCase := Core.CaseCreate(mainElement, '', siteId);
+          WriteLn('Result: ');
+          WriteLn(resultCase);
+       end
+    end;
+end;
 {$endregion}
 
 end.
