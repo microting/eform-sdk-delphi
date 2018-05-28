@@ -23,7 +23,9 @@ type
     function TemplateValidation(mainElement: TMainElement): TStringList;
     function Advanced_SiteItemReadAll: TObjectList<TSiteName_Dto>;
     function TemplateItemRead(templateId: integer): TTemplate_Dto;
-    function CaseCreate(mainElement: TMainElement; caseUId: string; siteUId: integer): string;
+    function CaseCreate(mainElement: TMainElement; caseUId: string; siteUId: integer): string; overload;
+    function CaseCreate(mainElement: TMainElement; caseUId: string; siteUIds: TList<integer>;
+        custom: string): TStringList; overload;
 
     property CoreEvent: TCoreStartEvent read FCoreStartEvent write SetCoreStartEvent;
   end;
@@ -354,7 +356,7 @@ begin
   packer := TPacker.Create;
   jsonMainElement := packer.Pack(mainElement);
   TDllHelper.GetInstance.Core_TemplateValidation(jsonMainElement, jsonValidation);
-  result := packer.UnpackValidationErrors(jsonValidation);
+  result := packer.UnpackStringList(jsonValidation);
 end;
 
 
@@ -389,6 +391,21 @@ begin
   jsonMainElement := packer.Pack(mainElement);
   TDllHelper.GetInstance.Core_CaseCreate(jsonMainElement, caseUId, siteUId, resultCase);
   result := resultCase;
+end;
+
+function  TCore.CaseCreate(mainElement: TMainElement; caseUId: string; siteUIds: TList<integer>;
+    custom: string): TStringList;
+var
+  jsonMainElement: WideString;
+  jsonSiteUIds: WideString;
+  jsonResultCases: WideString;
+  packer: TPacker;
+begin
+  packer := TPacker.Create;
+  jsonMainElement := packer.Pack(mainElement);
+  jsonSiteUIds := packer.PackIntegerList(siteUIds);
+  TDllHelper.GetInstance.Core_CaseCreate(jsonMainElement, caseUId, jsonSiteUIds, custom, jsonResultCases);
+  result := packer.UnpackStringList(jsonResultCases);
 end;
 
 {$endregion}

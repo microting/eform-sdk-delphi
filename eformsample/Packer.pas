@@ -54,8 +54,9 @@ type
       function UnpackSiteNameDtoList(arr: TJSONArray): TObjectList<TSiteName_Dto>; overload;
   public
       function Pack(mainElement: TMainElement): string; overload;
+      function PackIntegerList(list: TList<integer>): string;
       function UnpackMainElement(json: string): TMainElement;
-      function UnpackValidationErrors(jsonValidation: string): TStringList;
+      function UnpackStringList(jsonList: string): TStringList;
       function UnpackSiteNameDtoList(json: string): TObjectList<TSiteName_Dto>; overload;
       function UnpackTemplateDto(json: string): TTemplate_Dto;
   end;
@@ -455,6 +456,18 @@ begin
 
    result := obj.ToString();
 end;
+
+function TPacker.PackIntegerList(list: TList<integer>): string;
+var
+  arr: TJSONArray;
+  val: integer;
+begin
+  arr := TJSONArray.Create;
+  for val in list do
+     arr.Add(IntToStr(val));
+  result := arr.ToString();
+end;
+
 {$endregion}
 
 {$region 'Unpackers'}
@@ -895,13 +908,13 @@ begin
   result := mainElement;
 end;
 
-function TPacker.UnpackValidationErrors(jsonValidation: string): TStringList;
+function TPacker.UnpackStringList(jsonList: string): TStringList;
 var
   arr: TJSONArray;
   i: integer;
 begin
   result := TStringList.Create;
-  arr := TJSONObject.ParseJSONValue(jsonValidation) as TJSONArray;
+  arr := TJSONObject.ParseJSONValue(jsonList) as TJSONArray;
   for i := 0 to arr.Count-1 do
     result.Add(arr.Items[i].Value);
 end;

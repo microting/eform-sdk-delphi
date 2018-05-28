@@ -535,17 +535,26 @@ end;
 procedure TSamples.Sample3;
 var
   mainElement: TMainElement;
-  resultCase: string;
+
   input: string;
   templateId: integer;
-  siteId: integer;
+
+  siteUId: integer;
+  resultCase: string;
+
+  siteUIds: TList<integer>;
+  resultCases: TStringList;
+  parts: TArray<string>;
+  i: integer;
+  custom: string;
 begin
    Core.Start(ServerConnectionString);
 
    while true do
    begin
        WriteLn('');
-       WriteLn('  Type ''C'' Read main element from database by templateId and create eForm case  (CaseCreate test)');
+       WriteLn('  Type ''C'' Read main element from database by templateId and siteUId and create eForm case  (CaseCreate test)');
+       WriteLn('  Type ''M '' Read main element from database by templateId and multiple siteUIds and create eForm case  (CaseCreate test)');
        WriteLn('  Type ''Q'' to quit');
        WriteLn('  As long as the Core left running, the system is able to process eForms');
        ReadLn(input);
@@ -559,14 +568,38 @@ begin
           ReadLn(input);
           templateId := StrToInt(input);
 
-          WriteLn('  Type siteId:');
+          WriteLn('  Type siteUId:');
           ReadLn(input);
-          siteId := StrToInt(input);
+          siteUId := StrToInt(input);
 
           mainElement := Core.TemplateRead(templateId);
-          resultCase := Core.CaseCreate(mainElement, '', siteId);
+          resultCase := Core.CaseCreate(mainElement, '', siteUId);
           WriteLn('Result: ');
           WriteLn(resultCase);
+       end
+       else if UpperCase(input) = 'M' then
+       begin
+          WriteLn('');
+          WriteLn('  Type templateId: ');
+          ReadLn(input);
+          templateId := StrToInt(input);
+
+          WriteLn('  Type siteUIds (comma separated):');
+          ReadLn(input);
+          siteUIds := TList<integer>.Create;
+          parts := input.Split([',']);
+          for i:=0 to Length(parts) - 1 do
+            siteUIds.Add(StrToInt(parts[i]));
+
+          WriteLn('  Type custom: ');
+          ReadLn(input);
+          custom := input;
+
+          mainElement := Core.TemplateRead(templateId);
+          resultCases := Core.CaseCreate(mainElement, '', siteUIds, custom);
+          WriteLn('Results: ');
+          for i := 0 to resultCases.Count - 1 do
+              WriteLn(resultCases[i]);
        end
     end;
 end;
