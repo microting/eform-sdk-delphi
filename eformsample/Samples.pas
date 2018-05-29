@@ -15,9 +15,12 @@ type
 
 
       procedure PrintMainElement(mainElement: TMainElement);
+      procedure PrintReplyElement(replyElement: TReplyElement);
+      procedure PrintElementList(elementList: TObjectList<TElement>; offset: string);
       procedure PrintDataItemList(dataItemList: TObjectList<TDataItem>; offset: string);
       procedure PrintDataItemGroupList(dataItemGroupList: TObjectList<TDataItemGroup>; offset: string);
       procedure PrintKeyValuePairList(list:  TObjectList<TKeyValuePair>; offset: string);
+      procedure PrintFieldValues(list: TObjectList<TFieldValue>; offset: string);
       procedure PrintValidationErrors(validationErrors: TStringList; offset: string);
       procedure PrintTemplateDto(templateDto: TTemplate_Dto);
       procedure PrintFieldDto(fieldDto: TField_Dto);
@@ -139,7 +142,8 @@ begin
           WriteLn('');
           WriteLn('  Type templateId: ');
           ReadLn(input);
-          mainElement.Free;
+          if (mainElement <> nil) then
+             mainElement.Free;
           mainElement := Core.TemplateRead(StrToInt(input));
           PrintMainElement(mainElement);
        end
@@ -162,9 +166,6 @@ begin
 end;
 
 procedure TSamples.PrintMainElement(mainElement: TMainElement);
-var 
-  element: TElement;  
-  dataElement: TDataElement;
 begin
    WriteLn('');
    WriteLn('Main element:');
@@ -181,40 +182,75 @@ begin
    WriteLn('ManualSync: ' + BoolToStr(mainElement.ManualSync));
    WriteLn('CaseType: ' + mainElement.CaseType);
    WriteLn('ElementList:');
-   for element in mainElement.ElementList do
+   PrintElementList(mainElement.ElementList,'  ');
+end;
+
+procedure TSamples.PrintElementList(elementList: TObjectList<TElement>; offset: string);
+var
+  element: TElement;
+  dataElement: TDataElement;
+  checkListValue: TCheckListValue;
+begin
+   for element in elementList do
    begin
-       WriteLn('  Element:');
+       WriteLn(offset + 'Element:');
        if element is TDataElement then
        begin
-         WriteLn('  Type: DataElement');
+         WriteLn(offset + 'Type: DataElement');
          dataElement := element as TDataElement;
-         WriteLn('  Id: ' + IntToStr(dataElement.Id));
-         WriteLn('  Label: ' + dataElement._Label);
-         WriteLn('  Description: ' + dataElement.Description.InderValue);
-         WriteLn('  DisplayOrder: ' + IntToStr(dataElement.DisplayOrder));
-         WriteLn('  ReviewEnabled: ' + BoolToStr(dataElement.ReviewEnabled));
+         WriteLn(offset + 'Id: ' + IntToStr(dataElement.Id));
+         WriteLn(offset + 'Label: ' + dataElement._Label);
+         WriteLn(offset + 'Description: ' + dataElement.Description.InderValue);
+         WriteLn(offset + 'DisplayOrder: ' + IntToStr(dataElement.DisplayOrder));
+         WriteLn(offset + 'ReviewEnabled: ' + BoolToStr(dataElement.ReviewEnabled));
         // WriteLn('  ManualSync: ' + BoolToStr(element.ManualSync));
-         WriteLn('  ExtraFieldsEnabled: ' + BoolToStr(dataElement.ExtraFieldsEnabled));
+         WriteLn(offset + 'ExtraFieldsEnabled: ' + BoolToStr(dataElement.ExtraFieldsEnabled));
         // WriteLn('  DoneButtonDisabled: ' + BoolToStr(element.DoneButtonDisabled));
-         WriteLn('  ApprovalEnabled: ' + BoolToStr(dataElement.ApprovalEnabled));
+         WriteLn(offset + 'ApprovalEnabled: ' + BoolToStr(dataElement.ApprovalEnabled));
          {$region 'DataItemList'}
          if dataElement.DataItemList.Count > 0 then
          begin
-            WriteLn('  DataItemList:');
-            PrintDataItemList(dataElement.DataItemList,'    ');
+            WriteLn(offset + 'DataItemList:');
+            PrintDataItemList(dataElement.DataItemList,offset + '  ');
          end;
          {$endregion}
          {$region 'DataItemGroupList'}
          if dataElement.DataItemGroupList.Count > 0 then
          begin
             WriteLn('  DataItemGroupList:');
-            PrintDataItemGroupList(dataElement.DataItemGroupList,'    ');
+            PrintDataItemGroupList(dataElement.DataItemGroupList,offset + '  ');
+         end;
+         {$endregion}
+       end
+       else if element is TCheckListValue then
+       begin
+         WriteLn(offset + 'Type: CheckListValue');
+         checkListValue := element as TCheckListValue;
+         WriteLn(offset + 'Id: ' + IntToStr(checkListValue.Id));
+         WriteLn(offset + 'Label: ' + checkListValue._Label);
+         WriteLn(offset + 'Description: ' + checkListValue.Description.InderValue);
+         WriteLn(offset + 'DisplayOrder: ' + IntToStr(checkListValue.DisplayOrder));
+         WriteLn(offset + 'ReviewEnabled: ' + BoolToStr(checkListValue.ReviewEnabled));
+         WriteLn(offset + 'ExtraFieldsEnabled: ' + BoolToStr(checkListValue.ExtraFieldsEnabled));
+         WriteLn(offset + 'ApprovalEnabled: ' + BoolToStr(checkListValue.ApprovalEnabled));
+         {$region 'DataItemList'}
+         if checkListValue.DataItemList.Count > 0 then
+         begin
+            WriteLn(offset + 'DataItemList:');
+            PrintDataItemList(checkListValue.DataItemList,offset + '  ');
+         end;
+         {$endregion}
+         {$region 'DataItemGroupList'}
+         if checkListValue.DataItemGroupList.Count > 0 then
+         begin
+            WriteLn('  DataItemGroupList:');
+            PrintDataItemGroupList(checkListValue.DataItemGroupList,offset + '  ');
          end;
          {$endregion}
        end;
 
+
    end;
-   WriteLn('');
 end;
 
 procedure TSamples.PrintDataItemList(dataItemList: TObjectList<TDataItem>; offset: string);
@@ -234,6 +270,7 @@ var
   text: TText;
   comment: TComment;
   fieldContainer: TFieldContainer;
+  field: TField;
 begin
    for dataItem in dataItemList do
    begin
@@ -396,16 +433,44 @@ begin
           WriteLn(offset + 'Value: ' + fieldContainer.Value);
           WriteLn(offset + 'FieldType: ' + fieldContainer.FieldType);
           PrintDataItemList(fieldContainer.DataItemList, offset + '    ');
+       end
+       else if dataItem is TField then
+       begin
+          field := dataItem as TField;
+          WriteLn(offset + 'Type: Field');
+          WriteLn(offset + 'Id: ' + IntToStr(field.Id));
+          WriteLn(offset + 'Label: ' + field._Label);
+          WriteLn(offset + 'Description: ' + field.Description.InderValue);
+          WriteLn(offset + 'DisplayOrder: ' + IntToStr(field.DisplayOrder));
+          WriteLn(offset + 'Mandatory: ' + BoolToStr(field.Mandatory));
+          WriteLn(offset + 'Color: ' + field.Color);
+          PrintKeyValuePairList(field.KeyValuePairList, offset + '  ');
+          PrintFieldValues(field.FieldValues, offset + '  ');
        end;
 
    end;
 end;
 
+
+procedure TSamples.PrintFieldValues(list: TObjectList<TFieldValue>; offset: string);
+var
+  fieldValue: TFieldValue;
+begin
+//    for pair in list do
+//    begin
+//      WriteLn(offset + 'KeyValuePair:');
+//      WriteLn(offset + 'Key: ' + pair.Key);
+//      WriteLn(offset + 'Value: ' + pair.Value);
+//      WriteLn(offset + 'DisplayOrder: ' + pair.DisplayOrder);
+//      WriteLn(offset + 'Selected: ' + BoolToStr(pair.Selected));
+//    end;
+end;
+
+
 procedure TSamples.PrintKeyValuePairList(list:  TObjectList<TKeyValuePair>; offset: string);
 var
   pair: TKeyValuePair;
 begin
-
     for pair in list do
     begin
       WriteLn(offset + 'KeyValuePair:');
@@ -535,9 +600,12 @@ end;
 procedure TSamples.Sample3;
 var
   mainElement: TMainElement;
+  replyElement: TReplyElement;
 
   input: string;
   templateId: integer;
+  microtingUId: string;
+  checkUId: string;
 
   siteUId: integer;
   resultCase: string;
@@ -554,7 +622,8 @@ begin
    begin
        WriteLn('');
        WriteLn('  Type ''C'' Read main element from database by templateId and siteUId and create eForm case  (CaseCreate test)');
-       WriteLn('  Type ''M '' Read main element from database by templateId and multiple siteUIds and create eForm case  (CaseCreate test)');
+       WriteLn('  Type ''M'' Read main element from database by templateId and multiple siteUIds and create eForm case  (CaseCreate test)');
+       WriteLn('  Type ''R'' Read case database by microtingUId and checkUId (CaseRead test)');
        WriteLn('  Type ''Q'' to quit');
        WriteLn('  As long as the Core left running, the system is able to process eForms');
        ReadLn(input);
@@ -601,7 +670,46 @@ begin
           for i := 0 to resultCases.Count - 1 do
               WriteLn(resultCases[i]);
        end
+       else if UpperCase(input) = 'R' then
+       begin
+          WriteLn('');
+          WriteLn('  Type microtingUId: ');
+          ReadLn(input);
+          microtingUId := input;
+
+          WriteLn('  Type checkUId');
+          ReadLn(input);
+          checkUId := input;
+
+          replyElement := Core.CaseRead(microtingUId, checkUId);
+          PrintReplyElement(replyElement);
+       end
     end;
+end;
+
+
+procedure TSamples.PrintReplyElement(replyElement: TReplyElement);
+begin
+   WriteLn('');
+   WriteLn('Reply element:');
+   WriteLn('Id: ' + IntToStr(replyElement.Id));
+   WriteLn('Label: ' + replyElement._Label);
+   WriteLn('DisplayOrder: ' + IntToStr(replyElement.DisplayOrder));
+   WriteLn('CheckListFolderName: ' + replyElement.CheckListFolderName);
+   WriteLn('Repeated: ' + IntToStr(replyElement.Repeated));
+   WriteLn('StartDate: ' + DateToStr(replyElement.StartDate));
+   WriteLn('EndDate: ' + DateToStr(replyElement.EndDate));
+   WriteLn('Language: ' + replyElement.Language);
+   WriteLn('MultiApproval: ' + BoolToStr(replyElement.MultiApproval));
+   WriteLn('FastNavigation: ' + BoolToStr(replyElement.FastNavigation));
+   WriteLn('ManualSync: ' + BoolToStr(replyElement.ManualSync));
+   WriteLn('CaseType: ' + replyElement.CaseType);
+   WriteLn('UnitId: ' + IntToStr(replyElement.UnitId));
+   WriteLn('DoneById: ' + IntToStr(replyElement.DoneById));
+   WriteLn('DoneAt: ' + DateToStr(replyElement.DoneAt));
+   WriteLn('Custom: ' + replyElement.Custom);
+   WriteLn('ElementList:');
+   PrintElementList(replyElement.ElementList,'  ');
 end;
 {$endregion}
 

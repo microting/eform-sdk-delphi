@@ -234,15 +234,6 @@ type
  {$endregion}
  {$endregion}
 
- {$region 'TField'}
-  TField = class(TDataItem)
-  public
-    FieldType: string;
-    FieldValue: string;
-    EntityGroudId: integer;
-    KeyValuePairList: TObjectList<TKeyValuePair>;
-  end;
-  {$endregion}
 
  {$region 'TUploadedData'}
  TUploadedData = class
@@ -279,6 +270,16 @@ type
  {$endregion}
 
 
+{$region 'TField'}
+TField = class(TDataItem)
+public
+  FieldType: string;
+  FieldValue: string;
+  EntityGroudId: integer;
+  KeyValuePairList: TObjectList<TKeyValuePair>;
+  FieldValues: TObjectList<TFieldValue>;
+end;
+{$endregion}
 TDataItemColors = (e2f4fb_Blue, f5eafa_Purple, f0f8db_Green,  fff6df_Yellow, ffe4e4_Red, None_Default);
 
 implementation

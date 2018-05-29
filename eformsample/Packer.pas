@@ -30,6 +30,7 @@ type
 
       function UnpackPicture(obj: TJSONObject): TPicture;
       function UnpackSaveButton(obj: TJSONObject): TSaveButton;
+      function UnpackField(obj: TJSONObject): TField;
       function UnpackSignature(obj: TJSONObject): TSignature;
       function UnpackDate(obj: TJSONObject): TDate;
       function UnpackShowPdf(obj: TJSONObject): TShowPdf;
@@ -44,11 +45,13 @@ type
       function UnpackKeyValuePairList(arr: TJSONArray): TObjectList<TKeyValuePair>;
       function UnpackKeyValuePair(obj: TJSONObject): TKeyValuePair;
       function UnpackFieldContainer(obj: TJSONObject): TFieldContainer;
+      function UnpackFieldValues(arr: TJSONArray): TObjectList<TFieldValue>;
       function UnpackDataItemGroupList(arr: TJSONArray): TObjectList<TDataItemGroup>;
       function UnpackDataItemGroup(obj: TJSONObject): TDataItemGroup;
       function UnpackDataItemList(arr: TJSONArray): TObjectList<TDataItem>;
       function UnpackElementList(arr: TJSONArray): TObjectList<TElement>;
       function UnpackDataElement(obj: TJSONObject): TDataElement;
+      function UnpackCheckListValue(obj: TJSONObject): TCheckListValue;
       function UnpackSiteNameDto(obj: TJSONValue): TSiteName_Dto;
       function UnpackFieldDto(obj: TJSONValue): TField_Dto;
       function UnpackSiteNameDtoList(arr: TJSONArray): TObjectList<TSiteName_Dto>; overload;
@@ -56,6 +59,7 @@ type
       function Pack(mainElement: TMainElement): string; overload;
       function PackIntegerList(list: TList<integer>): string;
       function UnpackMainElement(json: string): TMainElement;
+      function UnpackReplyElement(json: string): TReplyElement;
       function UnpackStringList(jsonList: string): TStringList;
       function UnpackSiteNameDtoList(json: string): TObjectList<TSiteName_Dto>; overload;
       function UnpackTemplateDto(json: string): TTemplate_Dto;
@@ -471,6 +475,47 @@ end;
 {$endregion}
 
 {$region 'Unpackers'}
+
+function TPacker.UnpackField(obj: TJSONObject): TField;
+var
+  field: TField;
+  s: string;
+begin
+  field := TField.Create;
+  field.Id := obj.GetValue<integer>('Id');
+  field._Label := obj.GetValue<string>('Label');
+  field.Mandatory := obj.GetValue<boolean>('Mandatory');
+  field.ReadOnly := obj.GetValue<boolean>('ReadOnly');
+  field.Description := TCDataValue.Create;
+  field.Description.InderValue := obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue');
+  field.DisplayOrder := obj.GetValue<integer>('DisplayOrder');
+  field.Color := obj.GetValue<string>('Color');
+  field.Dummy := obj.GetValue<boolean>('Dummy');
+  field.FieldType := obj.GetValue<string>('FieldType');
+  field.FieldValue := obj.GetValue<string>('FieldValue');
+  if obj.GetValue('EntityGroudId') <> nil then
+     field.EntityGroudId := obj.GetValue<integer>('EntityGroudId');
+  s := obj.GetValue('KeyValuePairList').Value;
+  if (obj.GetValue('KeyValuePairList') <> nil) and (obj.GetValue('KeyValuePairList').Value <>'null') then
+    field.KeyValuePairList := UnpackKeyValuePairList(obj.GetValue<TJSONArray>('KeyValuePairList'))
+  else
+    field.KeyValuePairList := TObjectList<TKeyValuePair>.Create;
+  field.FieldValues := UnpackFieldValues(obj.GetValue<TJSONArray>('FieldValues'));
+  result := field;
+end;
+
+function TPacker.UnpackFieldValues(arr: TJSONArray): TObjectList<TFieldValue>;
+var
+   fieldValues: TObjectList<TFieldValue>;
+   i: integer;
+begin
+   fieldValues := TObjectList<TFieldValue>.Create;
+   //for i := 0 to arr.Count - 1 do
+   //    keyValuePairList.Add(UnpackKeyValuePair(arr.Items[i] as TJSONObject));
+   result := fieldValues;
+end;
+
+
 function TPacker.UnpackSignature(obj: TJSONObject): TSignature;
 var
   signature: TSignature;
@@ -830,7 +875,9 @@ begin
      else if _type = 'FieldContainer' then
        dataItemList.Add(UnpackFieldContainer(obj))
      else if _type = 'Signature' then
-       dataItemList.Add(UnpackSignature(obj));
+       dataItemList.Add(UnpackSignature(obj))
+     else if _type = 'Field' then
+       dataItemList.Add(UnpackField(obj));
 
    end;
    result := dataItemList;
@@ -856,11 +903,34 @@ begin
    result := dataElement;
 end;
 
+function TPacker.UnpackCheckListValue(obj: TJSONObject): TCheckListValue;
+var
+   checkListValue: TCheckListValue;
+   dataElement : TDataElement;
+begin
+   dataElement := TDataElement.Create(
+       obj.GetValue<integer>('Id'),
+       obj.GetValue<string>('Label'),
+       obj.GetValue<integer>('DisplayOrder'),
+       obj.GetValue<TJSONObject>('Description').GetValue<string>('InderValue'),
+       obj.GetValue<boolean>('ApprovalEnabled'),
+       obj.GetValue<boolean>('ReviewEnabled'),
+       obj.GetValue<boolean>('DoneButtonEnabled'),
+       obj.GetValue<boolean>('ExtraFieldsEnabled'),
+       obj.GetValue<string>('PinkBarText'),
+       UnpackDataItemGroupList(obj.GetValue<TJSONArray>('DataItemGroupList')),
+       UnpackDataItemList(obj.GetValue<TJSONArray>('DataItemList'))
+   );
+   checkListValue := TCheckListValue.Create(dataElement, obj.GetValue<string>('Status'));
+   result := checkListValue;
+end;
+
 function TPacker.UnpackElementList(arr: TJSONArray): TObjectList<TElement>;
 var
   obj: TJSONObject;
   elementList: TObjectList<TElement>;
   dataElement: TDataElement;
+  checkListValue: TCheckListValue;
   i: integer;
   _type: string;
 begin
@@ -873,7 +943,13 @@ begin
     begin
        dataElement := UnpackDataElement(obj);
        elementList.Add(dataElement);
+    end
+    else if _type = 'CheckListValue' then
+    begin
+      checkListValue := UnpackCheckListValue(obj);
+      elementList.Add(checkListValue);
     end;
+
   end;
   result := elementList;
 end;
@@ -907,6 +983,41 @@ begin
      );
   result := mainElement;
 end;
+
+function TPacker.UnpackReplyElement(json: string): TReplyElement;
+var
+  replyElement: TReplyElement;
+  coreElement: TCoreElement;
+  obj: TJSONValue;
+  id: integer;
+  elementList: TObjectList<TElement>;
+begin
+  obj := TJSONObject.ParseJSONValue(json);
+  elementList := TObjectList<TElement>.Create;
+  coreElement := TCoreElement.Create(
+     obj.GetValue<integer>('Id'),
+     obj.GetValue<string>('Label'),
+     obj.GetValue<integer>('DisplayOrder'),
+     obj.GetValue<string>('CheckListFolderName'),
+     obj.GetValue<integer>('Repeated'),
+     obj.GetValue<TDateTime>('StartDate'),
+     obj.GetValue<TDateTime>('EndDate'),
+     obj.GetValue<string>('Language'),
+     obj.GetValue<boolean>('MultiApproval'),
+     obj.GetValue<boolean>('FastNavigation'),
+     obj.GetValue<boolean>('DownloadEntities'),
+     obj.GetValue<boolean>('ManualSync'),
+     obj.GetValue<string>('CaseType'),
+     UnpackElementList( obj.GetValue<TJSONArray>('ElementList'))
+     );
+  replyElement := TReplyElement(coreElement);
+  replyElement.UnitId := obj.GetValue<integer>('UnitId');
+  replyElement.Custom := obj.GetValue<string>('Custom');
+  replyElement.DoneById := obj.GetValue<integer>('DoneById');
+  replyElement.DoneAt := obj.GetValue<TDateTime>('DoneAt');
+  result := replyElement;
+end;
+
 
 function TPacker.UnpackStringList(jsonList: string): TStringList;
 var
