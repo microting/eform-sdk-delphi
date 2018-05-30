@@ -55,6 +55,7 @@ type
       function UnpackSiteNameDto(obj: TJSONValue): TSiteName_Dto;
       function UnpackFieldDto(obj: TJSONValue): TField_Dto;
       function UnpackSiteNameDtoList(arr: TJSONArray): TObjectList<TSiteName_Dto>; overload;
+      function UnpackUploadedData(obj: TJSONObject): TUploadedData;
   public
       function Pack(mainElement: TMainElement): string; overload;
       function PackIntegerList(list: TList<integer>): string;
@@ -507,12 +508,57 @@ end;
 function TPacker.UnpackFieldValues(arr: TJSONArray): TObjectList<TFieldValue>;
 var
    fieldValues: TObjectList<TFieldValue>;
+   fieldValue: TFieldValue;
    i: integer;
+   obj: TJSONObject;
+   s: string;
 begin
    fieldValues := TObjectList<TFieldValue>.Create;
-   //for i := 0 to arr.Count - 1 do
-   //    keyValuePairList.Add(UnpackKeyValuePair(arr.Items[i] as TJSONObject));
+   for i := 0 to arr.Count - 1 do
+   begin
+      obj := arr.Items[i] as TJSONObject;
+      fieldValue := TFieldValue.Create;
+      fieldValue.FieldId := obj.GetValue<integer>('FieldId');
+      fieldValue.FieldType := obj.GetValue<string>('FieldType');
+      fieldValue.DateOfDoing := obj.GetValue<TDateTime>('DateOfDoing');
+      fieldValue.Value := obj.GetValue<string>('Value');
+      fieldValue.MicrotingUuid := obj.GetValue<string>('MicrotingUuid');
+      fieldValue.Latitude := obj.GetValue<string>('Latitude');
+      fieldValue.Longitude := obj.GetValue<string>('Longitude');
+      fieldValue.Altitude := obj.GetValue<string>('Altitude');
+      fieldValue.Heading := obj.GetValue<string>('Heading');
+      fieldValue.Accuracy := obj.GetValue<string>('Accuracy');
+      if (not (obj.Get('Date').JsonValue is  TJSONNull)) then
+          fieldValue.Date := obj.GetValue<TDateTime>('Date');
+      fieldValue.UploadedData := obj.GetValue<string>('UploadedData');
+      fieldValue.UploadedDataObj := UnpackUploadedData(obj.GetValue<TJSONObject>('UploadedDataObj'));
+
+      s := obj.GetValue('KeyValuePairList').Value;
+      if (obj.GetValue('KeyValuePairList') <> nil) and ( not (obj.Get('KeyValuePairList').JsonValue is TJSONNull))  then
+        fieldValue.KeyValuePairList := UnpackKeyValuePairList(obj.GetValue<TJSONArray>('KeyValuePairList'))
+      else
+        fieldValue.KeyValuePairList := TObjectList<TKeyValuePair>.Create;
+
+
+      fieldValues.Add(fieldValue);
+   end;
    result := fieldValues;
+end;
+
+
+function TPacker.UnpackUploadedData(obj: TJSONObject): TUploadedData;
+var
+  uploadedData: TUploadedData;
+begin
+  uploadedData := TUploadedData.Create;
+  uploadedData.Checksum := obj.GetValue<string>('Checksum');
+  uploadedData.Extension := obj.GetValue<string>('Extension');
+  uploadedData.CurrentFile := obj.GetValue<string>('CurrentFile');
+  uploadedData.UploaderId := obj.GetValue<integer>('UploaderId');
+  uploadedData.UploaderType := obj.GetValue<string>('UploaderType');
+  uploadedData.FileLocation := obj.GetValue<string>('FileLocation');
+  uploadedData.FileName := obj.GetValue<string>('FileName');
+  result := uploadedData;
 end;
 
 

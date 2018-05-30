@@ -27,6 +27,7 @@ type
     function CaseCreate(mainElement: TMainElement; caseUId: string; siteUIds: TList<integer>;
         custom: string): TStringList; overload;
     function  CaseRead(microtingUId: string; checkUId: string): TReplyElement;
+    function  CaseDelete(microtingUId: string): boolean;
 
     property CoreEvent: TCoreStartEvent read FCoreStartEvent write SetCoreStartEvent;
   end;
@@ -156,6 +157,14 @@ begin
   packer := TPacker.Create;
   TDllHelper.GetInstance.Core_CaseRead(microtingUId, checkUId, jsonReplyElement);
   result := packer.UnpackReplyElement(jsonReplyElement);
+end;
+
+function  TCore.CaseDelete(microtingUId: string ): boolean;
+var
+  deleteResult: boolean;
+begin
+  TDllHelper.GetInstance.Core_CaseDelete(microtingUId, deleteResult);
+  result := deleteResult;
 end;
 
 {$endregion}

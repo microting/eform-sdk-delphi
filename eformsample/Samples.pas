@@ -21,6 +21,7 @@ type
       procedure PrintDataItemGroupList(dataItemGroupList: TObjectList<TDataItemGroup>; offset: string);
       procedure PrintKeyValuePairList(list:  TObjectList<TKeyValuePair>; offset: string);
       procedure PrintFieldValues(list: TObjectList<TFieldValue>; offset: string);
+      procedure PrintUploadedData(uploadedData: TUploadedData; offset: string);
       procedure PrintValidationErrors(validationErrors: TStringList; offset: string);
       procedure PrintTemplateDto(templateDto: TTemplate_Dto);
       procedure PrintFieldDto(fieldDto: TField_Dto);
@@ -456,14 +457,38 @@ procedure TSamples.PrintFieldValues(list: TObjectList<TFieldValue>; offset: stri
 var
   fieldValue: TFieldValue;
 begin
-//    for pair in list do
-//    begin
-//      WriteLn(offset + 'KeyValuePair:');
-//      WriteLn(offset + 'Key: ' + pair.Key);
-//      WriteLn(offset + 'Value: ' + pair.Value);
-//      WriteLn(offset + 'DisplayOrder: ' + pair.DisplayOrder);
-//      WriteLn(offset + 'Selected: ' + BoolToStr(pair.Selected));
-//    end;
+    for fieldValue in list do
+    begin
+        WriteLn(offset + 'FieldValue:');
+        WriteLn(offset + 'Key: ' + IntToStr(fieldValue.FieldId));
+        WriteLn(offset + 'FieldType: ' + fieldValue.FieldType);
+        WriteLn(offset + 'DateOfDoing: ' + DateToStr(fieldValue.DateOfDoing));
+        WriteLn(offset + 'Value: ' + fieldValue.Value);
+        WriteLn(offset + 'MicrotingUuid: ' + fieldValue.MicrotingUuid);
+        WriteLn(offset + 'ValueReadable: ' + fieldValue.ValueReadable);
+        WriteLn(offset + 'Latitude: ' + fieldValue.Latitude);
+        WriteLn(offset + 'Longitude: ' + fieldValue.Longitude);
+        WriteLn(offset + 'Altitude: ' + fieldValue.Altitude);
+        WriteLn(offset + 'Heading: ' + fieldValue.Heading);
+        WriteLn(offset + 'Accuracy: ' + fieldValue.Accuracy);
+        WriteLn(offset + 'Date: ' + DateToStr(fieldValue.Date));
+        WriteLn(offset + 'UploadedData: ' + fieldValue.UploadedData);
+        PrintUploadedData(fieldValue.UploadedDataObj, offset + '  ');
+        PrintKeyValuePairList(fieldValue.KeyValuePairList, offset + '  ');
+     end;
+end;
+
+
+procedure TSamples.PrintUploadedData(uploadedData: TUploadedData; offset: string);
+begin
+    WriteLn(offset + 'UploadedData:');
+    WriteLn(offset + 'Checksum: ' + uploadedData.Checksum);
+    WriteLn(offset + 'Extension: ' + uploadedData.Extension);
+    WriteLn(offset + 'CurrentFile: ' + uploadedData.CurrentFile);
+    WriteLn(offset + 'UploaderId: ' + IntToStr(uploadedData.UploaderId));
+    WriteLn(offset + 'UploaderType: ' + uploadedData.UploaderType);
+    WriteLn(offset + 'FileLocation: ' + uploadedData.FileLocation);
+    WriteLn(offset + 'FileName: ' + uploadedData.FileName);
 end;
 
 
@@ -615,6 +640,7 @@ var
   parts: TArray<string>;
   i: integer;
   custom: string;
+  result: boolean;
 begin
    Core.Start(ServerConnectionString);
 
@@ -624,6 +650,7 @@ begin
        WriteLn('  Type ''C'' Read main element from database by templateId and siteUId and create eForm case  (CaseCreate test)');
        WriteLn('  Type ''M'' Read main element from database by templateId and multiple siteUIds and create eForm case  (CaseCreate test)');
        WriteLn('  Type ''R'' Read case database by microtingUId and checkUId (CaseRead test)');
+       WriteLn('  Type ''D'' Delete case by microtingUId (CaseDelete test)');
        WriteLn('  Type ''Q'' to quit');
        WriteLn('  As long as the Core left running, the system is able to process eForms');
        ReadLn(input);
@@ -683,6 +710,17 @@ begin
 
           replyElement := Core.CaseRead(microtingUId, checkUId);
           PrintReplyElement(replyElement);
+       end
+       else if UpperCase(input) = 'D' then
+       begin
+          WriteLn('');
+          WriteLn('  Type microtingUId: ');
+          ReadLn(input);
+          microtingUId := input;
+
+          result := Core.CaseDelete(microtingUId);
+          WriteLn('');
+          WriteLn('Result of delete case: ' + BoolToStr(result));
        end
     end;
 end;

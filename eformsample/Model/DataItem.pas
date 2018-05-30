@@ -237,14 +237,14 @@ type
 
  {$region 'TUploadedData'}
  TUploadedData = class
-  public
+ public
     Checksum: string;
     Extension: string;
     CurrentFile: string;
     UploaderId: Integer;
     UploaderType: string;
     FileLocation: string;
-    Filename: string;
+    FileName: string;
  end;
  {$endregion}
 
