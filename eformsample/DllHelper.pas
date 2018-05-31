@@ -15,6 +15,9 @@ type
   TCore_TemplateRead = function(templateId: integer; var json: WideString): integer; stdcall;
   TCore_TemplateValidation = function (jsonMainElement: WideString;
          var jsonValidationErrors: WideString) : integer; stdcall;
+  TCore_TemplateDelete = function (templateId: integer;  var deleteResult: boolean) : integer; stdcall;
+  TCore_TemplateUploadData = function (jsonMainElementIn: WideString;
+         var jsonMainElementOut: WideString) : integer; stdcall;
   TCore_Advanced_SiteItemReadAll = function (var json: WideString): integer; stdcall;
   TCore_TemplateItemRead = function(templateId: Integer; var json: WideString) : integer; stdcall;
   TCore_CaseCreate = function (jsonMainElement: WideString; caseUId: WideString; siteUId: integer;
@@ -49,6 +52,8 @@ type
     Core_TemplateCreateFunc: TCore_TemplateCreate;
     Core_TemplateReadFunc: TCore_TemplateRead;
     Core_TemplateValidationFunc: TCore_TemplateValidation;
+    Core_TemplateDeleteFunc: TCore_TemplateDelete;
+    Core_TemplateUploadDataFunc: TCore_TemplateUploadData;
     Core_Advanced_SiteItemReadAllFunc: TCore_Advanced_SiteItemReadAll;
     Core_TemplateItemReadFunc: TCore_TemplateItemRead;
     Core_CaseCreateFunc: TCore_CaseCreate;
@@ -80,6 +85,9 @@ type
     function Core_TemplateRead(templateId: Integer; var json: WideString) : integer;
     function Core_TemplateValidation(jsonMainElement: WideString;
          var jsonValidationErrors: WideString) : integer;
+    function Core_TemplateDelete(templateId: integer;  var deleteResult: boolean) : integer;
+    function Core_TemplateUploadData(jsonMainElementIn: WideString;
+         var jsonMainElementOut: WideString) : integer;
     function Core_Advanced_SiteItemReadAll(var json: WideString): integer;
     function Core_TemplateItemRead(templateId: Integer; var json: WideString) : integer;
     function Core_CaseCreate(jsonMainElement: WideString; caseUId: WideString; siteUId: integer;
@@ -166,6 +174,14 @@ begin
    @Core_TemplateValidationFunc := GetProcAddress(handle, 'Core_TemplateValidation') ;
    if not Assigned (Core_TemplateValidationFunc) then
      raise Exception.Create('function Core_TemplateValidation not found');
+
+   @Core_TemplateDeleteFunc := GetProcAddress(handle, 'Core_TemplateDelete') ;
+   if not Assigned (Core_TemplateDeleteFunc) then
+     raise Exception.Create('function Core_TemplateDelete not found');
+
+   @Core_TemplateUploadDataFunc := GetProcAddress(handle, 'Core_TemplateUploadData') ;
+   if not Assigned (Core_TemplateUploadDataFunc) then
+     raise Exception.Create('function Core_TemplateUploadData not found');
 
    @Core_Advanced_SiteItemReadAllFunc := GetProcAddress(handle, 'Core_Advanced_SiteItemReadAll') ;
    if not Assigned (Core_Advanced_SiteItemReadAllFunc) then
@@ -319,6 +335,35 @@ begin
   result := res;
 end;
 
+
+function TDllHelper.Core_TemplateDelete(templateId: integer;  var deleteResult: boolean) : integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplateDeleteFunc(templateId, deleteResult);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
+end;
+
+function TDllHelper.Core_TemplateUploadData(jsonMainElementIn: WideString;
+   var jsonMainElementOut: WideString) : integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplateUploadDataFunc(jsonMainElementIn, jsonMainElementOut);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
+end;
 
 
 function TDllHelper.Core_Advanced_SiteItemReadAll(var json: WideString): integer;

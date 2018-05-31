@@ -21,6 +21,8 @@ type
     function TemplateCreate(mainElement: TMainElement): integer;
     function TemplateRead(templateId: integer): TMainElement;
     function TemplateValidation(mainElement: TMainElement): TStringList;
+    function TemplateDelete(templateId: integer): boolean;
+    function TemplateUploadData(mainElement: TMainElement): TMainElement;
     function Advanced_SiteItemReadAll: TObjectList<TSiteName_Dto>;
     function TemplateItemRead(templateId: integer): TTemplate_Dto;
     function CaseCreate(mainElement: TMainElement; caseUId: string; siteUId: integer): string; overload;
@@ -99,6 +101,27 @@ begin
   TDllHelper.GetInstance.Core_TemplateValidation(jsonMainElement, jsonValidation);
   result := packer.UnpackStringList(jsonValidation);
 end;
+
+function TCore.TemplateDelete(templateId: integer): boolean;
+var
+  deleteResult: boolean;
+begin
+  TDllHelper.GetInstance.Core_TemplateDelete(templateId, deleteResult);
+  result := deleteResult;
+end;
+
+function TCore.TemplateUploadData(mainElement: TMainElement): TMainElement;
+var
+  jsonMainElementIn: string;
+  jsonMainElementOut: WideString;
+  packer: TPacker;
+begin
+  packer := TPacker.Create;
+  jsonMainElementIn := packer.Pack(mainElement);
+  TDllHelper.GetInstance.Core_TemplateUploadData(jsonMainElementIn, jsonMainElementOut);
+  result := packer.UnpackMainElement(jsonMainElementOut);
+end;
+
 
 function TCore.Advanced_SiteItemReadAll: TObjectList<TSiteName_Dto>;
 var

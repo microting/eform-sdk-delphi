@@ -94,6 +94,7 @@ var
    xml: WideString;
    templateId: integer;
    validationErrors: TStringList;
+   result: boolean;
 begin
    Core.Start(ServerConnectionString);
 
@@ -104,6 +105,8 @@ begin
        WriteLn('  Type ''C'' Read main element from xml file and create it in database (TemplateCreate test)');
        WriteLn('  Type ''R'' Read main element from database by templateId and output it''s content to console (TemplateRead test)');
        WriteLn('  Type ''V'' Read main element from xml file and validate it (TemplateValidation test)');
+       WriteLn('  Type ''D'' Delete template by templateId (TemplateDelete test)');
+       WriteLn('  Type ''U'' Read main element from database by templateId and upload its data (TemplateUploadData test)');
        WriteLn('  Type ''Q'' to quit');
        WriteLn('  As long as the Core left running, the system is able to process eForms');
        ReadLn(input);
@@ -162,7 +165,31 @@ begin
           mainElement := Core.TemplatFromXml(xml);
           validationErrors := Core.TemplateValidation(mainElement);
           PrintValidationErrors(validationErrors, '  ');
-       end;
+       end
+       else if UpperCase(input) = 'D' then
+       begin
+          WriteLn('');
+          WriteLn('  Type templateId: ');
+          ReadLn(input);
+
+          templateId := StrToInt(input);
+          result := Core.TemplateDelete(templateId);
+          WriteLn('');
+          WriteLn('Delete result: ' + BoolToStr(result));
+       end
+       else if UpperCase(input) = 'U' then
+       begin
+          WriteLn('');
+          WriteLn('  Type templateId: ');
+          ReadLn(input);
+          if (mainElement <> nil) then
+             mainElement.Free;
+
+          templateId := StrToInt(input);
+          mainElement := Core.TemplateRead(templateId);
+          mainElement := Core.TemplateUploadData(mainElement);
+          PrintMainElement(mainElement);
+       end
    end;
 end;
 
