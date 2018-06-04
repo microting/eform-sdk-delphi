@@ -3,7 +3,7 @@ unit Packer;
 interface
 
 uses
-  System.JSON, REST.JSON, DataItem, Element, MainElement, Generics.Collections, Classes, SysUtils,
+  System.JSON, REST.Json, DataItem, Element, MainElement, Generics.Collections, Classes, SysUtils,
   FieldContainer, DataItemGroup, System.Classes;
 
 type

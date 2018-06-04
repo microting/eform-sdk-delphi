@@ -23,7 +23,12 @@ uses
   Classes in 'Dto\Classes.pas',
   FieldContainer in 'Model\FieldContainer.pas',
   Samples in 'Samples.pas',
-  Packer in 'Packer.pas';
+  Packer in 'Packer.pas',
+  REST.Json in 'C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\rest\REST.Json.pas',
+  REST.JsonReflect in 'C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\rest\REST.JsonReflect.pas',
+  REST.Json.Types in 'C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\rest\REST.Json.Types.pas',
+  REST.Consts in 'C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\rest\REST.Consts.pas',
+  REST.Json.Interceptors in 'C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\rest\REST.Json.Interceptors.pas';
 
 procedure OnCoreStartEvent;
 begin
