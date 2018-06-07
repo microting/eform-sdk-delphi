@@ -83,7 +83,6 @@ begin
     else if (UpperCase(input) = 'I') then
     begin
        core := TCore.Create;
-       core.CoreEvent := OnCoreStartEvent;
        core.Start(serverConnectionString);
        WriteLn('Press any key to exit program');
        ReadLn;

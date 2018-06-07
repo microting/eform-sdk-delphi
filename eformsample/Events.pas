@@ -2,8 +2,10 @@ unit Events;
 
 interface
 
+uses Classes;
+
 type
-    TCoreStartEvent = procedure;
+    TCaseCreatedEvent = procedure(caseDto: TCase_Dto) of object;
 
 implementation
 

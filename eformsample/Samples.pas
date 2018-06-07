@@ -30,6 +30,8 @@ type
       procedure Sample1;
       procedure Sample2;
       procedure Sample3;
+
+      procedure OnCaseCreated(caseDto: TCase_Dto);
   public
       constructor Create(serverConnectionString: string);
       procedure Run;
@@ -80,9 +82,9 @@ function TSamples.GetDefaultFileName: string;
 begin
   //  result := 'field_groups_example.xml';
   //  result := 'options_with_microting_example.xml';
-  //  result := 'picture_test.xml';
+    result := 'picture_test.xml';
   //  result := 'picture_signature_example.xml';
-    result := 'pdf_test.xml';
+  //  result := 'pdf_test.xml';
   //  result := 'date_example.xml';
 end;
 
@@ -649,6 +651,13 @@ begin
    PrintKeyValuePairList(templateDto.Tags,'  ');
 end;
 
+
+procedure TSamples.OnCaseCreated(caseDto: TCase_Dto);
+begin
+  WriteLn('On case created event, result caseDto: ' + caseDto.ToString);
+end;
+
+
 procedure TSamples.Sample3;
 var
   mainElement: TMainElement;
@@ -674,8 +683,8 @@ begin
    while true do
    begin
        WriteLn('');
-       WriteLn('  Type ''C'' Read main element from database by templateId and siteUId and create eForm case  (CaseCreate test)');
-       WriteLn('  Type ''M'' Read main element from database by templateId and multiple siteUIds and create eForm case  (CaseCreate test)');
+       WriteLn('  Type ''C'' Read main element from database by templateId and create eForm case using siteUId (CaseCreate test)');
+       WriteLn('  Type ''M'' Read main element from database by templateId and create eForm case using multiple siteUIds  (CaseCreate test)');
        WriteLn('  Type ''R'' Read case database by microtingUId and checkUId (CaseRead test)');
        WriteLn('  Type ''D'' Delete case by microtingUId (CaseDelete test)');
        WriteLn('  Type ''Q'' to quit');
@@ -695,9 +704,11 @@ begin
           ReadLn(input);
           siteUId := StrToInt(input);
 
+          Core.HandleCaseCreated := OnCaseCreated;
+
           mainElement := Core.TemplateRead(templateId);
           resultCase := Core.CaseCreate(mainElement, '', siteUId);
-          WriteLn('Result: ');
+          WriteLn('Create case result: ');
           WriteLn(resultCase);
        end
        else if UpperCase(input) = 'M' then

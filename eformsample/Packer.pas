@@ -64,6 +64,7 @@ type
       function UnpackStringList(jsonList: string): TStringList;
       function UnpackSiteNameDtoList(json: string): TObjectList<TSiteName_Dto>; overload;
       function UnpackTemplateDto(json: string): TTemplate_Dto;
+      function UnpackCaseDto(json: string): TCase_Dto;
   end;
 
 implementation
@@ -1133,6 +1134,27 @@ begin
   Result := fieldDto;
 end;
 
+
+function TPacker.UnpackCaseDto(json: string): TCase_Dto;
+var
+  caseDto: TCase_Dto;
+  obj: TJSONValue;
+begin
+  obj := TJSONObject.ParseJSONValue(json);
+  caseDto := TCase_Dto.Create(
+    obj.GetValue<integer>('CaseId'),
+    obj.GetValue<string>('Stat'),
+    obj.GetValue<integer>('SiteUId'),
+    obj.GetValue<string>('CaseType'),
+    obj.GetValue<string>('CaseUId'),
+    obj.GetValue<string>('MicrotingUId'),
+    obj.GetValue<string>('CheckUId'),
+    obj.GetValue<string>('Custom'),
+    obj.GetValue<integer>('CheckListId'),
+    obj.GetValue<string>('WorkflowState')
+  );
+  Result := caseDto;
+end;
 
 function TPacker.UnpackTemplateDto(json: string): TTemplate_Dto;
 var

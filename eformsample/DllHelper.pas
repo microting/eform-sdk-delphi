@@ -8,7 +8,7 @@ uses
 type
   TCore_CreateFunc = function: integer; stdcall;
   TCore_StartFunc = function(serverConnectionString: WideString): integer; stdcall;
-  TCore_SubscribeStartEvent = function(callback: LongInt): integer; stdcall;
+  TCore_HandleCaseCreated = function(callback: LongInt): integer; stdcall;
 
   TCore_TemplateFromXml = function(xml: WideString; var json: WideString): integer; stdcall;
   TCore_TemplateCreate = function(json: WideString; var templateId: integer): integer; stdcall;
@@ -46,7 +46,7 @@ type
 
     Core_CreateFunc: TCore_CreateFunc;
     Core_StartFunc: TCore_StartFunc;
-    Core_SubscribeStartEventFunc: TCore_SubscribeStartEvent;
+    Core_HandleCaseCreatedFunc: TCore_HandleCaseCreated;
 
     Core_TemplateFromXmlFunc: TCore_TemplateFromXml;
     Core_TemplateCreateFunc: TCore_TemplateCreate;
@@ -68,7 +68,6 @@ type
     AdminTools_MigrateDbFunc: TAdminTools_MigrateDbFunc;
     LastErrorFunc: TLastErrorFunc;
 
-
     constructor Create;
     procedure Initialize;
     procedure LoadDll;
@@ -78,7 +77,7 @@ type
     class function GetInstance: TDllHelper;
     procedure Core_Create;
     procedure Core_Start(serverConnectionString: string);
-    procedure Core_SubscribeStartEvent(callback: LongInt);
+    procedure Core_HandleCaseCreated(callback: LongInt);
 
     function Core_TemplateFromXml(xml: WideString; var json: WideString) : integer;
     function Core_TemplateCreate(json: WideString) : integer;
@@ -155,9 +154,9 @@ begin
    if not Assigned (Core_StartFunc) then
      raise Exception.Create('function Core_Start not found');
 
-   @Core_SubscribeStartEventFunc := GetProcAddress(handle, 'Core_SubscribeStartEvent') ;
-   if not Assigned (Core_StartFunc) then
-     raise Exception.Create('function Core_SubscribeStartEvent not found');
+   @Core_HandleCaseCreatedFunc := GetProcAddress(handle, 'Core_HandleCaseCreated') ;
+   if not Assigned (Core_HandleCaseCreatedFunc) then
+     raise Exception.Create('function Core_HandleCaseCreated not found');
 
    @Core_TemplateFromXmlFunc := GetProcAddress(handle, 'Core_TemplateFromXml') ;
    if not Assigned (Core_TemplateFromXmlFunc) then
@@ -260,12 +259,12 @@ begin
 end;
 
 
-procedure TDllHelper.Core_SubscribeStartEvent(callback: LongInt);
+procedure TDllHelper.Core_HandleCaseCreated(callback: LongInt);
 var
   res: integer;
   err: WideString;
 begin
-  res := Core_SubscribeStartEventFunc(callback);
+  res := Core_HandleCaseCreatedFunc(callback);
   if res <> 0 then
   begin
      err := LastErrorFunc;

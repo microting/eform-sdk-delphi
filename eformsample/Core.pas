@@ -10,9 +10,8 @@ type
   {$region 'TCore declaration'}
   TCore = class
   private
-    FCoreStartEvent: TCoreStartEvent;
-    procedure SetCoreStartEvent(Value: TCoreStartEvent);
-    //procedure OnCoreStartEvent;
+    FCaseCreatedEvent: TCaseCreatedEvent;
+    procedure SetCaseCreatedEvent(Value: TCaseCreatedEvent);
 
   public
     constructor Create;
@@ -31,17 +30,23 @@ type
     function  CaseRead(microtingUId: string; checkUId: string): TReplyElement;
     function  CaseDelete(microtingUId: string): boolean;
 
-    property CoreEvent: TCoreStartEvent read FCoreStartEvent write SetCoreStartEvent;
+    procedure OnCaseCreatedInternal(jsonCaseDto: WideString);
+
+    property HandleCaseCreated: TCaseCreatedEvent read FCaseCreatedEvent write SetCaseCreatedEvent;
   end;
   {$endregion}
 
 implementation
+
+var
+  gCore: TCore;
 
 {$region 'TCore implementation'}
 constructor TCore.Create;
 begin
   inherited Create;
   TDllHelper.GetInstance.Core_Create;
+  gCore := self;
 end;
 
 procedure TCore.Start(serverConnectionString: string);
@@ -49,15 +54,27 @@ begin
   TDllHelper.GetInstance.Core_Start(serverConnectionString);
 end;
 
-procedure OnCoreStartEvent(param: Integer);  stdcall;
+procedure TCore.OnCaseCreatedInternal(jsonCaseDto: WideString);
+var
+  packer: TPacker;
+  caseDto: TCase_Dto;
 begin
-  WriteLn('On core test event, param: ' + IntToStr(param));
+  //WriteLn('Result: ' + jsonCaseDto);
+  packer := TPacker.Create;
+  caseDto := packer.UnpackCaseDto(jsonCaseDto);
+  if Assigned(FCaseCreatedEvent) then
+       FCaseCreatedEvent(caseDto);
 end;
 
-procedure TCore.SetCoreStartEvent(Value: TCoreStartEvent);
+procedure OnCaseCreated(jsonCaseDto: WideString); stdcall;
 begin
-   FCoreStartEvent := Value;
-   TDllHelper.GetInstance.Core_SubscribeStartEvent(LongInt(@OnCoreStartEvent));
+  gCore.OnCaseCreatedInternal(jsonCaseDto);
+end;
+
+procedure TCore.SetCaseCreatedEvent(Value: TCaseCreatedEvent);
+begin
+   FCaseCreatedEvent := Value;
+   TDllHelper.GetInstance.Core_HandleCaseCreated(LongInt(@OnCaseCreated));
 end;
 
 function TCore.TemplatFromXml(xml: string): TMainElement;
