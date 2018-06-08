@@ -32,6 +32,7 @@ type
       procedure Sample3;
 
       procedure OnCaseCreated(caseDto: TCase_Dto);
+      procedure OnCaseDeleted(caseDto: TCase_Dto);
   public
       constructor Create(serverConnectionString: string);
       procedure Run;
@@ -657,6 +658,10 @@ begin
   WriteLn('On case created event, result caseDto: ' + caseDto.ToString);
 end;
 
+procedure TSamples.OnCaseDeleted(caseDto: TCase_Dto);
+begin
+  WriteLn('On case deleted event, result caseDto: ' + caseDto.ToString);
+end;
 
 procedure TSamples.Sample3;
 var
@@ -755,6 +760,8 @@ begin
           WriteLn('  Type microtingUId: ');
           ReadLn(input);
           microtingUId := input;
+
+          Core.HandleCaseDeleted := OnCaseDeleted;
 
           result := Core.CaseDelete(microtingUId);
           WriteLn('');

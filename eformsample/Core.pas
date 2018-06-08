@@ -11,7 +11,12 @@ type
   TCore = class
   private
     FCaseCreatedEvent: TCaseCreatedEvent;
+    FCaseCompletedEvent: TCaseCompletedEvent;
+    FCaseDeletedEvent: TCaseDeletedEvent;
+
     procedure SetCaseCreatedEvent(Value: TCaseCreatedEvent);
+    procedure SetCaseCompletedEvent(Value: TCaseCompletedEvent);
+    procedure SetCaseDeletedEvent(Value: TCaseDeletedEvent);
 
   public
     constructor Create;
@@ -31,8 +36,12 @@ type
     function  CaseDelete(microtingUId: string): boolean;
 
     procedure OnCaseCreatedInternal(jsonCaseDto: WideString);
+    procedure OnCaseCompletedInternal(jsonCaseDto: WideString);
+    procedure OnCaseDeletedInternal(jsonCaseDto: WideString);
 
     property HandleCaseCreated: TCaseCreatedEvent read FCaseCreatedEvent write SetCaseCreatedEvent;
+    property HandleCaseCompleted: TCaseCompletedEvent read FCaseCompletedEvent write SetCaseCompletedEvent;
+    property HandleCaseDeleted: TCaseDeletedEvent read FCaseDeletedEvent write SetCaseDeletedEvent;
   end;
   {$endregion}
 
@@ -76,6 +85,54 @@ begin
    FCaseCreatedEvent := Value;
    TDllHelper.GetInstance.Core_HandleCaseCreated(LongInt(@OnCaseCreated));
 end;
+
+procedure TCore.OnCaseCompletedInternal(jsonCaseDto: WideString);
+var
+  packer: TPacker;
+  caseDto: TCase_Dto;
+begin
+  //WriteLn('Result: ' + jsonCaseDto);
+  packer := TPacker.Create;
+  caseDto := packer.UnpackCaseDto(jsonCaseDto);
+  if Assigned(FCaseCompletedEvent) then
+       FCaseCompletedEvent(caseDto);
+end;
+
+procedure OnCaseCompleted(jsonCaseDto: WideString); stdcall;
+begin
+  gCore.OnCaseCompletedInternal(jsonCaseDto);
+end;
+
+procedure TCore.SetCaseCompletedEvent(Value: TCaseCompletedEvent);
+begin
+   FCaseCompletedEvent := Value;
+   TDllHelper.GetInstance.Core_HandleCaseCompleted(LongInt(@OnCaseCompleted));
+end;
+
+procedure TCore.OnCaseDeletedInternal(jsonCaseDto: WideString);
+var
+  packer: TPacker;
+  caseDto: TCase_Dto;
+begin
+  //WriteLn('Result: ' + jsonCaseDto);
+  packer := TPacker.Create;
+  caseDto := packer.UnpackCaseDto(jsonCaseDto);
+  if Assigned(FCaseDeletedEvent) then
+       FCaseDeletedEvent(caseDto);
+end;
+
+
+procedure OnCaseDeleted(jsonCaseDto: WideString); stdcall;
+begin
+  gCore.OnCaseDeletedInternal(jsonCaseDto);
+end;
+
+procedure TCore.SetCaseDeletedEvent(Value: TCaseDeletedEvent);
+begin
+   FCaseDeletedEvent := Value;
+   TDllHelper.GetInstance.Core_HandleCaseDeleted(LongInt(@OnCaseDeleted));
+end;
+
 
 function TCore.TemplatFromXml(xml: string): TMainElement;
 var
