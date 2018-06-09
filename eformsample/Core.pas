@@ -13,10 +13,16 @@ type
     FCaseCreatedEvent: TCaseCreatedEvent;
     FCaseCompletedEvent: TCaseCompletedEvent;
     FCaseDeletedEvent: TCaseDeletedEvent;
+    FCaseRetrivedEvent: TCaseRetrivedEvent;
+    FEventExceptionEvent: TEventExceptionEvent;
+    FSiteActivatedEvent: TSiteActivatedEvent;
 
     procedure SetCaseCreatedEvent(Value: TCaseCreatedEvent);
     procedure SetCaseCompletedEvent(Value: TCaseCompletedEvent);
     procedure SetCaseDeletedEvent(Value: TCaseDeletedEvent);
+    procedure SetCaseRetrivedEvent(Value: TCaseRetrivedEvent);
+    procedure SetEvenExceptionEvent(Value: TEventExceptionEvent);
+    procedure SetSiteActivatedEvent(Value: TSiteActivatedEvent);
 
   public
     constructor Create;
@@ -38,6 +44,9 @@ type
     procedure OnCaseCreatedInternal(jsonCaseDto: WideString);
     procedure OnCaseCompletedInternal(jsonCaseDto: WideString);
     procedure OnCaseDeletedInternal(jsonCaseDto: WideString);
+    procedure OnCaseRetrivedInternal(jsonCaseDto: WideString);
+    procedure OnEventExceptionInternal(error: WideString);
+    procedure OnSiteActivatedInternal(siteId: integer);
 
     property HandleCaseCreated: TCaseCreatedEvent read FCaseCreatedEvent write SetCaseCreatedEvent;
     property HandleCaseCompleted: TCaseCompletedEvent read FCaseCompletedEvent write SetCaseCompletedEvent;
@@ -133,6 +142,63 @@ begin
    TDllHelper.GetInstance.Core_HandleCaseDeleted(LongInt(@OnCaseDeleted));
 end;
 
+procedure TCore.OnCaseRetrivedInternal(jsonCaseDto: WideString);
+var
+  packer: TPacker;
+  caseDto: TCase_Dto;
+begin
+  packer := TPacker.Create;
+  caseDto := packer.UnpackCaseDto(jsonCaseDto);
+  if Assigned(FCaseRetrivedEvent) then
+       FCaseRetrivedEvent(caseDto);
+end;
+
+
+procedure OnCaseRetrived(jsonCaseDto: WideString); stdcall;
+begin
+  gCore.OnCaseRetrivedInternal(jsonCaseDto);
+end;
+
+procedure TCore.SetCaseRetrivedEvent(Value: TCaseRetrivedEvent);
+begin
+   FCaseRetrivedEvent := Value;
+   TDllHelper.GetInstance.Core_HandleCaseRetrived(LongInt(@OnCaseRetrived));
+end;
+
+procedure TCore.OnEventExceptionInternal(error: WideString);
+begin
+  if Assigned(FEventExceptionEvent) then
+      FEventExceptionEvent(error);
+end;
+
+procedure OnEventException(error: WideString); stdcall;
+begin
+  gCore.OnEventExceptionInternal(error);
+end;
+
+procedure TCore.SetEvenExceptionEvent(Value: TEventExceptionEvent);
+begin
+   FEventExceptionEvent := Value;
+   TDllHelper.GetInstance.Core_HandleEventException(LongInt(@OnEventException));
+end;
+
+procedure TCore.OnSiteActivatedInternal(siteId: integer);
+begin
+  if Assigned(FSiteActivatedEvent) then
+     FSiteActivatedEvent(siteId);
+end;
+
+procedure OnSiteActivated(siteId: integer); stdcall;
+begin
+  gCore.OnSiteActivatedInternal(siteId);
+end;
+
+
+procedure TCore.SetSiteActivatedEvent(Value: TSiteActivatedEvent);
+begin
+   FSiteActivatedEvent := Value;
+   TDllHelper.GetInstance.Core_HandleSiteActivated(LongInt(@OnSiteActivated));
+end;
 
 function TCore.TemplatFromXml(xml: string): TMainElement;
 var

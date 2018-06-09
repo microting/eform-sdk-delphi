@@ -11,6 +11,9 @@ type
   TCore_HandleCaseCreated = function(callback: LongInt): integer; stdcall;
   TCore_HandleCaseCompleted = function(callback: LongInt): integer; stdcall;
   TCore_HandleCaseDeleted = function(callback: LongInt): integer; stdcall;
+  TCore_HandleCaseRetrived = function(callback: LongInt): integer; stdcall;
+  TCore_HandleEventException = function(callback: LongInt): integer; stdcall;
+  TCore_HandleSiteActivated = function(callback: LongInt): integer; stdcall;
 
   TCore_TemplateFromXml = function(xml: WideString; var json: WideString): integer; stdcall;
   TCore_TemplateCreate = function(json: WideString; var templateId: integer): integer; stdcall;
@@ -51,6 +54,9 @@ type
     Core_HandleCaseCreatedFunc: TCore_HandleCaseCreated;
     Core_HandleCaseCompletedFunc: TCore_HandleCaseCompleted;
     Core_HandleCaseDeletedFunc: TCore_HandleCaseDeleted;
+    Core_HandleCaseRetrivedFunc: TCore_HandleCaseRetrived;
+    Core_HandleEventExceptionFunc: TCore_HandleEventException;
+    Core_HandleSiteActivatedFunc: TCore_HandleSiteActivated;
 
     Core_TemplateFromXmlFunc: TCore_TemplateFromXml;
     Core_TemplateCreateFunc: TCore_TemplateCreate;
@@ -64,6 +70,7 @@ type
     Core_CaseCreate2Func: TCore_CaseCreate2;
     Core_CaseReadFunc: TCore_CaseRead;
     Core_CaseDeleteFunc: TCore_CaseDelete;
+
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
     AdminTools_DbSetupFunc: TAdminTools_DbSetupFunc;
@@ -84,6 +91,9 @@ type
     procedure Core_HandleCaseCreated(callback: LongInt);
     procedure Core_HandleCaseCompleted(callback: LongInt);
     procedure Core_HandleCaseDeleted(callback: LongInt);
+    procedure Core_HandleCaseRetrived(callback: LongInt);
+    procedure Core_HandleEventException(callback: LongInt);
+    procedure Core_HandleSiteActivated(callback: LongInt);
 
     function Core_TemplateFromXml(xml: WideString; var json: WideString) : integer;
     function Core_TemplateCreate(json: WideString) : integer;
@@ -171,6 +181,18 @@ begin
    @Core_HandleCaseDeletedFunc := GetProcAddress(handle, 'Core_HandleCaseDeleted') ;
    if not Assigned (Core_HandleCaseDeletedFunc) then
      raise Exception.Create('function Core_HandleCaseDeleted not found');
+
+   @Core_HandleCaseRetrivedFunc := GetProcAddress(handle, 'Core_HandleCaseRetrived') ;
+   if not Assigned (Core_HandleCaseRetrivedFunc) then
+     raise Exception.Create('function Core_HandleCaseRetrived not found');
+
+   @Core_HandleEventExceptionFunc := GetProcAddress(handle, 'Core_HandleEventException') ;
+   if not Assigned (Core_HandleEventExceptionFunc) then
+     raise Exception.Create('function Core_HandleEventException not found');
+
+   @Core_HandleSiteActivatedFunc := GetProcAddress(handle, 'Core_HandleSiteActivated') ;
+   if not Assigned (Core_HandleSiteActivatedFunc) then
+     raise Exception.Create('function Core_HandleSiteActivated not found');
 
    @Core_TemplateFromXmlFunc := GetProcAddress(handle, 'Core_TemplateFromXml') ;
    if not Assigned (Core_TemplateFromXmlFunc) then
@@ -306,6 +328,47 @@ var
   err: WideString;
 begin
   res := Core_HandleCaseDeletedFunc(callback);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+
+procedure TDllHelper.Core_HandleCaseRetrived(callback: LongInt);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_HandleCaseRetrivedFunc(callback);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+
+procedure TDllHelper.Core_HandleEventException(callback: LongInt);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_HandleEventExceptionFunc(callback);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_HandleSiteActivated(callback: LongInt);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_HandleSiteActivatedFunc(callback);
   if res <> 0 then
   begin
      err := LastErrorFunc;
