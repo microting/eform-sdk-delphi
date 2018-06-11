@@ -3,7 +3,7 @@ unit Samples;
 interface
 
 uses
-  Core, SysUtils, MainElement, IOUtils, Element, DataItem,  Generics.Collections, Classes,
+  Core, SysUtils, MainElement, IOUtils, Element, DataItem, Generics.Collections, Classes,
   FieldContainer, DataItemGroup, System.Classes;
 
 type

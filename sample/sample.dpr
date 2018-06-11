@@ -1,39 +1,12 @@
-program eformsample;
+program sample;
 
 {$APPTYPE CONSOLE}
 
 {$R *.res}
 
 uses
-  System.SysUtils,
-  AdminTools in 'AdminTools.pas',
-  DllHelper in 'DllHelper.pas',
-  Core in 'Core.pas',
-  Events in 'Events.pas',
-  Check in 'Model\Reply\Check.pas',
-  DataItemReply in 'Model\Reply\DataItemReply.pas',
-  ElementList in 'Model\Reply\ElementList.pas',
-  GeolocationData in 'Model\Reply\GeolocationData.pas',
-  Response in 'Model\Reply\Response.pas',
-  DataItem in 'Model\DataItem.pas',
-  DataItemGroup in 'Model\DataItemGroup.pas',
-  Element in 'Model\Element.pas',
-  Entities in 'Model\Entities.pas',
-  MainElement in 'Model\MainElement.pas',
-  Classes in 'Dto\Classes.pas',
-  FieldContainer in 'Model\FieldContainer.pas',
-  Samples in 'Samples.pas',
-  Packer in 'Packer.pas',
-  REST.Json in 'C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\rest\REST.Json.pas',
-  REST.JsonReflect in 'C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\rest\REST.JsonReflect.pas',
-  REST.Json.Types in 'C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\rest\REST.Json.Types.pas',
-  REST.Consts in 'C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\rest\REST.Consts.pas',
-  REST.Json.Interceptors in 'C:\Program Files (x86)\Embarcadero\Studio\19.0\source\data\rest\REST.Json.Interceptors.pas';
-
-procedure OnCoreStartEvent;
-begin
-  WriteLn('On core start event');
-end;
+  System.SysUtils, Core, AdminTools,
+  Samples in 'Samples.pas';
 
 var
   databaseName: String;

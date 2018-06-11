@@ -3,7 +3,7 @@ unit Core;
 interface
 
 uses
-  DllHelper, Events, SysUtils, MainElement, Element, Generics.Collections, Classes, DataItem, DataItemGroup,
+  DllHelper, EEvents, SysUtils, MainElement, Element, Generics.Collections, Classes, DataItem, DataItemGroup,
     FieldContainer, Packer, System.Classes;
 
 type

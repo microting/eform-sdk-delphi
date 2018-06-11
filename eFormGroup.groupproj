@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{5B4E90DB-8BB9-4A8F-90B9-D8A37DB7F115}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="eformdelphi\eformdelphi.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="sample\sample.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="eformdelphi">
+        <MSBuild Projects="eformdelphi\eformdelphi.dproj"/>
+    </Target>
+    <Target Name="eformdelphi:Clean">
+        <MSBuild Projects="eformdelphi\eformdelphi.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="eformdelphi:Make">
+        <MSBuild Projects="eformdelphi\eformdelphi.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="sample">
+        <MSBuild Projects="sample\sample.dproj"/>
+    </Target>
+    <Target Name="sample:Clean">
+        <MSBuild Projects="sample\sample.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="sample:Make">
+        <MSBuild Projects="sample\sample.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="eformdelphi;sample"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="eformdelphi:Clean;sample:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="eformdelphi:Make;sample:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

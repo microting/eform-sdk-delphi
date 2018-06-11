@@ -3,7 +3,7 @@ unit DllHelper;
 interface
 
 uses
-  Windows, SysUtils, Events;
+  Windows, SysUtils, EEvents;
 
 type
   TCore_CreateFunc = function: integer; stdcall;

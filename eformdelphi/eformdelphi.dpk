@@ -1,0 +1,58 @@
+package eformdelphi;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  xmlrtl;
+
+contains
+  Classes in 'Dto\Classes.pas',
+  REST.Consts in 'Rest\REST.Consts.pas',
+  REST.Json.Interceptors in 'Rest\REST.Json.Interceptors.pas',
+  REST.Json in 'Rest\REST.Json.pas',
+  REST.Json.Types in 'Rest\REST.Json.Types.pas',
+  REST.JsonReflect in 'Rest\REST.JsonReflect.pas',
+  AdminTools in 'AdminTools.pas',
+  Core in 'Core.pas',
+  DllHelper in 'DllHelper.pas',
+  EEvents in 'EEvents.pas',
+  Packer in 'Packer.pas',
+  Check in 'Model\Reply\Check.pas',
+  DataItemReply in 'Model\Reply\DataItemReply.pas',
+  ElementList in 'Model\Reply\ElementList.pas',
+  GeolocationData in 'Model\Reply\GeolocationData.pas',
+  Response in 'Model\Reply\Response.pas',
+  DataItem in 'Model\DataItem.pas',
+  DataItemGroup in 'Model\DataItemGroup.pas',
+  Element in 'Model\Element.pas',
+  Entities in 'Model\Entities.pas',
+  FieldContainer in 'Model\FieldContainer.pas',
+  MainElement in 'Model\MainElement.pas';
+
+end.
