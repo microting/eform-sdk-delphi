@@ -65,6 +65,8 @@ type
       function UnpackSiteNameDtoList(json: string): TObjectList<TSiteName_Dto>; overload;
       function UnpackTemplateDto(json: string): TTemplate_Dto;
       function UnpackCaseDto(json: string): TCase_Dto;
+      function UnpackFileDto(json: string): TFile_Dto;
+      function UnpackNoteDto(json: string): TNote_Dto;
   end;
 
 implementation
@@ -1154,6 +1156,39 @@ begin
     obj.GetValue<string>('WorkflowState')
   );
   Result := caseDto;
+end;
+
+
+function TPacker.UnpackFileDto(json: string): TFile_Dto;
+var
+  fileDto: TFile_Dto;
+  obj: TJSONValue;
+begin
+  obj := TJSONObject.ParseJSONValue(json);
+  fileDto := TFile_Dto.Create(
+    obj.GetValue<integer>('SiteUId'),
+    obj.GetValue<string>('CaseType'),
+    obj.GetValue<string>('CaseUId'),
+    obj.GetValue<string>('MicrotingUId'),
+    obj.GetValue<string>('CheckUId'),
+    obj.GetValue<string>('FileLocation')
+  );
+  Result := fileDto;
+end;
+
+
+function TPacker.UnpackNoteDto(json: string): TNote_Dto;
+var
+  noteDto: TNote_Dto;
+  obj: TJSONValue;
+begin
+  obj := TJSONObject.ParseJSONValue(json);
+  noteDto := TNote_Dto.Create(
+    obj.GetValue<string>('Id'),
+    obj.GetValue<string>('MicrotingUId'),
+    obj.GetValue<string>('Activity')
+  );
+  Result := noteDto;
 end;
 
 function TPacker.UnpackTemplateDto(json: string): TTemplate_Dto;

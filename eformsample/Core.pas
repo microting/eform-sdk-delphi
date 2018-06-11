@@ -16,13 +16,17 @@ type
     FCaseRetrivedEvent: TCaseRetrivedEvent;
     FEventExceptionEvent: TEventExceptionEvent;
     FSiteActivatedEvent: TSiteActivatedEvent;
+    FFileDownloadedEvent: TFileDownloadedEvent;
+    FNotificationNotFoundEvent: TNotificationNotFoundEvent;
 
     procedure SetCaseCreatedEvent(Value: TCaseCreatedEvent);
     procedure SetCaseCompletedEvent(Value: TCaseCompletedEvent);
     procedure SetCaseDeletedEvent(Value: TCaseDeletedEvent);
     procedure SetCaseRetrivedEvent(Value: TCaseRetrivedEvent);
-    procedure SetEvenExceptionEvent(Value: TEventExceptionEvent);
+    procedure SetEventExceptionEvent(Value: TEventExceptionEvent);
     procedure SetSiteActivatedEvent(Value: TSiteActivatedEvent);
+    procedure SetFileDownloadedEvent(Value: TFileDownloadedEvent);
+    procedure SetNotificationNotFoundEvent(Value: TNotificationNotFoundEvent);
 
   public
     constructor Create;
@@ -47,10 +51,19 @@ type
     procedure OnCaseRetrivedInternal(jsonCaseDto: WideString);
     procedure OnEventExceptionInternal(error: WideString);
     procedure OnSiteActivatedInternal(siteId: integer);
+    procedure OnFileDownloadedInternal(jsonFileDto: WideString);
+    procedure OnNotificationNotFoundInternal(jsonNoteDto: WideString);
 
     property HandleCaseCreated: TCaseCreatedEvent read FCaseCreatedEvent write SetCaseCreatedEvent;
     property HandleCaseCompleted: TCaseCompletedEvent read FCaseCompletedEvent write SetCaseCompletedEvent;
     property HandleCaseDeleted: TCaseDeletedEvent read FCaseDeletedEvent write SetCaseDeletedEvent;
+    property HandleCaseRetrived: TCaseRetrivedEvent read FCaseRetrivedEvent write SetCaseRetrivedEvent;
+    property HandleEventException: TEventExceptionEvent read FEventExceptionEvent write SetEventExceptionEvent;
+    property HandleSiteActivated: TSiteActivatedEvent read FSiteActivatedEvent write SetSiteActivatedEvent;
+    property HandleFileDownloaded: TFileDownloadedEvent read FFileDownloadedEvent write SetFileDownloadedEvent;
+    property HandleNotificationNotFound: TNotificationNotFoundEvent read FNotificationNotFoundEvent
+      write SetNotificationNotFoundEvent;
+
   end;
   {$endregion}
 
@@ -176,7 +189,7 @@ begin
   gCore.OnEventExceptionInternal(error);
 end;
 
-procedure TCore.SetEvenExceptionEvent(Value: TEventExceptionEvent);
+procedure TCore.SetEventExceptionEvent(Value: TEventExceptionEvent);
 begin
    FEventExceptionEvent := Value;
    TDllHelper.GetInstance.Core_HandleEventException(LongInt(@OnEventException));
@@ -193,12 +206,57 @@ begin
   gCore.OnSiteActivatedInternal(siteId);
 end;
 
-
 procedure TCore.SetSiteActivatedEvent(Value: TSiteActivatedEvent);
 begin
    FSiteActivatedEvent := Value;
    TDllHelper.GetInstance.Core_HandleSiteActivated(LongInt(@OnSiteActivated));
 end;
+
+
+procedure TCore.OnFileDownloadedInternal(jsonFileDto: WideString);
+var
+  packer: TPacker;
+  fileDto: TFile_Dto;
+begin
+  packer := TPacker.Create;
+  fileDto := packer.UnpackFileDto(jsonFileDto);
+  if Assigned(FFileDownloadedEvent) then
+       FFileDownloadedEvent(fileDto);
+end;
+
+procedure OnFileDownloaded(jsonFileDto: WideString);
+begin
+  gCore.OnFileDownloadedInternal(jsonFileDto);
+end;
+
+procedure TCore.SetFileDownloadedEvent(Value: TFileDownloadedEvent);
+begin
+   FFileDownloadedEvent := Value;
+   TDllHelper.GetInstance.Core_HandleFileDownloaded(LongInt(@OnFileDownloaded));
+end;
+
+procedure TCore.OnNotificationNotFoundInternal(jsonNoteDto: WideString);
+var
+  packer: TPacker;
+  noteDto: TNote_Dto;
+begin
+  packer := TPacker.Create;
+  noteDto := packer.UnpackNoteDto(jsonNoteDto);
+  if Assigned(FNotificationNotFoundEvent) then
+       FNotificationNotFoundEvent(noteDto);
+end;
+
+procedure OnNotificationNotFound(jsonNoteDto: WideString);
+begin
+  gCore.OnNotificationNotFoundInternal(jsonNoteDto);
+end;
+
+procedure TCore.SetNotificationNotFoundEvent(Value: TNotificationNotFoundEvent);
+begin
+   FNotificationNotFoundEvent := Value;
+   TDllHelper.GetInstance.Core_HandleNotificationNotFound(LongInt(@OnNotificationNotFound));
+end;
+
 
 function TCore.TemplatFromXml(xml: string): TMainElement;
 var

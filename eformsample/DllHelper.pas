@@ -14,6 +14,8 @@ type
   TCore_HandleCaseRetrived = function(callback: LongInt): integer; stdcall;
   TCore_HandleEventException = function(callback: LongInt): integer; stdcall;
   TCore_HandleSiteActivated = function(callback: LongInt): integer; stdcall;
+  TCore_HandleFileDownloaded = function(callback: LongInt): integer; stdcall;
+  TCore_HandleNotificationNotFound = function(callback: LongInt): integer; stdcall;
 
   TCore_TemplateFromXml = function(xml: WideString; var json: WideString): integer; stdcall;
   TCore_TemplateCreate = function(json: WideString; var templateId: integer): integer; stdcall;
@@ -57,7 +59,8 @@ type
     Core_HandleCaseRetrivedFunc: TCore_HandleCaseRetrived;
     Core_HandleEventExceptionFunc: TCore_HandleEventException;
     Core_HandleSiteActivatedFunc: TCore_HandleSiteActivated;
-
+    Core_HandleFileDownloadedFunc: TCore_HandleFileDownloaded;
+    Core_HandleNotificationNotFoundFunc: TCore_HandleNotificationNotFound;
     Core_TemplateFromXmlFunc: TCore_TemplateFromXml;
     Core_TemplateCreateFunc: TCore_TemplateCreate;
     Core_TemplateReadFunc: TCore_TemplateRead;
@@ -94,6 +97,8 @@ type
     procedure Core_HandleCaseRetrived(callback: LongInt);
     procedure Core_HandleEventException(callback: LongInt);
     procedure Core_HandleSiteActivated(callback: LongInt);
+    procedure Core_HandleFileDownloaded(callback: LongInt);
+    procedure Core_HandleNotificationNotFound(callback: LongInt);
 
     function Core_TemplateFromXml(xml: WideString; var json: WideString) : integer;
     function Core_TemplateCreate(json: WideString) : integer;
@@ -193,6 +198,14 @@ begin
    @Core_HandleSiteActivatedFunc := GetProcAddress(handle, 'Core_HandleSiteActivated') ;
    if not Assigned (Core_HandleSiteActivatedFunc) then
      raise Exception.Create('function Core_HandleSiteActivated not found');
+
+   @Core_HandleFileDownloadedFunc := GetProcAddress(handle, 'Core_HandleFileDownloaded') ;
+   if not Assigned (Core_HandleFileDownloadedFunc) then
+     raise Exception.Create('function Core_HandleFileDownloaded not found');
+
+   @Core_HandleNotificationNotFoundFunc := GetProcAddress(handle, 'Core_HandleNotificationNotFound') ;
+   if not Assigned (Core_HandleNotificationNotFoundFunc) then
+     raise Exception.Create('function Core_HandleNotificationNotFound not found');
 
    @Core_TemplateFromXmlFunc := GetProcAddress(handle, 'Core_TemplateFromXml') ;
    if not Assigned (Core_TemplateFromXmlFunc) then
@@ -369,6 +382,32 @@ var
   err: WideString;
 begin
   res := Core_HandleSiteActivatedFunc(callback);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_HandleFileDownloaded(callback: LongInt);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_HandleFileDownloadedFunc(callback);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
+procedure TDllHelper.Core_HandleNotificationNotFound(callback: LongInt);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_HandleNotificationNotFoundFunc(callback);
   if res <> 0 then
   begin
      err := LastErrorFunc;
