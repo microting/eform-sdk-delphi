@@ -1,0 +1,8 @@
+1) Get eform-dsk-delphiwrapper from github and build eFormSdk.Wrapper project
+2) Get eform-sdk-dephi from github
+3) Add following paths to Tools > Options > Environment Options > Delphi Options > Library: eformdelphi, eformdelphi/rest, eformdelphi/dto, eformdelphi/model, eformdelphi/model/reply
+4) After user builds his app put into Win32/Debug (Win32/Release) folder binaries from previosly built eFormSdk.Wrapper project
+
+
+
+  

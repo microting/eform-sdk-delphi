@@ -1,22 +1,2 @@
-MainElement
-Where are no such fields as Review, Summary among class members. But these fields exist in xml file 
-
-Element
-Where are no such fields as MultiSync, DoneButtonEnabled among class members. But these fields exist in xml file 
-
-Date
-Where are no such fields as Value. But these fields exist in xml file
-
-Number 
-Where are no such fields as Value. But these fields exist in xml file
-
-Text
-Where are no such fields as Multi, Split. But these fields exist in xml file
-
-Comment
-Where are no such fields as GeolocationEnabled. But these fields exist in xml file. There is no Split field as in xml, but there is SplitScreen field
-
-field_groups_example.xml  test file
-On dotnet side, in MainElement, instead of DataItemGroupList with one DataItemGroup of type FieldGroup, DateItem of type FieldContainer is created
 
 
