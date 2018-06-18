@@ -11,6 +11,7 @@ type
   public
     constructor Create(serverConnectionString: String);
     procedure Run;
+    function DbSetup(token: String): String;
   end;
   {$endregion}
 
@@ -21,6 +22,11 @@ constructor TAdminTools.Create(serverConnectionString: string);
 begin
   inherited Create;
   TDllHelper.GetInstance.AdminTools_Create(serverConnectionString);
+end;
+
+function TAdminTools.DbSetup(token: String): String;
+begin
+   Result := TDllHelper.GetInstance.AdminTools_DbSetup(token);
 end;
 
 procedure TAdminTools.Run;
