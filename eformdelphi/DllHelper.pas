@@ -27,7 +27,7 @@ type
   TCore_TemplateUploadData = function (jsonMainElementIn: WideString;
          var jsonMainElementOut: WideString) : integer; stdcall;
   TCore_Advanced_SiteItemReadAll = function (var json: WideString): integer; stdcall;
-  TCore_Advanced_SiteItemRead = function (var json: WideString): integer; stdcall;
+  TCore_Advanced_SiteItemRead = function (siteId: Integer; var json: WideString): integer; stdcall;
   TCore_TemplateItemRead = function(templateId: Integer; var json: WideString) : integer; stdcall;
   TCore_TemplateItemReadAll = function(includeRemoved: boolean; var json: WideString) : integer; stdcall;
   TCore_CaseCreate = function (jsonMainElement: WideString; caseUId: WideString; siteUId: integer;
@@ -116,7 +116,7 @@ type
     function Core_TemplateDelete(templateId: integer;  var deleteResult: boolean) : integer;
     function Core_TemplateUploadData(jsonMainElementIn: WideString;
          var jsonMainElementOut: WideString) : integer;
-    function Core_Advanced_SiteItemRead(var json: WideString): integer;
+    function Core_Advanced_SiteItemRead(siteId: integer; var json: WideString): integer;
     function Core_Advanced_SiteItemReadAll(var json: WideString): integer;
     function Core_TemplateItemRead(templateId: Integer; var json: WideString) : integer;
     function Core_TemplateItemReadAll(includeRemoved: boolean; var json: WideString) : integer;
@@ -245,13 +245,13 @@ begin
    if not Assigned (Core_TemplateUploadDataFunc) then
      raise Exception.Create('function Core_TemplateUploadData not found');
 
-   @Core_Advanced_SiteItemReadFunc := GetProcAddress(handle, 'Core_Advanced_SiteItemRead') ;
-   if not Assigned (Core_Advanced_SiteItemReadFunc) then
-     raise Exception.Create('function Core_Advanced_SiteItemRead not found');
-
    @Core_Advanced_SiteItemReadAllFunc := GetProcAddress(handle, 'Core_Advanced_SiteItemReadAll') ;
    if not Assigned (Core_Advanced_SiteItemReadAllFunc) then
      raise Exception.Create('function Core_Advanced_SiteItemReadAll not found');
+
+   @Core_Advanced_SiteItemReadFunc := GetProcAddress(handle, 'Core_Advanced_SiteItemRead') ;
+   if not Assigned (Core_Advanced_SiteItemReadFunc) then
+     raise Exception.Create('function Core_Advanced_SiteItemRead not found');
 
    @Core_TemplateItemReadFunc := GetProcAddress(handle, 'Core_TemplateItemRead') ;
    if not Assigned (Core_TemplateItemReadFunc) then
@@ -544,12 +544,12 @@ begin
 end;
 
 
-function TDllHelper.Core_Advanced_SiteItemRead(var json: WideString): integer;
+function TDllHelper.Core_Advanced_SiteItemRead(siteId: integer; var json: WideString): integer;
 var
   res: integer;
   err: WideString;
 begin
-  res := Core_Advanced_SiteItemReadFunc(json);
+  res := Core_Advanced_SiteItemReadFunc(siteId, json);
   if res <> 0 then
   begin
      err := LastErrorFunc;

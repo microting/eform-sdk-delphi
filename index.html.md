@@ -128,7 +128,25 @@ public Core getCore()
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses  System.SysUtils, Core;
+
+function GetCore: TCore;
+var
+  connectionStr: String;
+  core: TCore;
+begin
+  connectionStr := 'some_connection_string_to_db';
+
+  core := TCore.Create;
+
+  if (not core.StartSqlOnly(connectionStr)) then
+  begin
+    raise Exception.Create('Core is not running');
+  end;
+
+
+  result := core;
+end;
 ```
 
 
@@ -166,7 +184,24 @@ public Core getCore()
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, Core;
+
+function GetCore: TCore;
+var
+  connectionStr: String;
+  core: TCore;
+begin
+  connectionStr := 'some_connection_string_to_db';
+
+  core := TCore.Create;
+
+  if (not core.Start(connectionStr)) then
+  begin
+    raise Exception.Create('Core is not running');
+  end;
+
+  result := core;
+end;
 ```
 
 
@@ -202,7 +237,29 @@ public void SaveTemplate()
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, Core, MainElement;
+
+procedure SaveTemplate;
+var
+  core: TCore;
+  newTemplate: TMainElement;
+  templateXmlString: String;
+begin
+
+  core := GetCore;
+
+  templateXmlString := 'some_template_xml_string';
+
+  newTemplate := core.TemplatFromXml(templateXmlString);
+  newTemplate := core.TemplateUploadData(newTemplate);
+
+  if (core.TemplateValidation(newTemplate).Count = 0) then
+  begin
+     core.TemplateCreate(newTemplate);
+  end;
+
+end;
+
 ```
 
 ## Create a basic eForm template by objects
@@ -223,7 +280,16 @@ public List<Template_Dto> ListTemplates()
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, Generics.Collections, Core, Classes;
+
+function ListTemplates: TObjectList<TTemplate_Dto>;
+var
+  core: TCore;
+begin
+
+  core := GetCore;
+  result := core.TemplateItemReadAll(false);
+end;
 ```
 
 ## Deleting an eForm template
@@ -243,7 +309,18 @@ public bool DeleteTemplate(int id)
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, Core;
+
+function DeleteTemplate(id: integer): boolean;
+var
+  core: TCore;
+begin
+  core := GetCore;
+  if (core.TemplateDelete(id)) then
+    result := true
+  else
+    result := false;
+end;
 ```
 
 
@@ -274,7 +351,33 @@ public List<string> DeployTo(int templateId, int siteId)
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, System.Classes, System.DateUtils,
+  Generics.Collections, Core, MainElement, Classes;
+
+function DeployTo(templateId: integer; siteId: integer): TStringList;
+var
+  core: TCore;
+  mainElement: TMainElement;
+  site: TSiteName_Dto;
+  siteIds: TList<Integer>;
+begin
+
+  core := GetCore;
+
+  mainElement := core.TemplateRead(templateId);
+  mainElement.Repeated := 0;
+  // We set this right now hardcoded,
+  // this will let the eForm be deployed until end date or we actively retract it.
+  mainElement.StartDate := Date;
+  mainElement.EndDate := IncYear(Date, 10);
+
+  site := core.Advanced_SiteItemRead(siteId);
+
+  siteIds := TList<Integer>.Create;
+  siteIds.add(site.SiteUId);
+
+  result := core.CaseCreate(mainElement, '', siteIds, '');
+end;
 ```
 
 ## Deploying to one or more sites
