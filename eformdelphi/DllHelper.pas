@@ -28,6 +28,7 @@ type
          var jsonMainElementOut: WideString) : integer; stdcall;
   TCore_Advanced_SiteItemReadAll = function (var json: WideString): integer; stdcall;
   TCore_TemplateItemRead = function(templateId: Integer; var json: WideString) : integer; stdcall;
+  TCore_TemplateItemReadAll = function(includeRemoved: boolean; var json: WideString) : integer; stdcall;
   TCore_CaseCreate = function (jsonMainElement: WideString; caseUId: WideString; siteUId: integer;
        var resultCase: WideString): integer; stdcall;
   TCore_CaseCreate2 = function (jsonMainElement: WideString; caseUId: WideString; jsonSiteUIds: WideString;
@@ -72,6 +73,7 @@ type
     Core_TemplateUploadDataFunc: TCore_TemplateUploadData;
     Core_Advanced_SiteItemReadAllFunc: TCore_Advanced_SiteItemReadAll;
     Core_TemplateItemReadFunc: TCore_TemplateItemRead;
+    Core_TemplateItemReadAllFunc: TCore_TemplateItemReadAll;
     Core_CaseCreateFunc: TCore_CaseCreate;
     Core_CaseCreate2Func: TCore_CaseCreate2;
     Core_CaseReadFunc: TCore_CaseRead;
@@ -96,7 +98,7 @@ type
     procedure Core_Start(serverConnectionString: string; var startResult: boolean);
     procedure Core_StartSqlOnly(serverConnectionString: string; var startResult: boolean);
     procedure Core_HandleCaseCreated(callback: LongInt);
-   procedure Core_HandleCaseCompleted(callback: LongInt);
+    procedure Core_HandleCaseCompleted(callback: LongInt);
     procedure Core_HandleCaseDeleted(callback: LongInt);
     procedure Core_HandleCaseRetrived(callback: LongInt);
     procedure Core_HandleEventException(callback: LongInt);
@@ -114,6 +116,7 @@ type
          var jsonMainElementOut: WideString) : integer;
     function Core_Advanced_SiteItemReadAll(var json: WideString): integer;
     function Core_TemplateItemRead(templateId: Integer; var json: WideString) : integer;
+    function Core_TemplateItemReadAll(includeRemoved: boolean; var json: WideString) : integer;
     function Core_CaseCreate(jsonMainElement: WideString; caseUId: WideString; siteUId: integer;
        var resultCase: WideString): integer; overload;
     function Core_CaseCreate(jsonMainElement: WideString; caseUId: WideString; jsonSiteUIds: WideString;
@@ -246,6 +249,10 @@ begin
    @Core_TemplateItemReadFunc := GetProcAddress(handle, 'Core_TemplateItemRead') ;
    if not Assigned (Core_TemplateItemReadFunc) then
      raise Exception.Create('function Core_TemplateItemRead not found');
+
+   @Core_TemplateItemReadAllFunc := GetProcAddress(handle, 'Core_TemplateItemReadAll') ;
+   if not Assigned (Core_TemplateItemReadAllFunc) then
+     raise Exception.Create('function Core_TemplateItemReadAll not found');
 
    @Core_CaseCreateFunc := GetProcAddress(handle, 'Core_CaseCreate') ;
    if not Assigned (Core_CaseCreateFunc) then
@@ -558,6 +565,20 @@ begin
   result := res;
 end;
 
+
+function TDllHelper.Core_TemplateItemReadAll(includeRemoved: boolean; var json: WideString) : integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_TemplateItemReadAllFunc(includeRemoved, json);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
+end;
 
 function TDllHelper.Core_CaseCreate(jsonMainElement: WideString; caseUId: WideString;
      siteUId: integer; var resultCase: WideString) : integer;

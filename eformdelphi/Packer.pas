@@ -55,6 +55,7 @@ type
       function UnpackSiteNameDto(obj: TJSONValue): TSiteName_Dto;
       function UnpackFieldDto(obj: TJSONValue): TField_Dto;
       function UnpackSiteNameDtoList(arr: TJSONArray): TObjectList<TSiteName_Dto>; overload;
+      function UnpackTemplateDtoList(arr: TJSONArray): TObjectList<TTemplate_Dto>; overload;
       function UnpackUploadedData(obj: TJSONObject): TUploadedData;
   public
       function Pack(mainElement: TMainElement): string; overload;
@@ -63,6 +64,7 @@ type
       function UnpackReplyElement(json: string): TReplyElement;
       function UnpackStringList(jsonList: string): TStringList;
       function UnpackSiteNameDtoList(json: string): TObjectList<TSiteName_Dto>; overload;
+      function UnpackTemplateDtoList(json: string): TObjectList<TTemplate_Dto>; overload;
       function UnpackTemplateDto(json: string): TTemplate_Dto;
       function UnpackCaseDto(json: string): TCase_Dto;
       function UnpackFileDto(json: string): TFile_Dto;
@@ -1100,6 +1102,30 @@ begin
     result.Add(siteNameDto);
   end;
 end;
+
+function TPacker.UnpackTemplateDtoList(json: string): TObjectList<TTemplate_Dto>;
+var
+  arr: TJSONArray;
+begin
+  result := TObjectList<TTemplate_Dto>.Create;
+  arr := TJSONObject.ParseJSONValue(json) as TJSONArray;
+  result := UnpackTemplateDtoList(arr)
+end;
+
+
+function TPacker.UnpackTemplateDtoList(arr: TJSONArray): TObjectList<TTemplate_Dto>;
+var
+  i: integer;
+  templateDto: TTemplate_Dto;
+begin
+  result := TObjectList<TTemplate_Dto>.Create;
+  for i := 0 to arr.Count-1 do
+  begin
+    templateDto := UnpackTemplateDto(arr.Items[i].ToString);
+    result.Add(templateDto);
+  end;
+end;
+
 
 function TPacker.UnpackSiteNameDto(obj: TJSONValue): TSiteName_Dto;
 var

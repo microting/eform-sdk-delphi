@@ -40,6 +40,7 @@ type
     function TemplateUploadData(mainElement: TMainElement): TMainElement;
     function Advanced_SiteItemReadAll: TObjectList<TSiteName_Dto>;
     function TemplateItemRead(templateId: integer): TTemplate_Dto;
+    function TemplateItemReadAll(includeRemoved: boolean): TObjectList<TTemplate_Dto>;
     function CaseCreate(mainElement: TMainElement; caseUId: string; siteUId: integer): string; overload;
     function CaseCreate(mainElement: TMainElement; caseUId: string; siteUIds: TList<integer>;
         custom: string): TStringList; overload;
@@ -351,6 +352,17 @@ begin
   packer := TPacker.Create;
   TDllHelper.GetInstance.Core_TemplateItemRead(templateId, json);
   result :=  packer.UnpackTemplateDto(json);
+end;
+
+
+function TCore.TemplateItemReadAll(includeRemoved: boolean):  TObjectList<TTemplate_Dto>;
+var
+  json: WideString;
+  packer: TPacker;
+begin
+  packer := TPacker.Create;
+  TDllHelper.GetInstance.Core_TemplateItemReadAll(includeRemoved, json);
+  result :=  packer.UnpackTemplateDtoList(json);
 end;
 
 
