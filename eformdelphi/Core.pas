@@ -30,7 +30,8 @@ type
 
   public
     constructor Create;
-    procedure Start(serverConnectionString: string);
+    function Start(serverConnectionString: string): boolean;
+    function StartSqlOnly(serverConnectionString: string): boolean;
     function TemplatFromXml(xml: string): TMainElement;
     function TemplateCreate(mainElement: TMainElement): integer;
     function TemplateRead(templateId: integer): TMainElement;
@@ -80,9 +81,20 @@ begin
   gCore := self;
 end;
 
-procedure TCore.Start(serverConnectionString: string);
+function TCore.Start(serverConnectionString: string): boolean;
+var
+  startResult: boolean;
 begin
-  TDllHelper.GetInstance.Core_Start(serverConnectionString);
+  TDllHelper.GetInstance.Core_Start(serverConnectionString, startResult);
+  Result := startResult;
+end;
+
+function TCore.StartSqlOnly(serverConnectionString: string): boolean;
+var
+  startResult: boolean;
+begin
+  TDllHelper.GetInstance.Core_StartSqlOnly(serverConnectionString, startResult);
+  Result := startResult;
 end;
 
 procedure TCore.OnCaseCreatedInternal(jsonCaseDto: WideString);

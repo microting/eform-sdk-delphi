@@ -7,7 +7,8 @@ uses
 
 type
   TCore_CreateFunc = function: integer; stdcall;
-  TCore_StartFunc = function(serverConnectionString: WideString): integer; stdcall;
+  TCore_StartFunc = function(serverConnectionString: WideString; var startResult: boolean): integer; stdcall;
+  TCore_StartSqlOnlyFunc = function(serverConnectionString: WideString; var startResult: boolean): integer; stdcall;
   TCore_HandleCaseCreated = function(callback: LongInt): integer; stdcall;
   TCore_HandleCaseCompleted = function(callback: LongInt): integer; stdcall;
   TCore_HandleCaseDeleted = function(callback: LongInt): integer; stdcall;
@@ -37,6 +38,7 @@ type
 
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
+  TAdminTools_CreateSqlOnlyFunc = function(serverConnectionString: WideString): integer; stdcall;
   TAdminTools_DbSetupFunc = function(token: WideString; var reply: WideString): integer; stdcall;
   TAdminTools_DbSetupCompletedFunc = function(var reply: WideString): integer; stdcall;
   TAdminTools_DbSettingsReloadRemoteFunc = function(var reply: WideString): integer; stdcall;
@@ -53,6 +55,7 @@ type
 
     Core_CreateFunc: TCore_CreateFunc;
     Core_StartFunc: TCore_StartFunc;
+    Core_StartSqlOnlyFunc: TCore_StartSqlOnlyFunc;
     Core_HandleCaseCreatedFunc: TCore_HandleCaseCreated;
     Core_HandleCaseCompletedFunc: TCore_HandleCaseCompleted;
     Core_HandleCaseDeletedFunc: TCore_HandleCaseDeleted;
@@ -90,9 +93,10 @@ type
     destructor Destroy; override;
     class function GetInstance: TDllHelper;
     procedure Core_Create;
-    procedure Core_Start(serverConnectionString: string);
+    procedure Core_Start(serverConnectionString: string; var startResult: boolean);
+    procedure Core_StartSqlOnly(serverConnectionString: string; var startResult: boolean);
     procedure Core_HandleCaseCreated(callback: LongInt);
-    procedure Core_HandleCaseCompleted(callback: LongInt);
+   procedure Core_HandleCaseCompleted(callback: LongInt);
     procedure Core_HandleCaseDeleted(callback: LongInt);
     procedure Core_HandleCaseRetrived(callback: LongInt);
     procedure Core_HandleEventException(callback: LongInt);
@@ -174,6 +178,10 @@ begin
    @Core_StartFunc := GetProcAddress(handle, 'Core_Start') ;
    if not Assigned (Core_StartFunc) then
      raise Exception.Create('function Core_Start not found');
+
+   @Core_StartSqlOnlyFunc := GetProcAddress(handle, 'Core_StartSqlOnly') ;
+   if not Assigned (Core_StartFunc) then
+     raise Exception.Create('function Core_StartSqlOnly not found');
 
    @Core_HandleCaseCreatedFunc := GetProcAddress(handle, 'Core_HandleCaseCreated') ;
    if not Assigned (Core_HandleCaseCreatedFunc) then
@@ -294,18 +302,32 @@ begin
   end;
 end;
 
-procedure TDllHelper.Core_Start(serverConnectionString: string);
+procedure TDllHelper.Core_Start(serverConnectionString: string; var startResult: boolean);
 var
   res: integer;
   err: WideString;
 begin
-  res := Core_StartFunc(serverConnectionString);
+  res := Core_StartFunc(serverConnectionString, startResult);
   if res <> 0 then
   begin
      err := LastErrorFunc;
      raise Exception.Create(err);
   end;
 end;
+
+procedure TDllHelper.Core_StartSqlOnly(serverConnectionString: string; var startResult: boolean);
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_StartSqlOnlyFunc(serverConnectionString, startResult);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+end;
+
 
 
 procedure TDllHelper.Core_HandleCaseCreated(callback: LongInt);
