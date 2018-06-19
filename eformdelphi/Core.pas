@@ -38,6 +38,7 @@ type
     function TemplateValidation(mainElement: TMainElement): TStringList;
     function TemplateDelete(templateId: integer): boolean;
     function TemplateUploadData(mainElement: TMainElement): TMainElement;
+    function Advanced_SiteItemRead: TSiteName_Dto;
     function Advanced_SiteItemReadAll: TObjectList<TSiteName_Dto>;
     function TemplateItemRead(templateId: integer): TTemplate_Dto;
     function TemplateItemReadAll(includeRemoved: boolean): TObjectList<TTemplate_Dto>;
@@ -333,6 +334,16 @@ begin
   result := packer.UnpackMainElement(jsonMainElementOut);
 end;
 
+
+function TCore.Advanced_SiteItemRead: TSiteName_Dto;
+var
+  json: WideString;
+  packer: TPacker;
+begin
+  packer := TPacker.Create;
+  TDllHelper.GetInstance.Core_Advanced_SiteItemRead(json);
+  result := packer.UnpackSiteNameDto(json);
+end;
 
 function TCore.Advanced_SiteItemReadAll: TObjectList<TSiteName_Dto>;
 var

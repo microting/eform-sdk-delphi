@@ -52,7 +52,7 @@ type
       function UnpackElementList(arr: TJSONArray): TObjectList<TElement>;
       function UnpackDataElement(obj: TJSONObject): TDataElement;
       function UnpackCheckListValue(obj: TJSONObject): TCheckListValue;
-      function UnpackSiteNameDto(obj: TJSONValue): TSiteName_Dto;
+      function UnpackSiteNameDto(obj: TJSONValue): TSiteName_Dto; overload;
       function UnpackFieldDto(obj: TJSONValue): TField_Dto;
       function UnpackSiteNameDtoList(arr: TJSONArray): TObjectList<TSiteName_Dto>; overload;
       function UnpackTemplateDtoList(arr: TJSONArray): TObjectList<TTemplate_Dto>; overload;
@@ -64,6 +64,7 @@ type
       function UnpackReplyElement(json: string): TReplyElement;
       function UnpackStringList(jsonList: string): TStringList;
       function UnpackSiteNameDtoList(json: string): TObjectList<TSiteName_Dto>; overload;
+      function UnpackSiteNameDto(json: string): TSiteName_Dto; overload;
       function UnpackTemplateDtoList(json: string): TObjectList<TTemplate_Dto>; overload;
       function UnpackTemplateDto(json: string): TTemplate_Dto;
       function UnpackCaseDto(json: string): TCase_Dto;
@@ -1126,6 +1127,14 @@ begin
   end;
 end;
 
+
+function TPacker.UnpackSiteNameDto(json: string): TSiteName_Dto;
+var
+  obj: TJSONValue;
+begin
+  obj := TJSONObject.ParseJSONValue(json);
+  result := UnpackSiteNameDto(obj);
+end;
 
 function TPacker.UnpackSiteNameDto(obj: TJSONValue): TSiteName_Dto;
 var
