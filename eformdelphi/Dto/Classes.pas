@@ -117,6 +117,7 @@ type
       Field9: TField_Dto;
       Field10: TField_Dto;
       Tags: TObjectList<TKeyValuePair>;
+      MicrotingUId: string;
 
       constructor Create; overload;
       constructor Create(id: integer; createdAt: TDateTime; updatedAt: TDateTime; _label: string;

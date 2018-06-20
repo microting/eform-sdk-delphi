@@ -38,7 +38,10 @@ type
        var jsonReplyElement: WideString): integer; stdcall;
   TCore_CaseDelete = function (microtingUId: WideString; var deleteResult: boolean): integer; stdcall;
   TCore_CaseDelete2 = function (templateId: integer; siteUId: integer; var deleteResult: boolean): integer; stdcall;
-
+  TCore_Advanced_TemplateDisplayIndexChangeDb = function(templateId: integer; displayIndex: integer;
+      var changeResult: boolean): integer; stdcall;
+  TCore_Advanced_TemplateDisplayIndexChangeServer = function(templateId: integer; siteUId: integer;
+       displayIndex: integer; var changeResult: boolean): integer; stdcall;
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
   TAdminTools_CreateSqlOnlyFunc = function(serverConnectionString: WideString): integer; stdcall;
@@ -82,6 +85,8 @@ type
     Core_CaseReadFunc: TCore_CaseRead;
     Core_CaseDeleteFunc: TCore_CaseDelete;
     Core_CaseDelete2Func: TCore_CaseDelete2;
+    Core_Advanced_TemplateDisplayIndexChangeDbFunc: TCore_Advanced_TemplateDisplayIndexChangeDb;
+    Core_Advanced_TemplateDisplayIndexChangeServerFunc: TCore_Advanced_TemplateDisplayIndexChangeServer;
 
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
@@ -129,6 +134,11 @@ type
     function Core_CaseRead(microtingUId: WideString; checkUId: WideString; var jsonReplyElement: WideString): integer;
     function Core_CaseDelete(microtingUId: WideString; var deleteResult: boolean): integer;  overload;
     function Core_CaseDelete(templateId: integer; siteUId: integer; var deleteResult: boolean): integer; overload;
+    function Core_Advanced_TemplateDisplayIndexChangeDb(templateId: integer; displayIndex: integer;
+      var changeResult: boolean): integer;
+    function Core_Advanced_TemplateDisplayIndexChangeServer(templateId: integer; siteUId: integer;
+       displayIndex: integer; var changeResult: boolean): integer;
+
 
     procedure AdminTools_Create(serverConnectionString: string);
     function AdminTools_DbSetup(token: string): string;
@@ -278,6 +288,14 @@ begin
    @Core_CaseDeleteFunc := GetProcAddress(handle, 'Core_CaseDelete') ;
    if not Assigned (Core_CaseDeleteFunc) then
      raise Exception.Create('function Core_CaseDelete not found');
+
+   @Core_Advanced_TemplateDisplayIndexChangeDbFunc := GetProcAddress(handle, 'Core_Advanced_TemplateDisplayIndexChangeDb') ;
+   if not Assigned (Core_Advanced_TemplateDisplayIndexChangeDbFunc) then
+     raise Exception.Create('function Core_Advanced_TemplateDisplayIndexChangeDb not found');
+
+   @Core_Advanced_TemplateDisplayIndexChangeServerFunc := GetProcAddress(handle, 'Core_Advanced_TemplateDisplayIndexChangeServer') ;
+   if not Assigned (Core_Advanced_TemplateDisplayIndexChangeServerFunc) then
+     raise Exception.Create('function Core_Advanced_TemplateDisplayIndexChangeServer not found');
 
    @Core_CaseDelete2Func := GetProcAddress(handle, 'Core_CaseDelete2') ;
    if not Assigned (Core_CaseDelete2Func) then
@@ -680,6 +698,39 @@ begin
   end;
   result := res;
 end;
+
+function TDllHelper.Core_Advanced_TemplateDisplayIndexChangeDb(templateId: integer; displayIndex: integer;
+      var changeResult: boolean): integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_Advanced_TemplateDisplayIndexChangeDbFunc(templateId, displayIndex, changeResult);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
+end;
+
+function TDllHelper.Core_Advanced_TemplateDisplayIndexChangeServer(templateId: integer; siteUId: integer;
+       displayIndex: integer; var changeResult: boolean): integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_Advanced_TemplateDisplayIndexChangeServerFunc(templateId, siteUId, displayIndex,
+     changeResult);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
+
+end;
+
 
 procedure TDllHelper.AdminTools_Create(serverConnectionString: string);
 var

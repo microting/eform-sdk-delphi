@@ -48,6 +48,9 @@ type
     function CaseRead(microtingUId: string; checkUId: string): TReplyElement;
     function CaseDelete(microtingUId: string): boolean; overload;
     function CaseDelete(templateId: integer; siteUId: integer): boolean; overload;
+    function Advanced_TemplateDisplayIndexChangeDb(templateId: integer; displayIndex: integer): boolean;
+    function Advanced_TemplateDisplayIndexChangeServer(templateId: integer; siteUId: integer;
+       displayIndex: integer): boolean;
 
     procedure OnCaseCreatedInternal(jsonCaseDto: WideString);
     procedure OnCaseCompletedInternal(jsonCaseDto: WideString);
@@ -431,6 +434,26 @@ begin
   TDllHelper.GetInstance.Core_CaseDelete(templateId, siteUId, deleteResult);
   result := deleteResult;
 end;
+
+
+function TCore.Advanced_TemplateDisplayIndexChangeDb(templateId: integer; displayIndex: integer): boolean;
+var
+  changeResult: boolean;
+begin
+  TDllHelper.GetInstance.Core_Advanced_TemplateDisplayIndexChangeDb(templateId, displayIndex, changeResult);
+  result := changeResult;
+end;
+
+function TCore.Advanced_TemplateDisplayIndexChangeServer(templateId: integer; siteUId: integer;
+       displayIndex: integer): boolean;
+var
+  changeResult: boolean;
+begin
+  TDllHelper.GetInstance.Core_Advanced_TemplateDisplayIndexChangeServer(templateId, siteUId,
+    displayIndex, changeResult);
+  result := changeResult;
+end;
+
 
 {$endregion}
 
