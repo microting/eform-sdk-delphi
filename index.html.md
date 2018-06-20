@@ -245,7 +245,6 @@ var
   newTemplate: TMainElement;
   templateXmlString: String;
 begin
-
   core := GetCore;
 
   templateXmlString := 'some_template_xml_string';
@@ -286,8 +285,8 @@ function ListTemplates: TObjectList<TTemplate_Dto>;
 var
   core: TCore;
 begin
-
   core := GetCore;
+  
   result := core.TemplateItemReadAll(false);
 end;
 ```
@@ -316,6 +315,7 @@ var
   core: TCore;
 begin
   core := GetCore;
+  
   if (core.TemplateDelete(id)) then
     result := true
   else
@@ -361,7 +361,6 @@ var
   site: TSiteName_Dto;
   siteIds: TList<Integer>;
 begin
-
   core := GetCore;
 
   mainElement := core.TemplateRead(templateId);
@@ -401,7 +400,26 @@ public List<string> DeployTo(int templateId, List<int> sitesToBeDeployedTo)
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, System.Classes, System.DateUtils,
+  Generics.Collections, Core, MainElement;
+
+function DeployTo(templateId: Integer; sitesToBeDeployedTo: TList<Integer>): TStringList;
+var
+  core: TCore;
+  mainElement: TMainElement;
+  siteIds: TList<Integer>;
+begin
+  core := GetCore;
+
+  mainElement := core.TemplateRead(templateId);
+  mainElement.Repeated := 0;
+  // We set this right now hardcoded,
+  // this will let the eForm be deployed until end date or we actively retract it.
+  mainElement.StartDate := Date;
+  mainElement.EndDate := IncYear(Date, 10);
+
+  result := core.CaseCreate(mainElement, '', sitesToBeDeployedTo, '');
+end;
 ```
 
 > `sitesToBeDeployedTo` should contain the SiteUId for the sites to deploy to.
@@ -424,7 +442,20 @@ public void DeployTo(int templateId, List<int> sitesToBeRetractedFrom)
 ```     
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, System.Classes, Generics.Collections, Core;
+
+procedure DeployTo(templateId: integer; sitesToBeRetractedFrom: TList<integer>);
+var
+  core: TCore;
+  siteUID: integer;
+begin
+  core := GetCore;
+  
+  for siteUID in sitesToBeRetractedFrom do
+  begin
+     core.CaseDelete(templateId, siteUId);
+  end;
+end;
 ```
                                           
 > `sitesToBeRetractedFrom` should contain the SiteUId for the sites to retract from.
@@ -445,7 +476,20 @@ public List<SiteName_Dto> ListDeployedSites(int templateId)
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, System.Classes, Generics.Collections,
+  Core, Classes;
+
+function ListDeployedSites(templateId: integer) : TObjectList<TSiteName_Dto>;
+var
+  core: TCore;
+  templateDto: TTemplate_Dto;
+begin
+  core := GetCore;
+
+  templateDto := core.TemplateItemRead(templateId);
+
+  result := templateDto.DeployedSites;
+end;
 ```
 
 ## Setting display index after deployment
@@ -472,7 +516,24 @@ public void SetDisplayIndexForTemplate(int templateId, int displayIndex)
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, System.Classes, Generics.Collections,
+  Core, Classes;
+
+procedure SetDisplayIndexForTemplate(templateId: integer; displayIndex: integer);
+var
+  core: TCore;
+  templateDto: TTemplate_Dto;
+  site: TSiteName_Dto;
+begin
+  core := GetCore;
+
+  templateDto := core.TemplateItemRead(templateId);
+  if (core.Advanced_TemplateDisplayIndexChangeDb(templateId, displayIndex)) then
+  begin
+      for site in templateDto.DeployedSites do
+        core.Advanced_TemplateDisplayIndexChangeServer(templateId, site.SiteUId, displayIndex);
+  end;
+end;
 ```
 
 # Using results
