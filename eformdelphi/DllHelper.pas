@@ -37,6 +37,7 @@ type
   TCore_CaseRead = function(microtingUId: WideString; checkUId: WideString;
        var jsonReplyElement: WideString): integer; stdcall;
   TCore_CaseDelete = function (microtingUId: WideString; var deleteResult: boolean): integer; stdcall;
+  TCore_CaseDelete2 = function (templateId: integer; siteUId: integer; var deleteResult: boolean): integer; stdcall;
 
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
@@ -80,6 +81,7 @@ type
     Core_CaseCreate2Func: TCore_CaseCreate2;
     Core_CaseReadFunc: TCore_CaseRead;
     Core_CaseDeleteFunc: TCore_CaseDelete;
+    Core_CaseDelete2Func: TCore_CaseDelete2;
 
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
@@ -125,8 +127,8 @@ type
     function Core_CaseCreate(jsonMainElement: WideString; caseUId: WideString; jsonSiteUIds: WideString;
        custom: WideString; var jsonResultCases: WideString): integer; overload;
     function Core_CaseRead(microtingUId: WideString; checkUId: WideString; var jsonReplyElement: WideString): integer;
-    function Core_CaseDelete(microtingUId: WideString; var deleteResult: boolean): integer;
-
+    function Core_CaseDelete(microtingUId: WideString; var deleteResult: boolean): integer;  overload;
+    function Core_CaseDelete(templateId: integer; siteUId: integer; var deleteResult: boolean): integer; overload;
 
     procedure AdminTools_Create(serverConnectionString: string);
     function AdminTools_DbSetup(token: string): string;
@@ -277,6 +279,9 @@ begin
    if not Assigned (Core_CaseDeleteFunc) then
      raise Exception.Create('function Core_CaseDelete not found');
 
+   @Core_CaseDelete2Func := GetProcAddress(handle, 'Core_CaseDelete2') ;
+   if not Assigned (Core_CaseDelete2Func) then
+     raise Exception.Create('function Core_CaseDelete2 not found');
 
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
@@ -654,6 +659,20 @@ var
   err: WideString;
 begin
   res := Core_CaseDeleteFunc(microtingUId, deleteResult);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
+end;
+
+function TDllHelper.Core_CaseDelete(templateId: integer; siteUId: integer; var deleteResult: boolean): integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_CaseDelete2Func(templateId, siteUId, deleteResult);
   if res <> 0 then
   begin
      err := LastErrorFunc;

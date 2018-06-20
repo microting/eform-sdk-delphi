@@ -45,8 +45,9 @@ type
     function CaseCreate(mainElement: TMainElement; caseUId: string; siteUId: integer): string; overload;
     function CaseCreate(mainElement: TMainElement; caseUId: string; siteUIds: TList<integer>;
         custom: string): TStringList; overload;
-    function  CaseRead(microtingUId: string; checkUId: string): TReplyElement;
-    function  CaseDelete(microtingUId: string): boolean;
+    function CaseRead(microtingUId: string; checkUId: string): TReplyElement;
+    function CaseDelete(microtingUId: string): boolean; overload;
+    function CaseDelete(templateId: integer; siteUId: integer): boolean; overload;
 
     procedure OnCaseCreatedInternal(jsonCaseDto: WideString);
     procedure OnCaseCompletedInternal(jsonCaseDto: WideString);
@@ -415,11 +416,19 @@ begin
   result := packer.UnpackReplyElement(jsonReplyElement);
 end;
 
-function  TCore.CaseDelete(microtingUId: string ): boolean;
+function  TCore.CaseDelete(microtingUId: string): boolean;
 var
   deleteResult: boolean;
 begin
   TDllHelper.GetInstance.Core_CaseDelete(microtingUId, deleteResult);
+  result := deleteResult;
+end;
+
+function  TCore.CaseDelete(templateId: integer; siteUId: integer): boolean;
+var
+  deleteResult: boolean;
+begin
+  TDllHelper.GetInstance.Core_CaseDelete(templateId, siteUId, deleteResult);
   result := deleteResult;
 end;
 
