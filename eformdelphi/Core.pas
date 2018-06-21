@@ -46,6 +46,7 @@ type
     function CaseCreate(mainElement: TMainElement; caseUId: string; siteUIds: TList<integer>;
         custom: string): TStringList; overload;
     function CaseRead(microtingUId: string; checkUId: string): TReplyElement;
+    function CaseReadAll(templateId: integer; start: TDateTime; _end: TDateTime): TObjectList<TCase>;
     function CaseDelete(microtingUId: string): boolean; overload;
     function CaseDelete(templateId: integer; siteUId: integer): boolean; overload;
     function Advanced_TemplateDisplayIndexChangeDb(templateId: integer; displayIndex: integer): boolean;
@@ -417,6 +418,17 @@ begin
   packer := TPacker.Create;
   TDllHelper.GetInstance.Core_CaseRead(microtingUId, checkUId, jsonReplyElement);
   result := packer.UnpackReplyElement(jsonReplyElement);
+end;
+
+function TCore.CaseReadAll(templateId: integer; start: TDateTime; _end: TDateTime): TObjectList<TCase>;
+var
+  jsonCases: WideString;
+  packer: TPacker;
+begin
+  packer := TPacker.Create;
+  TDllHelper.GetInstance.Core_CaseReadAll(templateId, FormatDateTime('yyyy-MM-dd', start), FormatDateTime('yyyy-MM-dd', _end),
+     jsonCases);
+  result := packer.UnpackCasesList(jsonCases);
 end;
 
 function  TCore.CaseDelete(microtingUId: string): boolean;

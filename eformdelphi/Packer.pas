@@ -57,6 +57,8 @@ type
       function UnpackSiteNameDtoList(arr: TJSONArray): TObjectList<TSiteName_Dto>; overload;
       function UnpackTemplateDtoList(arr: TJSONArray): TObjectList<TTemplate_Dto>; overload;
       function UnpackUploadedData(obj: TJSONObject): TUploadedData;
+      function UnpackCase(obj: TJSONObject): TCase;
+
   public
       function Pack(mainElement: TMainElement): string; overload;
       function PackIntegerList(list: TList<integer>): string;
@@ -70,6 +72,7 @@ type
       function UnpackCaseDto(json: string): TCase_Dto;
       function UnpackFileDto(json: string): TFile_Dto;
       function UnpackNoteDto(json: string): TNote_Dto;
+      function UnpackCasesList(json: string): TObjectList<TCase>;
   end;
 
 implementation
@@ -478,6 +481,8 @@ begin
      arr.Add(IntToStr(val));
   result := arr.ToString();
 end;
+
+
 
 {$endregion}
 
@@ -1260,6 +1265,52 @@ begin
   );
   result := templateDto;
 end;
+
+function TPacker.UnpackCasesList(json: string): TObjectList<TCase>;
+var
+  arr: TJSONArray;
+  i: integer;
+begin
+  result := TObjectList<TCase>.Create;
+  arr := TJSONObject.ParseJSONValue(json) as TJSONArray;
+  for i := 0 to arr.Count-1 do
+    result.Add(UnpackCase(arr.Items[i] as TJSONObject));
+end;
+
+function TPacker.UnpackCase(obj: TJSONObject): TCase;
+var
+  _case: TCase;
+begin
+  _case := TCase.Create;
+  _case.Id := obj.GetValue<integer>('Id');
+  _case.WorkflowState := obj.GetValue<string>('WorkflowState');
+  _case.Version := obj.GetValue<integer>('Version');
+  _case.Status := obj.GetValue<integer>('Status');
+  _case.CreatedAt := obj.GetValue<TDateTime>('CreatedAt');
+  _case.UpdatedAt := obj.GetValue<TDateTime>('UpdatedAt');
+  _case.DoneAt := obj.GetValue<TDateTime>('DoneAt');
+  _case.SiteName := obj.GetValue<string>('SiteName');
+  _case.UnitId := obj.GetValue<integer>('UnitId');
+  _case.WorkerName := obj.GetValue<string>('WorkerName');
+  _case.TemplatId := obj.GetValue<integer>('TemplatId');
+  _case.CaseType := obj.GetValue<string>('CaseType');
+  _case.MicrotingUId := obj.GetValue<string>('MicrotingUId');
+  //_case.CheckUIid := obj.GetValue<string>('CheckUIid');
+  _case.CaseUId := obj.GetValue<string>('CaseUId');
+  _case.FieldValue1 := obj.GetValue<string>('FieldValue1');
+  _case.FieldValue2 := obj.GetValue<string>('FieldValue2');
+  _case.FieldValue3 := obj.GetValue<string>('FieldValue3');
+  _case.FieldValue4 := obj.GetValue<string>('FieldValue4');
+  _case.FieldValue5 := obj.GetValue<string>('FieldValue5');
+  _case.FieldValue6 := obj.GetValue<string>('FieldValue6');
+  _case.FieldValue7 := obj.GetValue<string>('FieldValue7');
+  _case.FieldValue8 := obj.GetValue<string>('FieldValue8');
+  _case.FieldValue9 := obj.GetValue<string>('FieldValue9');
+  _case.FieldValue10 := obj.GetValue<string>('FieldValue10');
+
+  result := _case;
+end;
+
 {$endregion}
 
 end.
