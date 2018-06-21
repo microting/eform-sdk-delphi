@@ -52,6 +52,8 @@ type
     function Advanced_TemplateDisplayIndexChangeDb(templateId: integer; displayIndex: integer): boolean;
     function Advanced_TemplateDisplayIndexChangeServer(templateId: integer; siteUId: integer;
        displayIndex: integer): boolean;
+    function CasesToCsv(templateId: integer; start: TDateTime; _end: TDateTime; pathAndName: string;
+      customPathForUploadedData: string): string;
 
     procedure OnCaseCreatedInternal(jsonCaseDto: WideString);
     procedure OnCaseCompletedInternal(jsonCaseDto: WideString);
@@ -464,6 +466,16 @@ begin
   TDllHelper.GetInstance.Core_Advanced_TemplateDisplayIndexChangeServer(templateId, siteUId,
     displayIndex, changeResult);
   result := changeResult;
+end;
+
+function TCore.CasesToCsv(templateId: integer; start: TDateTime; _end: TDateTime; pathAndName: string;
+      customPathForUploadedData: string): string;
+var
+  csvResult: WideString;
+begin
+  TDllHelper.GetInstance.Core_CasesToCsv(templateId, FormatDateTime('yyyy-MM-dd', start),
+      FormatDateTime('yyyy-MM-dd', _end), pathAndName,  customPathForUploadedData, csvResult);
+  result := csvResult;
 end;
 
 

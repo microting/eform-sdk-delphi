@@ -554,7 +554,22 @@ public List<Case> ListCasesForTemplate(int templateId)
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, System.Classes, Generics.Collections,
+  Core, Classes, DateUtils;
+
+function ListCasesForTemplate(templateId: integer) : TObjectList<TCase>;
+var
+  core: TCore;
+  startDate: TDateTime;
+  endDate: TDateTime;
+begin
+  core := GetCore;
+
+  startDate := IncYear(Date, -10);
+  endDate := IncYear(Date, 10);
+
+  result := core.CaseReadAll(templateId, startDate, endDate);
+end;
 ```
 
 ## Getting cases pr template as csv
@@ -579,7 +594,33 @@ public String Csv(int templateId)
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, System.Classes, Generics.Collections,
+  Core, Classes, DateUtils;
+
+function Csv(templateId: integer): string;
+var
+  core: TCore;
+  file_path: string;
+  image_path: string;
+
+  startDate: TDateTime;
+  endDate: TDateTime;
+begin
+
+  core := GetCore;
+
+  startDate := IncYear(Date, -10);
+  endDate := IncYear(Date, 10);
+
+
+  file_path := 'output path with filename where csv will be saved to';
+  image_path := 'location where pictures/signatures are stored';
+
+  core.CasesToCsv(templateId, startDate, endDate, file_path, image_path);
+
+  result := file_path;
+end;
+.
 ```
  
 ## Getting a single case

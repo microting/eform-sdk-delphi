@@ -44,6 +44,10 @@ type
       var changeResult: boolean): integer; stdcall;
   TCore_Advanced_TemplateDisplayIndexChangeServer = function(templateId: integer; siteUId: integer;
        displayIndex: integer; var changeResult: boolean): integer; stdcall;
+  TCore_CasesToCsv = function(templateId: integer; start: WideString; _end: WideString;
+       pathAndName: WideString; customPathForUploadedData: WideString;
+       var csvResult: WideString): integer; stdcall;
+
 
   TAdminTools_CreateFunc = function(serverConnectionString: WideString): integer; stdcall;
   TAdminTools_CreateSqlOnlyFunc = function(serverConnectionString: WideString): integer; stdcall;
@@ -90,6 +94,7 @@ type
     Core_CaseDelete2Func: TCore_CaseDelete2;
     Core_Advanced_TemplateDisplayIndexChangeDbFunc: TCore_Advanced_TemplateDisplayIndexChangeDb;
     Core_Advanced_TemplateDisplayIndexChangeServerFunc: TCore_Advanced_TemplateDisplayIndexChangeServer;
+    Core_CasesToCsvFunc: TCore_CasesToCsv;
 
 
     AdminTools_CreateFunc: TAdminTools_CreateFunc;
@@ -143,6 +148,9 @@ type
       var changeResult: boolean): integer;
     function Core_Advanced_TemplateDisplayIndexChangeServer(templateId: integer; siteUId: integer;
        displayIndex: integer; var changeResult: boolean): integer;
+    function Core_CasesToCsv(templateId: integer; start: WideString; _end: WideString;
+       pathAndName: WideString; customPathForUploadedData: WideString; var csvResult: WideString): integer;
+
 
 
     procedure AdminTools_Create(serverConnectionString: string);
@@ -309,6 +317,10 @@ begin
    @Core_CaseDelete2Func := GetProcAddress(handle, 'Core_CaseDelete2') ;
    if not Assigned (Core_CaseDelete2Func) then
      raise Exception.Create('function Core_CaseDelete2 not found');
+
+   @Core_CasesToCsvFunc := GetProcAddress(handle, 'Core_CasesToCsv') ;
+   if not Assigned (Core_CasesToCsvFunc) then
+     raise Exception.Create('function Core_CasesToCsv not found');
 
    @AdminTools_CreateFunc := GetProcAddress(handle, 'AdminTools_Create') ;
    if not Assigned (AdminTools_CreateFunc) then
@@ -753,7 +765,21 @@ begin
      raise Exception.Create(err);
   end;
   result := res;
+end;
 
+function TDllHelper.Core_CasesToCsv(templateId: integer; start: WideString; _end: WideString;
+   pathAndName: WideString; customPathForUploadedData: WideString; var csvResult: WideString): integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_CasesToCsvFunc(templateId, start, _end, pathAndName, customPathForUploadedData, csvResult);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
 end;
 
 
@@ -830,6 +856,10 @@ begin
   end;
   Result := reply;
 end;
+
+
+
+
 {$endregion}
 
 
