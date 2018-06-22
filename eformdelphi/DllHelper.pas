@@ -38,6 +38,7 @@ type
        var jsonReplyElement: WideString): integer; stdcall;
   TCore_CaseReadAll = function(templateId: integer; start: WideString; _end: WideString;
       var jsonCases: WideString): integer; stdcall;
+  TCore_CaseReadByCaseId = function(caseId: integer;  var jsonCaseDto: WideString): integer; stdcall;
   TCore_CaseDelete = function (microtingUId: WideString; var deleteResult: boolean): integer; stdcall;
   TCore_CaseDelete2 = function (templateId: integer; siteUId: integer; var deleteResult: boolean): integer; stdcall;
   TCore_Advanced_TemplateDisplayIndexChangeDb = function(templateId: integer; displayIndex: integer;
@@ -90,6 +91,7 @@ type
     Core_CaseCreate2Func: TCore_CaseCreate2;
     Core_CaseReadFunc: TCore_CaseRead;
     Core_CaseReadAllFunc: TCore_CaseReadAll;
+    Core_CaseReadByCaseIdFunc: TCore_CaseReadByCaseId;
     Core_CaseDeleteFunc: TCore_CaseDelete;
     Core_CaseDelete2Func: TCore_CaseDelete2;
     Core_Advanced_TemplateDisplayIndexChangeDbFunc: TCore_Advanced_TemplateDisplayIndexChangeDb;
@@ -142,6 +144,7 @@ type
     function Core_CaseRead(microtingUId: WideString; checkUId: WideString; var jsonReplyElement: WideString): integer;
     function Core_CaseReadAll(templateId: integer; start: WideString; _end: WideString;
       var jsonCases: WideString): integer;
+    function Core_CaseReadByCaseId(caseId: integer;  var jsonCaseDto: WideString): integer;
     function Core_CaseDelete(microtingUId: WideString; var deleteResult: boolean): integer;  overload;
     function Core_CaseDelete(templateId: integer; siteUId: integer; var deleteResult: boolean): integer; overload;
     function Core_Advanced_TemplateDisplayIndexChangeDb(templateId: integer; displayIndex: integer;
@@ -301,6 +304,10 @@ begin
    @Core_CaseReadAllFunc := GetProcAddress(handle, 'Core_CaseReadAll') ;
    if not Assigned (Core_CaseReadAllFunc) then
      raise Exception.Create('function Core_CaseReadAll not found');
+
+   @Core_CaseReadByCaseIdFunc := GetProcAddress(handle, 'Core_CaseReadByCaseId') ;
+   if not Assigned (Core_CaseReadByCaseIdFunc) then
+     raise Exception.Create('function Core_CaseReadByCaseId not found');
 
    @Core_CaseDeleteFunc := GetProcAddress(handle, 'Core_CaseDelete') ;
    if not Assigned (Core_CaseDeleteFunc) then
@@ -707,6 +714,20 @@ begin
   result := res;
 end;
 
+
+function TDllHelper.Core_CaseReadByCaseId(caseId: integer;  var jsonCaseDto: WideString): integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_CaseReadByCaseIdFunc(caseId, jsonCaseDto);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
+end;
 
 function TDllHelper.Core_CaseDelete(microtingUId: WideString; var deleteResult: boolean): integer;
 var
