@@ -41,6 +41,8 @@ type
   TCore_CaseReadByCaseId = function(caseId: integer;  var jsonCaseDto: WideString): integer; stdcall;
   TCore_CaseDelete = function (microtingUId: WideString; var deleteResult: boolean): integer; stdcall;
   TCore_CaseDelete2 = function (templateId: integer; siteUId: integer; var deleteResult: boolean): integer; stdcall;
+  TCore_CaseUpdate = function(caseId: integer; jsonNewFieldValuePairLst: WideString;
+       jsonNewCheckListValuePairLst: WideString; var updateResult: boolean): integer; stdcall;
   TCore_Advanced_TemplateDisplayIndexChangeDb = function(templateId: integer; displayIndex: integer;
       var changeResult: boolean): integer; stdcall;
   TCore_Advanced_TemplateDisplayIndexChangeServer = function(templateId: integer; siteUId: integer;
@@ -94,6 +96,7 @@ type
     Core_CaseReadByCaseIdFunc: TCore_CaseReadByCaseId;
     Core_CaseDeleteFunc: TCore_CaseDelete;
     Core_CaseDelete2Func: TCore_CaseDelete2;
+    Core_CaseUpdateFunc: TCore_CaseUpdate;
     Core_Advanced_TemplateDisplayIndexChangeDbFunc: TCore_Advanced_TemplateDisplayIndexChangeDb;
     Core_Advanced_TemplateDisplayIndexChangeServerFunc: TCore_Advanced_TemplateDisplayIndexChangeServer;
     Core_CasesToCsvFunc: TCore_CasesToCsv;
@@ -147,6 +150,8 @@ type
     function Core_CaseReadByCaseId(caseId: integer;  var jsonCaseDto: WideString): integer;
     function Core_CaseDelete(microtingUId: WideString; var deleteResult: boolean): integer;  overload;
     function Core_CaseDelete(templateId: integer; siteUId: integer; var deleteResult: boolean): integer; overload;
+    function Core_CaseUpdate(caseId: integer; jsonNewFieldValuePairLst: WideString;
+       jsonNewCheckListValuePairLst: WideString; var updateResult: boolean): integer;
     function Core_Advanced_TemplateDisplayIndexChangeDb(templateId: integer; displayIndex: integer;
       var changeResult: boolean): integer;
     function Core_Advanced_TemplateDisplayIndexChangeServer(templateId: integer; siteUId: integer;
@@ -312,6 +317,10 @@ begin
    @Core_CaseDeleteFunc := GetProcAddress(handle, 'Core_CaseDelete') ;
    if not Assigned (Core_CaseDeleteFunc) then
      raise Exception.Create('function Core_CaseDelete not found');
+
+   @Core_CaseUpdateFunc := GetProcAddress(handle, 'Core_CaseUpdate') ;
+   if not Assigned (Core_CaseUpdateFunc) then
+     raise Exception.Create('function Core_CaseUpdate not found');
 
    @Core_Advanced_TemplateDisplayIndexChangeDbFunc := GetProcAddress(handle, 'Core_Advanced_TemplateDisplayIndexChangeDb') ;
    if not Assigned (Core_Advanced_TemplateDisplayIndexChangeDbFunc) then
@@ -749,6 +758,22 @@ var
   err: WideString;
 begin
   res := Core_CaseDelete2Func(templateId, siteUId, deleteResult);
+  if res <> 0 then
+  begin
+     err := LastErrorFunc;
+     raise Exception.Create(err);
+  end;
+  result := res;
+end;
+
+function TDllHelper.Core_CaseUpdate(caseId: integer; jsonNewFieldValuePairLst: WideString;
+       jsonNewCheckListValuePairLst: WideString; var updateResult: boolean): integer;
+var
+  res: integer;
+  err: WideString;
+begin
+  res := Core_CaseUpdateFunc(caseId, jsonNewFieldValuePairLst, jsonNewCheckListValuePairLst,
+    updateResult);
   if res <> 0 then
   begin
      err := LastErrorFunc;

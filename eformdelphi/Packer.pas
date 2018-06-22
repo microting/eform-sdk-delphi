@@ -62,6 +62,8 @@ type
   public
       function Pack(mainElement: TMainElement): string; overload;
       function PackIntegerList(list: TList<integer>): string;
+      function PackStringList(list: TStringList): string;
+
       function UnpackMainElement(json: string): TMainElement;
       function UnpackReplyElement(json: string): TReplyElement;
       function UnpackStringList(jsonList: string): TStringList;
@@ -482,6 +484,16 @@ begin
   result := arr.ToString();
 end;
 
+function TPacker.PackStringList(list: TStringList): string;
+var
+  arr: TJSONArray;
+  val: string;
+begin
+  arr := TJSONArray.Create;
+  for val in list do
+     arr.Add(val);
+  result := arr.ToString();
+end;
 
 
 {$endregion}

@@ -641,7 +641,22 @@ public ReplyElement Edit(int caseId)
 ```
 
 ```delphi
-Delphi code is comming here soon.
+uses System.SysUtils, Core, Classes, MainElement;
+
+function Edit(caseId: integer): TReplyElement;
+var
+  core: TCore;
+  caseDto: TCase_Dto;
+  microting_uuid: string;
+  microting_check_uid: string;
+begin
+  core := TCore.Create;
+
+  caseDto := core.CaseReadByCaseId(caseId);
+  microting_uuid := caseDto.MicrotingUId;
+  microting_check_uid := caseDto.CheckUId;
+  result := core.CaseRead(microting_uuid, microting_check_uid);
+end;
 ```
 
 ## Saving modified results for a case

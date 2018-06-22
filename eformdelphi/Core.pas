@@ -50,6 +50,8 @@ type
     function CaseReadByCaseId(caseId: integer): TCase_Dto;
     function CaseDelete(microtingUId: string): boolean; overload;
     function CaseDelete(templateId: integer; siteUId: integer): boolean; overload;
+    function CaseUpdate(caseId: integer; newFieldValuePairLst: TStringList;
+       newCheckListValuePairLst: TStringlist): boolean;
     function Advanced_TemplateDisplayIndexChangeDb(templateId: integer; displayIndex: integer): boolean;
     function Advanced_TemplateDisplayIndexChangeServer(templateId: integer; siteUId: integer;
        displayIndex: integer): boolean;
@@ -458,6 +460,23 @@ var
 begin
   TDllHelper.GetInstance.Core_CaseDelete(templateId, siteUId, deleteResult);
   result := deleteResult;
+end;
+
+function TCore.CaseUpdate(caseId: integer; newFieldValuePairLst: TStringList;
+       newCheckListValuePairLst: TStringlist): boolean;
+var
+  updateResult: boolean;
+  packer: TPacker;
+  jsonNewFieldValuePairLst: WideString;
+  jsonNewCheckListValuePairLst: WideString;
+
+begin
+  packer := TPacker.Create;
+  jsonNewFieldValuePairLst := packer.PackStringList(newFieldValuePairLst);
+  jsonNewCheckListValuePairLst := packer.PackStringList(newCheckListValuePairLst);
+  TDllHelper.GetInstance.Core_CaseUpdate(caseId, jsonNewFieldValuePairLst, jsonNewCheckListValuePairLst,
+    updateResult);
+  result := updateResult;
 end;
 
 
