@@ -29,7 +29,7 @@ You need to create an account for Microting API and get your access credentials.
 
 The MIT License (MIT)
 
-Copyright (c) 2007-2017 microting
+Copyright (c) 2007-2018 microting
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
